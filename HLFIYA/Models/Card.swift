@@ -13,12 +13,9 @@ struct Card: Identifiable {
     let imageName: String
     let age: Int
     let bio: String
-    /// Card x position
-    var x: CGFloat = 0.0
-    /// Card y position
-    var y: CGFloat = 0.0
-    /// Card rotation angle
-    var degree: Double = 0.0
+    var x: CGFloat = 0.0 // Card x position
+    var y: CGFloat = 0.0 // Card y position
+    var degree: Double = 0.0 // Card rotation angle
     
     static var data: [Card] {
         [
