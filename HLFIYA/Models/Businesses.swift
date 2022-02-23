@@ -7,13 +7,19 @@
 
 import UIKit
 
+struct Businesses: Codable {
+    let total: Int
+    let businesses: [Business]
+    let region: Region
+}
+
 struct Business: Identifiable, Codable {
     let id: String
     let rating: Double
     let price: String
     let phone: String
-    let display_phone: String
-    let alias: String
+    let display_phone: String?
+    let alias: String?
     let is_closed: Bool
     let categories: [Category]
     let review_count: Int
@@ -22,12 +28,16 @@ struct Business: Identifiable, Codable {
     let coordinates: Coordinates
     let image_url: String
     let location: Location
-    let distance: Double
-    let transactions: [String]
+    let distance: Double?
+    let transactions: [String]?
     
     var x: CGFloat = 0.0 // Card x position
     var y: CGFloat = 0.0 // Card y position
     var degree: Double = 0.0 // Card rotation angle
+    
+    enum CodingKeys: String, CodingKey {
+        case id, rating, price, phone, display_phone, alias, is_closed, categories, review_count, name, url, coordinates, image_url, location, distance, transactions
+    }
     
     static var data: [Business] {
         [
@@ -56,10 +66,21 @@ extension Business {
         let city: String
         let country: String
         let address2: String?
-        let address3: String
+        let address3: String?
         let state: String
         let address1: String
         let zip_code: String
-        let display_address: [String]
+        let display_address: [String]?
+    }
+}
+
+extension Businesses {
+    struct Region: Codable {
+        let center: Center
+    }
+    
+    struct Center: Codable {
+        let longitude: Double
+        let latitude: Double
     }
 }

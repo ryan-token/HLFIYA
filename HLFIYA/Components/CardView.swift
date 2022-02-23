@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct CardView: View {
-    @State var business: Business
+    @Binding var business: Business
     
     let cardGradient = Gradient(colors: [Color.black.opacity(0), Color.black.opacity(0.5)])
     
@@ -100,8 +100,8 @@ struct CardView: View {
     }
 }
 
-struct CardView_Previews: PreviewProvider {
-    static var previews: some View {
-        CardView(business: Business.data[0])
-    }
-}
+//struct CardView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        CardView(business: Business.data[0])
+//    }
+//}

@@ -1,0 +1,46 @@
+//
+//  BusinessFetcher.swift
+//  HLFIYA
+//
+//  Created by Ryan Token on 2/22/22.
+//
+
+import Foundation
+
+struct BusinessFetcher {
+    enum BusinessFetcherError: Error {
+        case invalidURL
+        case missingData
+    }
+    
+    // radius is in meters
+    static func getBusinessesNear(latitude: Double, longitude: Double, radius: Int) async throws -> [Business] {
+        print("getting businesses near \(latitude), \(longitude), within a radius of \(radius) meters")
+        let endpoint = "https://api.yelp.com/v3/businesses/search?latitude=\(latitude)&longitude=\(longitude)&radius=\(radius)"
+        let cleanEndpoint = endpoint.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        print(cleanEndpoint)
+        
+        guard let url = URL(string: cleanEndpoint) else {
+            throw BusinessFetcherError.invalidURL
+        }
+        
+        let yelpKey = "BeQ7EhHbnd1qfNSPjT5t03BrHmtMLaYdt2byyLfPSHD8D9rP35YZ_1tU9b8TCeL7B3rROt4TVIwnAOyMFckxe_7o0xyemhWhvRJH61BuScIgnPHIjt0D99RTYkPsYXYx"
+        
+        var yelpRequest = URLRequest(url: url)
+        yelpRequest.httpMethod = "GET"
+        yelpRequest.setValue("Bearer \(yelpKey)", forHTTPHeaderField: "Authorization")
+        yelpRequest.setValue("application/json;charset=utf-8", forHTTPHeaderField: "Content-Type")
+
+        // Use the async variant of URLSession to fetch data
+        // Code might suspend here
+        let (data, _) = try await URLSession.shared.data(for: yelpRequest)
+
+        // Parse the JSON data
+        let response = try JSONDecoder().decode(Businesses.self, from: data)
+        let businesses = response.businesses
+        
+        print(businesses)
+        print(businesses[0].location.city)
+        return businesses
+    }
+}
