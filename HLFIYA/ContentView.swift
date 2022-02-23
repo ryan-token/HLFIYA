@@ -26,6 +26,20 @@ struct ContentView: View {
                     CardView(business: business)
                         .padding(8)
                 }
+                
+                if nearbyBusinesses.isEmpty {
+                    AsyncButton(action: {
+                        await refreshBusinesses(latitude: 37.786882, longitude: -122.399972, radius: 24140)
+                    }, label: {
+                        HStack {
+                            Image(systemName: "arrow.clockwise.circle")
+                            Text("Refresh Food")
+                        }
+                        .frame(width: 150, height: 100)
+                        .font(.headline)
+                        .foregroundColor(.red)
+                    })
+                }
             }
             .zIndex(1.0)
             
