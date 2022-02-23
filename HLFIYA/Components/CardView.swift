@@ -9,14 +9,17 @@
 import SwiftUI
 
 struct CardView: View {
-    @State var card: Card
+    @State var business: Business
     
     let cardGradient = Gradient(colors: [Color.black.opacity(0), Color.black.opacity(0.5)])
     
     var body: some View {
         ZStack(alignment: .topLeading) {
-            Image(card.imageName)
-                .resizable()
+            AsyncImage(url: URL(string: business.image_url)) { image in
+                image.resizable()
+            } placeholder: {
+                Color.blue
+            }
             
             LinearGradient(gradient: cardGradient, startPoint: .top, endPoint: .bottom)
             
@@ -24,13 +27,13 @@ struct CardView: View {
                 Spacer()
                 VStack(alignment: .leading) {
                     HStack {
-                        Text(card.name)
+                        Text(business.name)
                             .font(.largeTitle)
                             .fontWeight(.bold)
-                        Text(String(card.age))
+                        Text(String(business.rating))
                             .font(.title)
                     }
-                    Text(card.bio)
+                    Text(business.categories[0].title)
                 }
             }
             .padding()
@@ -41,7 +44,7 @@ struct CardView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 150)
-                    .opacity(Double(card.x/10 - 1))
+                    .opacity(Double(business.x/10 - 1))
                 
                 Spacer()
                 
@@ -49,20 +52,20 @@ struct CardView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 150)
-                    .opacity(Double(card.x/10 * -1 - 1))
+                    .opacity(Double(business.x/10 * -1 - 1))
             }
         }
         .cornerRadius(8)
-        .offset(x: card.x, y: card.y)
-        .rotationEffect(.init(degrees: card.degree))
+        .offset(x: business.x, y: business.y)
+        .rotationEffect(.init(degrees: business.degree))
         
         .gesture (
             DragGesture()
                 .onChanged { value in
                     withAnimation(.default) {
-                        card.x = value.translation.width
-                        card.y = value.translation.height
-                        card.degree = 7 * (value.translation.width > 0 ? 1 : -1)
+                        business.x = value.translation.width
+                        business.y = value.translation.height
+                        business.degree = 7 * (value.translation.width > 0 ? 1 : -1)
                     }
                 }
             
@@ -70,26 +73,26 @@ struct CardView: View {
                     withAnimation(.interpolatingSpring(mass: 1.0, stiffness: 50, damping: 8, initialVelocity: 0)) {
                         switch value.translation.width {
                         case 0...100:
-                            card.x = 0
-                            card.degree = 0
-                            card.y = 0
+                            business.x = 0
+                            business.degree = 0
+                            business.y = 0
                             print("swiping right")
                         case let x where x > 100:
-                            card.x = 500
-                            card.degree = 12
+                            business.x = 500
+                            business.degree = 12
                             print("swiped right")
                         case (-100)...(-1):
-                            card.x = 0
-                            card.degree = 0
-                            card.y = 0
+                            business.x = 0
+                            business.degree = 0
+                            business.y = 0
                             print("swiping left")
                         case let x where x < -100:
-                            card.x = -500
-                            card.y = -12
+                            business.x = -500
+                            business.y = -12
                             print("swiped left")
                         default:
-                            card.x = 0
-                            card.y = 0
+                            business.x = 0
+                            business.y = 0
                         }
                     }
                 }
@@ -99,6 +102,6 @@ struct CardView: View {
 
 struct CardView_Previews: PreviewProvider {
     static var previews: some View {
-        CardView(card: Card.data[0])
+        CardView(business: Business.data[0])
     }
 }

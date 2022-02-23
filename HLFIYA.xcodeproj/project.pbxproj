@@ -14,7 +14,7 @@
 		F45B3F1927963D97003DCC31 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F1827963D97003DCC31 /* Persistence.swift */; };
 		F45B3F1C27963D97003DCC31 /* HLFIYA.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F1A27963D97003DCC31 /* HLFIYA.xcdatamodeld */; };
 		F45B3F242796FEDE003DCC31 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F232796FEDE003DCC31 /* CardView.swift */; };
-		F45B3F2927970006003DCC31 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F2827970006003DCC31 /* Card.swift */; };
+		F45B3F2927970006003DCC31 /* Business.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F2827970006003DCC31 /* Business.swift */; };
 		F45B3F2B279700FC003DCC31 /* TopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F2A279700FC003DCC31 /* TopBarView.swift */; };
 		F45B3F2D27970140003DCC31 /* BottomBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F2C27970140003DCC31 /* BottomBarView.swift */; };
 /* End PBXBuildFile section */
@@ -28,7 +28,7 @@
 		F45B3F1827963D97003DCC31 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		F45B3F1B27963D97003DCC31 /* HLFIYA.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = HLFIYA.xcdatamodel; sourceTree = "<group>"; };
 		F45B3F232796FEDE003DCC31 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
-		F45B3F2827970006003DCC31 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
+		F45B3F2827970006003DCC31 /* Business.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Business.swift; sourceTree = "<group>"; };
 		F45B3F2A279700FC003DCC31 /* TopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarView.swift; sourceTree = "<group>"; };
 		F45B3F2C27970140003DCC31 /* BottomBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomBarView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -96,7 +96,7 @@
 		F45B3F252796FEEF003DCC31 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				F45B3F2827970006003DCC31 /* Card.swift */,
+				F45B3F2827970006003DCC31 /* Business.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -172,7 +172,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F45B3F1C27963D97003DCC31 /* HLFIYA.xcdatamodeld in Sources */,
-				F45B3F2927970006003DCC31 /* Card.swift in Sources */,
+				F45B3F2927970006003DCC31 /* Business.swift in Sources */,
 				F45B3F1927963D97003DCC31 /* Persistence.swift in Sources */,
 				F45B3F2D27970140003DCC31 /* BottomBarView.swift in Sources */,
 				F45B3F1227963D96003DCC31 /* ContentView.swift in Sources */,

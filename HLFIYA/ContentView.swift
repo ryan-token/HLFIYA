@@ -14,8 +14,8 @@ struct ContentView: View {
             TopBarView()
             
             ZStack {
-                ForEach(Card.data.reversed()) { card in
-                    CardView(card: card)
+                ForEach(Business.data.reversed()) { business in
+                    CardView(business: business)
                         .padding(8)
                 }
             }
