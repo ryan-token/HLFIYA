@@ -39,7 +39,6 @@ struct BusinessFetcher {
         let response = try JSONDecoder().decode(Businesses.self, from: data)
         let businesses = response.businesses
         
-        print(businesses)
         print(businesses[0].location.city)
         return businesses
     }

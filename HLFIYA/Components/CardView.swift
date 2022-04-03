@@ -10,6 +10,8 @@ import SwiftUI
 
 struct CardView: View {
     @Binding var business: Business
+    @Binding var remainingBusinessesInList: Int
+    var totalBusinesses: Int
     
     let cardGradient = Gradient(colors: [Color.black.opacity(0), Color.black.opacity(0.5)])
     
@@ -80,7 +82,9 @@ struct CardView: View {
                         case let x where x > 100:
                             business.x = 500
                             business.degree = 12
+                            remainingBusinessesInList -= 1
                             print("swiped right")
+                            print("remaining businesses: \(remainingBusinessesInList)")
                         case (-100)...(-1):
                             business.x = 0
                             business.degree = 0
@@ -89,7 +93,9 @@ struct CardView: View {
                         case let x where x < -100:
                             business.x = -500
                             business.y = -12
+                            remainingBusinessesInList -= 1
                             print("swiped left")
+                            print("remaining businesses: \(remainingBusinessesInList)")
                         default:
                             business.x = 0
                             business.y = 0

@@ -10,6 +10,7 @@ import CoreData
 
 struct ContentView: View {
     @State private var nearbyBusinesses = [Business]()
+    @State private var remainingBusinessesInList = Int()
     @State private var apiError = false
     
     var body: some View {
@@ -23,11 +24,11 @@ struct ContentView: View {
             
             ZStack {
                 ForEach($nearbyBusinesses) { business in
-                    CardView(business: business)
+                    CardView(business: business, remainingBusinessesInList: $remainingBusinessesInList, totalBusinesses: nearbyBusinesses.count)
                         .padding(8)
                 }
                 
-                if nearbyBusinesses.isEmpty {
+                if remainingBusinessesInList == 0 {
                     AsyncButton(action: {
                         await refreshBusinesses(latitude: 37.786882, longitude: -122.399972, radius: 24140)
                     }, label: {
@@ -59,10 +60,11 @@ struct ContentView: View {
     // radius is in meters
     func refreshBusinesses(latitude: Double, longitude: Double, radius: Int) async {
         Task {
-            print("fetching new data")
+            print("fetching new business data")
             do {
                 let fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: radius)
                 nearbyBusinesses = fetchedBusinesses
+                remainingBusinessesInList = fetchedBusinesses.count
                 apiError = false
             } catch {
                 print("Request failed with error: \(error)")
