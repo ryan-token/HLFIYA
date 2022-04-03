@@ -11,6 +11,8 @@ import CoreData
 struct ContentView: View {
     @State private var nearbyBusinesses = [Business]()
     @State private var remainingBusinessesInList = Int()
+    @State private var currentBusinessIndex = 0
+    @State private var showRefreshButton = false
     @State private var apiError = false
     
     var body: some View {
@@ -22,15 +24,22 @@ struct ContentView: View {
                     .foregroundColor(.gray)
             }
             
+            if !nearbyBusinesses.isEmpty {
+                Text(nearbyBusinesses[currentBusinessIndex].location.city)
+                    .font(.title2)
+                    .padding(5)
+                    .animation(.none, value: currentBusinessIndex)
+            }
+            
             ZStack {
-                ForEach($nearbyBusinesses) { business in
-                    CardView(business: business, remainingBusinessesInList: $remainingBusinessesInList, totalBusinesses: nearbyBusinesses.count)
+                ForEach($nearbyBusinesses.reversed()) { business in
+                    CardView(business: business, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, totalBusinesses: nearbyBusinesses.count)
                         .padding(8)
                 }
                 
-                if remainingBusinessesInList == 0 {
+                if remainingBusinessesInList == 0 && showRefreshButton {
                     AsyncButton(action: {
-                        await refreshBusinesses(latitude: 37.786882, longitude: -122.399972, radius: 24140)
+                        await refreshBusinesses(latitude: 40.678177, longitude: -73.944160, radius: 24140)
                     }, label: {
                         HStack {
                             Image(systemName: "arrow.clockwise.circle")
@@ -50,7 +59,7 @@ struct ContentView: View {
         .task {
             if nearbyBusinesses.isEmpty {
                 print("refreshing businesses")
-                await refreshBusinesses(latitude: 37.786882, longitude: -122.399972, radius: 24140)
+                await refreshBusinesses(latitude: 40.678177, longitude: -73.944160, radius: 24140)
             } else {
                 print("We already have businesses, not fetching onAppear")
             }
@@ -64,7 +73,10 @@ struct ContentView: View {
             do {
                 let fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: radius)
                 nearbyBusinesses = fetchedBusinesses
+                print(nearbyBusinesses)
                 remainingBusinessesInList = fetchedBusinesses.count
+                currentBusinessIndex = 0
+                showRefreshButton = true
                 apiError = false
             } catch {
                 print("Request failed with error: \(error)")

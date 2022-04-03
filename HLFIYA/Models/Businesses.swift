@@ -16,7 +16,7 @@ struct Businesses: Codable {
 struct Business: Identifiable, Codable {
     let id: String
     let rating: Double
-    let price: String
+    let price: String?
     let phone: String
     let display_phone: String?
     let alias: String?
