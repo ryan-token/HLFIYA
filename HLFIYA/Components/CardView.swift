@@ -9,9 +9,12 @@
 import SwiftUI
 
 struct CardView: View {
+    @State private var showingBusinessDetails = false
+    
     @Binding var business: Business
     @Binding var remainingBusinessesInList: Int
     @Binding var currentBusinessIndex: Int
+    
     var totalBusinesses: Int
     
     let cardGradient = Gradient(colors: [Color.black.opacity(0), Color.black.opacity(0.5)])
@@ -87,6 +90,9 @@ struct CardView: View {
                             if remainingBusinessesInList != 0 {
                                 currentBusinessIndex += 1
                             }
+                            
+                            showingBusinessDetails.toggle()
+                            
                             print("swiped right")
                             print("remaining businesses: \(remainingBusinessesInList)")
                         case (-100)...(-1):
@@ -110,6 +116,10 @@ struct CardView: View {
                     }
                 }
         )
+        
+        .sheet(isPresented: $showingBusinessDetails) {
+            BusinessView(business: business)
+        }
     }
 }
 
