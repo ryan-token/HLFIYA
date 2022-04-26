@@ -34,11 +34,22 @@ struct BusinessView: View {
             
             List {
                 Section(header: Text(currentBusiness.name ?? "")) {
-                    ImageSlider(imageUrls: currentBusiness.photos ?? [""])
+                    StarRatingView(rating: currentBusiness.rating ?? 0.0)
+                }
+                .headerProminence(.increased)
+                
+                Section(header: Text("Categories")) {
+                    ForEach(currentBusiness.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
+                        Text(category.title ?? "")
+                    }
+                }
+                
+                Section(header: Text("Photos")) {
+                    ImageSliderView(imageUrls: currentBusiness.photos ?? [""])
                         .frame(height: 300)
                         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 }
-                .headerProminence(.increased)
+                
             }
             
             Spacer()

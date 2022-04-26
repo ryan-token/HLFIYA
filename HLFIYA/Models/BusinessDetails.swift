@@ -81,7 +81,7 @@ struct BusinessDetails: Identifiable, Codable {
 }
 
 extension BusinessDetails {
-    struct Category: Codable {
+    struct Category: Codable, Hashable {
         var alias: String?
         var title: String?
     }
