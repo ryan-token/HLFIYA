@@ -35,6 +35,7 @@ struct BusinessView: View {
             List {
                 Section(header: Text(currentBusiness.name ?? "")) {
                     StarRatingView(rating: currentBusiness.rating ?? 0.0)
+                    PriceView(price: currentBusiness.price ?? "")
                 }
                 .headerProminence(.increased)
                 

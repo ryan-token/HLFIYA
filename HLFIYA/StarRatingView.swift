@@ -18,7 +18,6 @@ struct StarRatingView: View {
     var body: some View {
         HStack {
             Text("Rating:")
-                .font(.headline)
             ForEach(1..<maximumRating + 1, id: \.self) { number in
                 starImage(for: number)
                     .foregroundColor(Double(number) > rating + 0.5 ? offColor : onColor)

@@ -23,6 +23,7 @@
 		F49820EB281626A600035D1C /* BusinessDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49820EA281626A600035D1C /* BusinessDetails.swift */; };
 		F49820ED281636ED00035D1C /* ImageSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49820EC281636ED00035D1C /* ImageSliderView.swift */; };
 		F49820EF28177EEF00035D1C /* StarRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49820EE28177EEF00035D1C /* StarRatingView.swift */; };
+		F49820F128178B2800035D1C /* PriceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49820F028178B2800035D1C /* PriceView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +44,7 @@
 		F49820EA281626A600035D1C /* BusinessDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessDetails.swift; sourceTree = "<group>"; };
 		F49820EC281636ED00035D1C /* ImageSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ImageSliderView.swift; path = HLFIYA/ImageSliderView.swift; sourceTree = SOURCE_ROOT; };
 		F49820EE28177EEF00035D1C /* StarRatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StarRatingView.swift; path = HLFIYA/StarRatingView.swift; sourceTree = SOURCE_ROOT; };
+		F49820F028178B2800035D1C /* PriceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +104,7 @@
 			isa = PBXGroup;
 			children = (
 				F49820EE28177EEF00035D1C /* StarRatingView.swift */,
+				F49820F028178B2800035D1C /* PriceView.swift */,
 				F49820EC281636ED00035D1C /* ImageSliderView.swift */,
 				F45B3F232796FEDE003DCC31 /* CardView.swift */,
 				F45B3F2A279700FC003DCC31 /* TopBarView.swift */,
@@ -211,6 +214,7 @@
 				F45B3F1027963D96003DCC31 /* HLFIYAApp.swift in Sources */,
 				F45B3F242796FEDE003DCC31 /* CardView.swift in Sources */,
 				F49820ED281636ED00035D1C /* ImageSliderView.swift in Sources */,
+				F49820F128178B2800035D1C /* PriceView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
