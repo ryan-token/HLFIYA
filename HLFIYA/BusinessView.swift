@@ -18,7 +18,7 @@ struct BusinessView: View {
     var body: some View {
         VStack(alignment: .leading) {
             VStack {
-                Button("Dismiss") {
+                Button("Close") {
                     dismiss()
                 }
             }
@@ -51,6 +51,36 @@ struct BusinessView: View {
                         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 }
                 
+                Section(header: Text("Information")) {
+                    HStack {
+                        Text("Currently Open:")
+                            .foregroundColor(.gray)
+                        Text(isClosed(currentBusiness.is_closed ?? false))
+                    }
+                    
+                    HStack {
+                        Text("Full Hours:")
+                            .foregroundColor(.gray)
+                        Text("Show Hours Here")
+                    }
+                    
+                    HStack {
+                        Text("Phone:")
+                            .foregroundColor(.gray)
+                        Button(action: {
+                            let phone = "tel://"
+                            let phoneNumberformatted = phone + (currentBusiness.phone ?? "555-555-5555")
+                            guard let url = URL(string: phoneNumberformatted) else { return }
+                            UIApplication.shared.open(url)
+                        }) {
+                            Text(currentBusiness.display_phone ?? "")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    
+                    Link("Website", destination: URL(string: currentBusiness.url ?? "https://ryantoken.com")!)
+                }
+                
             }
             
             Spacer()
@@ -72,6 +102,14 @@ struct BusinessView: View {
                 print("Request failed with error: \(error)")
                 apiError = true
             }
+        }
+    }
+    
+    func isClosed(_ closed: Bool) -> String {
+        if closed == true {
+            return "No"
+        } else {
+            return "Yes"
         }
     }
 }

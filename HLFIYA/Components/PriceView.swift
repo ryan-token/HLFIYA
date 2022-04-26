@@ -17,6 +17,7 @@ struct PriceView: View {
     var body: some View {
         HStack {
             Text("Price:")
+                .foregroundColor(.gray)
             ForEach(1..<maximumPrice + 1, id: \.self) { possiblePrice in
                 dollarImage
                     .foregroundColor(possiblePrice > countDollarSigns(from: price) ? offColor : onColor)

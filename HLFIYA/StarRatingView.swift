@@ -18,6 +18,7 @@ struct StarRatingView: View {
     var body: some View {
         HStack {
             Text("Rating:")
+                .foregroundColor(.gray)
             ForEach(1..<maximumRating + 1, id: \.self) { number in
                 starImage(for: number)
                     .foregroundColor(Double(number) > rating + 0.5 ? offColor : onColor)
@@ -28,7 +29,6 @@ struct StarRatingView: View {
     func starImage(for number: Int) -> Image {
         let numberAsDouble = Double(number)
         let difference = numberAsDouble - rating
-        print(difference)
         
         if difference == 0.5 {
             return halfStarImage
