@@ -68,7 +68,8 @@ struct ContentView: View {
                 .task {
                     if !currentLocationSet {
                         print("requesting location...")
-                        locationManager.requestLocation()
+                        LocationManager.shared.requestLocation()
+                        currentLocationSet = true
                     }
                     
                     if let location = locationManager.location {

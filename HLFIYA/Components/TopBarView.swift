@@ -9,7 +9,6 @@ import SwiftUI
 import CoreLocationUI
 
 struct TopBarView: View {
-    @ObservedObject var locationManager = LocationManager()
     
     var body: some View {
         HStack {
@@ -33,7 +32,7 @@ struct TopBarView: View {
             Spacer()
             
             Button(action: {
-                locationManager.requestLocation()
+                LocationManager.shared.requestLocation()
             }) {
                 Image(systemName: "location.circle.fill")
                     .font(.largeTitle)
