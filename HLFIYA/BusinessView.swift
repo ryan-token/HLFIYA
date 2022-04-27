@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct BusinessView: View {
     @State private var currentBusiness = BusinessDetails()
@@ -34,7 +35,7 @@ struct BusinessView: View {
             
             List {
                 Section(header: Text(currentBusiness.name ?? "")) {
-                    StarRatingView(rating: currentBusiness.rating ?? 0.0)
+                    StarRatingView(rating: currentBusiness.rating ?? 0.0, label: "Rating:")
                     PriceView(price: currentBusiness.price ?? "")
                 }
                 .headerProminence(.increased)
@@ -64,6 +65,23 @@ struct BusinessView: View {
                         Text("Show Hours Here")
                     }
                     
+                    VStack(alignment: .leading) {
+                        Text("Address:")
+                            .foregroundColor(.gray)
+                            .padding(.bottom, 2)
+                        
+                        Button {
+                            openAddressInAppleMaps(latitude: currentBusiness.coordinates?.latitude ?? 0.0, longitude: currentBusiness.coordinates?.longitude ?? 0.0)
+                        } label: {
+                            ForEach(currentBusiness.location?.display_address ?? [""], id: \.self) { addressPortion in
+                                HStack {
+                                    Text(addressPortion)
+                                    Spacer()
+                                }
+                            }
+                        }
+                    }
+                    
                     HStack {
                         Text("Phone:")
                             .foregroundColor(.gray)
@@ -78,7 +96,7 @@ struct BusinessView: View {
                         }
                     }
                     
-                    Link("Website", destination: URL(string: currentBusiness.url ?? "https://ryantoken.com")!)
+                    Link("Open Website", destination: URL(string: currentBusiness.url ?? "https://ryantoken.com")!)
                 }
                 
             }
@@ -111,6 +129,11 @@ struct BusinessView: View {
         } else {
             return "Yes"
         }
+    }
+    
+    func openAddressInAppleMaps (latitude: Double, longitude: Double) {
+        guard let url = URL(string:"http://maps.apple.com/?daddr=\(latitude),\(longitude)") else { return }
+        UIApplication.shared.open(url)
     }
 }
 

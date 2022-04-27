@@ -9,6 +9,7 @@ import SwiftUI
 
 struct StarRatingView: View {
     var rating: Double
+    var label: String
     var maximumRating = 5
     var halfStarImage = Image(systemName: "star.leadinghalf.filled")
     var fullStarImage = Image(systemName: "star.fill")
@@ -17,8 +18,11 @@ struct StarRatingView: View {
     
     var body: some View {
         HStack {
-            Text("Rating:")
-                .foregroundColor(.gray)
+            if label.isEmpty == false {
+                Text(label)
+                    .foregroundColor(.gray)
+            }
+            
             ForEach(1..<maximumRating + 1, id: \.self) { number in
                 starImage(for: number)
                     .foregroundColor(Double(number) > rating + 0.5 ? offColor : onColor)
@@ -40,6 +44,6 @@ struct StarRatingView: View {
 
 struct StarRatingView_Previews: PreviewProvider {
     static var previews: some View {
-        StarRatingView(rating: -0.5)
+        StarRatingView(rating: -0.5, label: "Rating:")
     }
 }

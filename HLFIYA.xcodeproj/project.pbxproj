@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F404FD672818DA96006D9C5A /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F404FD662818DA96006D9C5A /* LocationManager.swift */; };
+		F404FD692818E2D2006D9C5A /* LocationRequestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F404FD682818E2D2006D9C5A /* LocationRequestView.swift */; };
 		F45B3F1027963D96003DCC31 /* HLFIYAApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F0F27963D96003DCC31 /* HLFIYAApp.swift */; };
 		F45B3F1227963D96003DCC31 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F1127963D96003DCC31 /* ContentView.swift */; };
 		F45B3F1427963D97003DCC31 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F45B3F1327963D97003DCC31 /* Assets.xcassets */; };
@@ -27,6 +29,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F404FD662818DA96006D9C5A /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		F404FD682818E2D2006D9C5A /* LocationRequestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRequestView.swift; sourceTree = "<group>"; };
 		F45B3F0C27963D96003DCC31 /* HLFIYA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HLFIYA.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F45B3F0F27963D96003DCC31 /* HLFIYAApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HLFIYAApp.swift; sourceTree = "<group>"; };
 		F45B3F1127963D96003DCC31 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -88,6 +92,7 @@
 				F45B3F1527963D97003DCC31 /* Preview Content */,
 				F486A3C827C5E16900298DAF /* AsyncButton.swift */,
 				F49820E828160B4600035D1C /* BusinessView.swift */,
+				F404FD682818E2D2006D9C5A /* LocationRequestView.swift */,
 			);
 			path = HLFIYA;
 			sourceTree = "<group>";
@@ -126,6 +131,7 @@
 			isa = PBXGroup;
 			children = (
 				F486A3C627C5C95D00298DAF /* BusinessFetcher.swift */,
+				F404FD662818DA96006D9C5A /* LocationManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -202,8 +208,10 @@
 			files = (
 				F45B3F1C27963D97003DCC31 /* HLFIYA.xcdatamodeld in Sources */,
 				F45B3F2927970006003DCC31 /* Businesses.swift in Sources */,
+				F404FD692818E2D2006D9C5A /* LocationRequestView.swift in Sources */,
 				F45B3F1927963D97003DCC31 /* Persistence.swift in Sources */,
 				F45B3F2D27970140003DCC31 /* BottomBarView.swift in Sources */,
+				F404FD672818DA96006D9C5A /* LocationManager.swift in Sources */,
 				F45B3F1227963D96003DCC31 /* ContentView.swift in Sources */,
 				F486A3C727C5C95D00298DAF /* BusinessFetcher.swift in Sources */,
 				F49820EB281626A600035D1C /* BusinessDetails.swift in Sources */,
@@ -348,6 +356,7 @@
 				DEVELOPMENT_TEAM = DJAHJZFYK7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Please allow location access so we can show you hot local food in your area";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -377,6 +386,7 @@
 				DEVELOPMENT_TEAM = DJAHJZFYK7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Please allow location access so we can show you hot local food in your area";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

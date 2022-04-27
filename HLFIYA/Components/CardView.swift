@@ -32,13 +32,14 @@ struct CardView: View {
             VStack {
                 Spacer()
                 VStack(alignment: .leading) {
-                    HStack {
-                        Text(business.name)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                        Text(String(business.rating))
-                            .font(.title)
-                    }
+                    Text(business.name)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .padding(.bottom, 10)
+                    
+                    StarRatingView(rating: business.rating, label: "")
+                        .padding(.bottom, 5)
+                    
                     Text(business.categories[0].title)
                 }
             }
