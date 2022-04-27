@@ -48,7 +48,12 @@ struct ContentView: View {
                         
                         if remainingBusinessesInList == 0 && showRefreshButton {
                             AsyncButton(action: {
-                                await refreshBusinesses(latitude: 40.678177, longitude: -73.944160, radius: 24140)
+                                if let location = locationManager.location {
+                                    let latitude = location.coordinate.latitude
+                                    let longitude = location.coordinate.longitude
+                                    
+                                    await refreshBusinesses(latitude: latitude, longitude: longitude, radius: 24140)
+                                }
                             }, label: {
                                 HStack {
                                     Image(systemName: "arrow.clockwise.circle")
