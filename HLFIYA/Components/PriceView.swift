@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PriceView: View {
     var price: String
-    var maximumPrice = 5
+    var maximumPrice = 4
     var dollarImage = Image(systemName: "dollarsign.circle")
     var offColor = Color.gray
     var onColor = Color.green

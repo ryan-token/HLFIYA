@@ -22,7 +22,8 @@ struct CardView: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             AsyncImage(url: URL(string: business.image_url)) { image in
-                image.resizable()
+                image
+                    .resizable()
             } placeholder: {
                 Color.blue
             }
@@ -33,7 +34,7 @@ struct CardView: View {
                 Spacer()
                 VStack(alignment: .leading) {
                     Text(business.name)
-                        .font(.largeTitle)
+                        .font(Font.system(.largeTitle, design: .rounded))
                         .bold()
                         .padding(.bottom, 10)
                     

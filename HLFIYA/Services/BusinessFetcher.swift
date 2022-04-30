@@ -44,9 +44,9 @@ struct BusinessFetcher {
         // Parse the JSON data
         let response = try JSONDecoder().decode(Businesses.self, from: data)
         let businesses = response.businesses
-        let shuffledBusinesses = businesses.shuffled()
+        let shuffledBusinesses = businesses?.shuffled()
         
-        return shuffledBusinesses
+        return shuffledBusinesses ?? Business.emptyBusinesses
     }
     
     static func getBusiness(id: String) async throws -> BusinessDetails {

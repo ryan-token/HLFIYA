@@ -18,7 +18,7 @@ struct TopBarView: View {
                 Image("tinder-icon")
                     .resizable()
                     .scaledToFit()
-                    .frame(height: 50)
+                    .frame(height: 45)
             }
             
             Spacer()
@@ -27,7 +27,7 @@ struct TopBarView: View {
                 LocationManager.shared.requestLocation()
             }) {
                 Image(systemName: "location.circle.fill")
-                    .font(Font.system(size: 50, design: .rounded))
+                    .font(Font.system(size: 45, design: .rounded))
             }
         }
         .padding(.horizontal)

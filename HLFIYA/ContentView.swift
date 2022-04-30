@@ -6,9 +6,6 @@
 //
 
 import SwiftUI
-import CoreData
-import CoreLocation
-import CoreLocationUI
 
 struct ContentView: View {
     @State private var currentLocationSet = false
@@ -19,8 +16,10 @@ struct ContentView: View {
     @State private var apiError = false
     
     @State private var radiusFilter = 24140 // in meters
-    @State private var categoriesFilter = ""
-    @State private var priceFilter = ""
+    @State private var categoriesFilter = "food"
+    @State private var categoriesName = "All Food"
+    @State private var priceFilter = "1,2,3,4"
+    @State private var priceName = "All Prices"
     
     @ObservedObject var locationManager = LocationManager.shared
     
@@ -39,10 +38,29 @@ struct ContentView: View {
                     
                     if !nearbyBusinesses.isEmpty {
                         Text(nearbyBusinesses[currentBusinessIndex].location.city)
-                            .font(.title)
+                            .font(Font.system(.title, design: .rounded))
                             .bold()
                             .padding(5)
                             .animation(.none, value: currentBusinessIndex)
+                    }
+                    
+                    VStack {
+                        HStack {
+                            Text("Category:")
+                                .foregroundColor(.gray)
+                            Text(categoriesName)
+                                .bold()
+                        }
+                        .padding(.bottom, 1)
+                        .animation(.interactiveSpring(), value: categoriesName)
+                        
+                        HStack {
+                            Text("Price:")
+                                .foregroundColor(.gray)
+                            Text(priceName)
+                                .bold()
+                        }
+                        .animation(.interactiveSpring(), value: priceName)
                     }
                     
                     ZStack {
@@ -65,14 +83,14 @@ struct ContentView: View {
                                     Text("Refresh Food")
                                 }
                                 .frame(width: 150, height: 100)
-                                .font(.headline)
+                                .font(Font.system(.headline, design: .rounded))
                                 .foregroundColor(.red)
                             })
                         }
                     }
                     .zIndex(1.0)
                     
-                    BottomBarView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, radiusFilter: $radiusFilter, categoriesFilter: $categoriesFilter, priceFilter: $priceFilter)
+                    BottomBarView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, radiusFilter: $radiusFilter, categoriesFilter: $categoriesFilter, categoriesName: $categoriesName, priceFilter: $priceFilter, priceName: $priceName)
                 }
                 
                 .task {

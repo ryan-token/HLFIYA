@@ -8,9 +8,9 @@
 import UIKit
 
 struct Businesses: Codable {
-    let total: Int
-    let businesses: [Business]
-    let region: Region
+    let total: Int?
+    let businesses: [Business]?
+    let region: Region?
 }
 
 struct Business: Identifiable, Codable {
@@ -49,6 +49,12 @@ struct Business: Identifiable, Codable {
         ]
     }
     
+    static var emptyBusinesses: [Business] {
+        [
+            Business(id: "", rating: 0.0, price: "", phone: "", display_phone: "", alias: "", is_closed: false, categories: [Category(alias: "", title: "")], review_count: 0, name: "No Results", url: "#", coordinates: Coordinates(latitude: 0.00, longitude: 0.00), image_url: "#", location: Location(city: "", country: "", address2: "", address3: "", state: "", address1: "", zip_code: "", display_address: [""]), distance: 0.00, transactions: ["", ""])
+        ]
+    }
+    
 }
 
 extension Business {
@@ -68,7 +74,7 @@ extension Business {
         let address2: String?
         let address3: String?
         let state: String
-        let address1: String
+        let address1: String?
         let zip_code: String
         let display_address: [String]?
     }

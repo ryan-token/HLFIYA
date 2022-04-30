@@ -25,7 +25,6 @@ struct LocationRequestView: View {
                     .padding()
                 
                 Text("Start sharing your location")
-                    .bold()
                     .multilineTextAlignment(.center)
                     .padding()
                 
@@ -37,7 +36,7 @@ struct LocationRequestView: View {
                     } label: {
                         Text("Allow location")
                             .padding()
-                            .font(.headline)
+                            .font(Font.system(.headline, design: .rounded))
                             .foregroundColor(.white)
                     }
                     .frame(width: UIScreen.main.bounds.width)
@@ -51,7 +50,7 @@ struct LocationRequestView: View {
                     } label: {
                         Text("Maybe Later")
                             .padding()
-                            .font(.headline)
+                            .font(Font.system(.headline, design: .rounded))
                             .foregroundColor(.gray)
                     }
                 }

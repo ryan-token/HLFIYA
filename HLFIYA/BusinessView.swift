@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import CoreLocation
 
 struct BusinessView: View {
     @State private var currentBusiness = BusinessDetails()
@@ -47,7 +46,7 @@ struct BusinessView: View {
                 }
                 
                 Section(header: Text("Photos")) {
-                    ImageSliderView(imageUrls: currentBusiness.photos ?? [""])
+                    ImageSliderView(imageUrls: checkForPhotos(imageUrls: currentBusiness.photos ?? [""]))
                         .frame(height: 300)
                         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 }
@@ -96,7 +95,7 @@ struct BusinessView: View {
                         }
                     }
                     
-                    Link("Open Website", destination: URL(string: currentBusiness.url ?? "https://ryantoken.com")!)
+                    Link("Open Website", destination: URL(string: currentBusiness.url ?? "#")!)
                 }
                 
             }
@@ -128,6 +127,15 @@ struct BusinessView: View {
             return "No"
         } else {
             return "Yes"
+        }
+    }
+    
+    func checkForPhotos(imageUrls: [String]) -> [String] {
+        let emptyUrls = [""]
+        if !imageUrls.isEmpty {
+            return imageUrls
+        } else {
+            return emptyUrls
         }
     }
     
