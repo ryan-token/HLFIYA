@@ -66,7 +66,7 @@ struct ContentView: View {
                         HStack {
                             Text("Radius:")
                                 .foregroundColor(.gray)
-                            Text("\(String(format:"%.1f", radiusFilter)) miles")
+                            Text("\(String(format:"%.1f", radiusFilter)) Miles")
                                 .bold()
                         }
                         .animation(.interactiveSpring(), value: radiusFilter)

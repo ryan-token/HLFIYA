@@ -11,6 +11,7 @@
 		F404FD692818E2D2006D9C5A /* LocationRequestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F404FD682818E2D2006D9C5A /* LocationRequestView.swift */; };
 		F42D615E281D7D1000DBA5C0 /* AsyncImageHack.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42D615D281D7D1000DBA5C0 /* AsyncImageHack.swift */; };
 		F42D6160281D837B00DBA5C0 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42D615F281D837B00DBA5C0 /* Utils.swift */; };
+		F42D6162281D884000DBA5C0 /* RadiusSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42D6161281D884000DBA5C0 /* RadiusSlider.swift */; };
 		F45B3F1027963D96003DCC31 /* HLFIYAApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F0F27963D96003DCC31 /* HLFIYAApp.swift */; };
 		F45B3F1227963D96003DCC31 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F1127963D96003DCC31 /* ContentView.swift */; };
 		F45B3F1427963D97003DCC31 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F45B3F1327963D97003DCC31 /* Assets.xcassets */; };
@@ -35,6 +36,7 @@
 		F404FD682818E2D2006D9C5A /* LocationRequestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRequestView.swift; sourceTree = "<group>"; };
 		F42D615D281D7D1000DBA5C0 /* AsyncImageHack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImageHack.swift; sourceTree = "<group>"; };
 		F42D615F281D837B00DBA5C0 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		F42D6161281D884000DBA5C0 /* RadiusSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadiusSlider.swift; sourceTree = "<group>"; };
 		F45B3F0C27963D96003DCC31 /* HLFIYA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HLFIYA.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F45B3F0F27963D96003DCC31 /* HLFIYAApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HLFIYAApp.swift; sourceTree = "<group>"; };
 		F45B3F1127963D96003DCC31 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				F42D615D281D7D1000DBA5C0 /* AsyncImageHack.swift */,
 				F45B3F2A279700FC003DCC31 /* TopBarView.swift */,
 				F45B3F2C27970140003DCC31 /* BottomBarView.swift */,
+				F42D6161281D884000DBA5C0 /* RadiusSlider.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -212,6 +215,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F42D6162281D884000DBA5C0 /* RadiusSlider.swift in Sources */,
 				F45B3F1C27963D97003DCC31 /* HLFIYA.xcdatamodeld in Sources */,
 				F42D615E281D7D1000DBA5C0 /* AsyncImageHack.swift in Sources */,
 				F45B3F2927970006003DCC31 /* Businesses.swift in Sources */,

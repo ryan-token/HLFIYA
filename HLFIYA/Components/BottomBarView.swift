@@ -256,14 +256,7 @@ struct BottomBarView: View {
             }
             
             .popover(isPresented: $showingRadiusSlider) {
-                HStack {
-                    Text("Show food within a")
-                    Text("\(String(format:"%.1f", radiusFilter))")
-                        .bold()
-                    Text("mile radius")
-                }
-                Slider(value: $radiusFilter, in: 1...25)
-                    .padding()
+                RadiusSlider(radiusFilter: $radiusFilter, categoriesFilter: categoriesFilter, priceFilter: priceFilter, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError)
             }
         }
     }
