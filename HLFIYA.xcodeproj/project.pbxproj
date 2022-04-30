@@ -90,7 +90,6 @@
 				F45B3F1827963D97003DCC31 /* Persistence.swift */,
 				F45B3F1A27963D97003DCC31 /* HLFIYA.xcdatamodeld */,
 				F45B3F1527963D97003DCC31 /* Preview Content */,
-				F486A3C827C5E16900298DAF /* AsyncButton.swift */,
 				F49820E828160B4600035D1C /* BusinessView.swift */,
 				F404FD682818E2D2006D9C5A /* LocationRequestView.swift */,
 			);
@@ -108,6 +107,7 @@
 		F45B3F222796FED1003DCC31 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				F486A3C827C5E16900298DAF /* AsyncButton.swift */,
 				F49820EE28177EEF00035D1C /* StarRatingView.swift */,
 				F49820F028178B2800035D1C /* PriceView.swift */,
 				F49820EC281636ED00035D1C /* ImageSliderView.swift */,

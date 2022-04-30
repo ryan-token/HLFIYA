@@ -8,43 +8,74 @@
 import SwiftUI
 
 struct BottomBarView: View {
+    @Binding var nearbyBusinesses: [Business]
+    @Binding var remainingBusinessesInList: Int
+    @Binding var currentBusinessIndex: Int
+    @Binding var showRefreshButton: Bool
+    @Binding var apiError: Bool
+
+    @Binding var radiusFilter: Int
+    @Binding var categoriesFilter: String
+    @Binding var priceFilter: String
+    
+    @ObservedObject var locationManager = LocationManager.shared
+    
     var body: some View {
         HStack {
-            Button(action: {
+            Spacer()
+            
+            AsyncButton(action: {
+                if let location = locationManager.location {
+                    let latitude = location.coordinate.latitude
+                    let longitude = location.coordinate.longitude
+                    
+                    do {
+                        let fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: radiusFilter, categories: categoriesFilter, price: priceFilter)
+                        nearbyBusinesses = fetchedBusinesses
+                        print(nearbyBusinesses)
+                        remainingBusinessesInList = fetchedBusinesses.count
+                        currentBusinessIndex = 0
+                        showRefreshButton = true
+                        apiError = false
+                    } catch {
+                        print("Request failed with error: \(error)")
+                        apiError = true
+                    }
+                }
                 
             }) {
-                Image("refresh")
+                Image(systemName: "arrow.clockwise.circle.fill")
+                    .font(Font.system(size: 50, design: .rounded))
+                    .foregroundColor(.yellow)
             }
             
-            Button(action: {
-                
-            }) {
-                Image("dismiss")
-            }
+            Spacer()
             
             Button(action: {
-                
+                print("Categories filter: \(categoriesFilter)")
             }) {
-                Image("super_like")
+                Image(systemName: "line.3.horizontal.decrease.circle.fill")
+                    .font(Font.system(size: 50, design: .rounded))
+                    .foregroundColor(.orange)
             }
             
-            Button(action: {
-                
-            }) {
-                Image("like")
-            }
+            Spacer()
             
             Button(action: {
-                
+                print("Price filter: \(priceFilter)")
             }) {
-                Image("boost")
+                Image(systemName: "dollarsign.circle.fill")
+                    .font(Font.system(size: 50, design: .rounded))
+                    .foregroundColor(.green)
             }
+            
+            Spacer()
         }
     }
 }
 
-struct BottomBarView_Previews: PreviewProvider {
-    static var previews: some View {
-        BottomBarView()
-    }
-}
+//struct BottomBarView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        BottomBarView()
+//    }
+//}

@@ -18,6 +18,10 @@ struct ContentView: View {
     @State private var showRefreshButton = false
     @State private var apiError = false
     
+    @State private var radiusFilter = 24140 // in meters
+    @State private var categoriesFilter = ""
+    @State private var priceFilter = ""
+    
     @ObservedObject var locationManager = LocationManager.shared
     
     var body: some View {
@@ -35,7 +39,8 @@ struct ContentView: View {
                     
                     if !nearbyBusinesses.isEmpty {
                         Text(nearbyBusinesses[currentBusinessIndex].location.city)
-                            .font(.title2)
+                            .font(.title)
+                            .bold()
                             .padding(5)
                             .animation(.none, value: currentBusinessIndex)
                     }
@@ -52,7 +57,7 @@ struct ContentView: View {
                                     let latitude = location.coordinate.latitude
                                     let longitude = location.coordinate.longitude
                                     
-                                    await refreshBusinesses(latitude: latitude, longitude: longitude, radius: 24140)
+                                    await refreshBusinesses(latitude: latitude, longitude: longitude, radius: radiusFilter, categories: categoriesFilter, price: priceFilter)
                                 }
                             }, label: {
                                 HStack {
@@ -67,7 +72,7 @@ struct ContentView: View {
                     }
                     .zIndex(1.0)
                     
-                    BottomBarView()
+                    BottomBarView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, radiusFilter: $radiusFilter, categoriesFilter: $categoriesFilter, priceFilter: $priceFilter)
                 }
                 
                 .task {
@@ -83,7 +88,7 @@ struct ContentView: View {
                         
                         if nearbyBusinesses.isEmpty {
                             print("refreshing businesses")
-                            await refreshBusinesses(latitude: latitude, longitude: longitude, radius: 24140)
+                            await refreshBusinesses(latitude: latitude, longitude: longitude, radius: radiusFilter, categories: categoriesFilter, price: priceFilter)
                         } else {
                             print("We already have businesses, not fetching onAppear")
                         }
@@ -94,11 +99,11 @@ struct ContentView: View {
     }
     
     // radius is in meters
-    func refreshBusinesses(latitude: Double, longitude: Double, radius: Int) async {
+    func refreshBusinesses(latitude: Double, longitude: Double, radius: Int, categories: String, price: String) async {
         Task {
             print("fetching new business data")
             do {
-                let fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: radius)
+                let fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: radius, categories: categories, price: price)
                 nearbyBusinesses = fetchedBusinesses
                 print(nearbyBusinesses)
                 remainingBusinessesInList = fetchedBusinesses.count

@@ -15,18 +15,17 @@ struct LocationRequestView: View {
             VStack {
                 Spacer()
                 
-                Image(systemName: "paperplane.circle.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 200, height: 200)
+                Text("🍑")
+                    .font(Font.system(size: 150))
                     .padding(.bottom, 32)
                 
-                Text("Would you like to explore nearby food?")
+                Text("Would you like to *explore* HOT 🥵 LOCAL 📍 FOOD  in your area?")
                     .font(.system(size: 28, weight: .bold))
                     .multilineTextAlignment(.center)
                     .padding()
                 
                 Text("Start sharing your location")
+                    .bold()
                     .multilineTextAlignment(.center)
                     .padding()
                 
@@ -53,7 +52,7 @@ struct LocationRequestView: View {
                         Text("Maybe Later")
                             .padding()
                             .font(.headline)
-                            .foregroundColor(.red)
+                            .foregroundColor(.gray)
                     }
                 }
                 .padding(.bottom, 32)

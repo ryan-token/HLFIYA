@@ -34,7 +34,7 @@ struct CardView: View {
                 VStack(alignment: .leading) {
                     Text(business.name)
                         .font(.largeTitle)
-                        .fontWeight(.bold)
+                        .bold()
                         .padding(.bottom, 10)
                     
                     StarRatingView(rating: business.rating, label: "")

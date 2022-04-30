@@ -31,7 +31,7 @@ struct AsyncButton<Label: View>: View {
                     label().opacity(isPerformingTask ? 0 : 1)
 
                     if isPerformingTask {
-                        Text("Loading")
+                        Text("Exploring")
                     }
                 }
             }
