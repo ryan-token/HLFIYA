@@ -10,6 +10,7 @@ import SwiftUI
 struct BottomBarView: View {
     @State private var showingCategoryOptions = false
     @State private var showingPriceOptions = false
+    @State private var showingRadiusSlider = false
     
     @Binding var nearbyBusinesses: [Business]
     @Binding var remainingBusinessesInList: Int
@@ -17,7 +18,7 @@ struct BottomBarView: View {
     @Binding var showRefreshButton: Bool
     @Binding var apiError: Bool
 
-    @Binding var radiusFilter: Int
+    @Binding var radiusFilter: Double
     @Binding var categoriesFilter: String
     @Binding var categoriesName: String
     @Binding var priceFilter: String
@@ -55,6 +56,16 @@ struct BottomBarView: View {
                 Image(systemName: "dollarsign.circle.fill")
                     .font(Font.system(size: 50, design: .rounded))
                     .foregroundColor(.green)
+            }
+            
+            Spacer()
+            
+            Button(action: {
+                showingRadiusSlider = true
+            }) {
+                Image(systemName: "map.circle.fill")
+                    .font(Font.system(size: 50, design: .rounded))
+                    .foregroundColor(.pink)
             }
             
             Spacer()
@@ -243,6 +254,17 @@ struct BottomBarView: View {
                     Text("All Prices")
                 }
             }
+            
+            .popover(isPresented: $showingRadiusSlider) {
+                HStack {
+                    Text("Show food within a")
+                    Text("\(String(format:"%.1f", radiusFilter))")
+                        .bold()
+                    Text("mile radius")
+                }
+                Slider(value: $radiusFilter, in: 1...25)
+                    .padding()
+            }
         }
     }
     
@@ -264,7 +286,7 @@ struct BottomBarView: View {
             let longitude = location.coordinate.longitude
             
             do {
-                let fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: radiusFilter, categories: categoriesFilter, price: priceFilter)
+                let fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: radiusFilter), categories: categoriesFilter, price: priceFilter)
                 nearbyBusinesses = fetchedBusinesses
                 print(nearbyBusinesses)
                 remainingBusinessesInList = fetchedBusinesses.count

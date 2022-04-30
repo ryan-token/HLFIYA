@@ -15,7 +15,7 @@ struct ContentView: View {
     @State private var showRefreshButton = false
     @State private var apiError = false
     
-    @State private var radiusFilter = 24140 // in meters
+    @State private var radiusFilter = 15.0 // miles
     @State private var categoriesFilter = "food"
     @State private var categoriesName = "All Food"
     @State private var priceFilter = "1,2,3,4"
@@ -60,7 +60,16 @@ struct ContentView: View {
                             Text(priceName)
                                 .bold()
                         }
+                        .padding(.bottom, 1)
                         .animation(.interactiveSpring(), value: priceName)
+                        
+                        HStack {
+                            Text("Radius:")
+                                .foregroundColor(.gray)
+                            Text("\(String(format:"%.1f", radiusFilter)) miles")
+                                .bold()
+                        }
+                        .animation(.interactiveSpring(), value: radiusFilter)
                     }
                     
                     ZStack {
@@ -75,7 +84,7 @@ struct ContentView: View {
                                     let latitude = location.coordinate.latitude
                                     let longitude = location.coordinate.longitude
                                     
-                                    await refreshBusinesses(latitude: latitude, longitude: longitude, radius: radiusFilter, categories: categoriesFilter, price: priceFilter)
+                                    await refreshBusinesses(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: radiusFilter), categories: categoriesFilter, price: priceFilter)
                                 }
                             }, label: {
                                 HStack {
@@ -106,7 +115,7 @@ struct ContentView: View {
                         
                         if nearbyBusinesses.isEmpty {
                             print("refreshing businesses")
-                            await refreshBusinesses(latitude: latitude, longitude: longitude, radius: radiusFilter, categories: categoriesFilter, price: priceFilter)
+                            await refreshBusinesses(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: radiusFilter), categories: categoriesFilter, price: priceFilter)
                         } else {
                             print("We already have businesses, not fetching onAppear")
                         }
