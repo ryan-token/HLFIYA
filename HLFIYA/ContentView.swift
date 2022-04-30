@@ -73,6 +73,11 @@ struct ContentView: View {
                     }
                     
                     ZStack {
+                        if nearbyBusinesses.isEmpty {
+                            ProgressView()
+                                .frame(maxHeight: .infinity)
+                        }
+                        
                         ForEach($nearbyBusinesses.reversed()) { business in
                             CardView(business: business, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, totalBusinesses: nearbyBusinesses.count)
                                 .padding(8)
