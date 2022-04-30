@@ -21,12 +21,7 @@ struct CardView: View {
     
     var body: some View {
         ZStack(alignment: .topLeading) {
-            AsyncImage(url: URL(string: business.image_url)) { image in
-                image
-                    .resizable()
-            } placeholder: {
-                Color.blue
-            }
+            AsyncImageHack(url: business.image_url, isScaledToFill: false)
             
             LinearGradient(gradient: cardGradient, startPoint: .top, endPoint: .bottom)
             
@@ -39,9 +34,19 @@ struct CardView: View {
                         .padding(.bottom, 10)
                     
                     StarRatingView(rating: business.rating, label: "")
-                        .padding(.bottom, 5)
+                        .padding(.bottom, 15)
                     
-                    Text(business.categories[0].title)
+                    PriceView(price: business.price ?? "", label: "")
+                    
+                    HStack {
+                        Text(business.categories[0].title)
+                        Spacer()
+                        Image("yelp_burst")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 30)
+                            .padding(.bottom, 4)
+                    }
                 }
             }
             .padding()

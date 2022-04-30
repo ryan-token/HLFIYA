@@ -13,13 +13,7 @@ struct ImageSliderView: View {
     var body: some View {
         TabView {
             ForEach(imageUrls, id: \.self) { url in
-                AsyncImage(url: URL(string: url)) { imageUrl in
-                    imageUrl
-                        .resizable()
-                        .scaledToFill()
-                } placeholder: {
-                    Color.blue
-                }
+                AsyncImageHack(url: url, isScaledToFill: true)
             }
         }
         .tabViewStyle(PageTabViewStyle())

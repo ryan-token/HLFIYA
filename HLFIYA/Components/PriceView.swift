@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PriceView: View {
     var price: String
+    var label: String
     var maximumPrice = 4
     var dollarImage = Image(systemName: "dollarsign.circle")
     var offColor = Color.gray
@@ -16,8 +17,11 @@ struct PriceView: View {
     
     var body: some View {
         HStack {
-            Text("Price:")
-                .foregroundColor(.gray)
+            if label.isEmpty == false {
+                Text(label)
+                    .foregroundColor(.gray)
+            }
+            
             ForEach(1..<maximumPrice + 1, id: \.self) { possiblePrice in
                 dollarImage
                     .foregroundColor(possiblePrice > countDollarSigns(from: price) ? offColor : onColor)
@@ -32,6 +36,6 @@ struct PriceView: View {
 
 struct PriceView_Previews: PreviewProvider {
     static var previews: some View {
-        PriceView(price: "$$")
+        PriceView(price: "$$", label: "Price:")
     }
 }

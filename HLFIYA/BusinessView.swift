@@ -35,7 +35,7 @@ struct BusinessView: View {
             List {
                 Section(header: Text(currentBusiness.name ?? "")) {
                     StarRatingView(rating: currentBusiness.rating ?? 0.0, label: "Rating:")
-                    PriceView(price: currentBusiness.price ?? "")
+                    PriceView(price: currentBusiness.price ?? "", label: "Price:")
                 }
                 .headerProminence(.increased)
                 
@@ -98,9 +98,16 @@ struct BusinessView: View {
                     Link("Open Website", destination: URL(string: currentBusiness.url ?? "#")!)
                 }
                 
+                HStack {
+                    Text("Powered by:")
+                    Image("yelp_logo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 75)
+                }
+                .listRowBackground(Color.clear)
+                
             }
-            
-            Spacer()
         }
         
         .task {
