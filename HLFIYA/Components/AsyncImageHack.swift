@@ -33,7 +33,7 @@ struct AsyncImageHack: View {
                             image
                                 .resizable()
                                 .scaledToFill()
-                        } else{
+                        } else {
                             Image(systemName: "xmark.octagon")
                                 .font(.title)
                                 .foregroundColor(.gray)
@@ -41,15 +41,10 @@ struct AsyncImageHack: View {
                     }
 
             case .empty:
-                Image(systemName: "xmark.octagon")
-                    .font(.title)
-                    .foregroundColor(.gray)
+                Color.secondary
 
             @unknown default:
-                Image(systemName: "xmark.octagon")
-                    .font(.title)
-                    .foregroundColor(.gray)
-                
+                Color.blue
             }
         }
     }
