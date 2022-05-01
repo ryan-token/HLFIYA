@@ -10,6 +10,10 @@ import SwiftUI
 
 struct CardView: View {
     @State private var showingBusinessDetails = false
+    @State private var userTappedToShowMorePhotos = false
+    @State private var selectedTab = 1
+    @State private var imageUrls = [String]()
+    @State private var apiError = false
     
     @Binding var business: Business
     @Binding var remainingBusinessesInList: Int
@@ -21,7 +25,17 @@ struct CardView: View {
     
     var body: some View {
         ZStack(alignment: .topLeading) {
-            AsyncImageHack(url: business.image_url, isScaledToFill: false)
+            if apiError {
+                Text("😕 Error loading business photos")
+                    .foregroundColor(.gray)
+                    .padding(.leading)
+            }
+            
+            if userTappedToShowMorePhotos {
+                ImageSliderView(selectedTab: $selectedTab, imageUrls: imageUrls)
+            } else {
+                ImageSliderView(selectedTab: $selectedTab, imageUrls: [business.image_url])
+            }
             
             LinearGradient(gradient: cardGradient, startPoint: .top, endPoint: .bottom)
             
@@ -71,6 +85,20 @@ struct CardView: View {
         .cornerRadius(8)
         .offset(x: business.x, y: business.y)
         .rotationEffect(.init(degrees: business.degree))
+        
+        .onTapGesture {
+            if userTappedToShowMorePhotos == false {
+                Task {
+                    await getBusinessPhotos(id: business.id)
+                }
+            } else {
+                if selectedTab == imageUrls.count {
+                    selectedTab = 1
+                } else {
+                    selectedTab = selectedTab + 1
+                }
+            }
+        }
         
         .gesture (
             DragGesture()
@@ -126,6 +154,23 @@ struct CardView: View {
         
         .sheet(isPresented: $showingBusinessDetails) {
             BusinessView(business: business)
+        }
+    }
+    
+    func getBusinessPhotos(id: String) async {
+        Task {
+            do {
+                let businessDetails = try await BusinessFetcher.getBusiness(id: id)
+                print("businessDetails: \(businessDetails)")
+                imageUrls = businessDetails.photos ?? [business.image_url]
+                print("imageUrls: \(imageUrls)")
+                apiError = false
+                selectedTab = 2
+                userTappedToShowMorePhotos = true
+            } catch {
+                print("Request failed with error: \(error)")
+                apiError = true
+            }
         }
     }
 }

@@ -92,14 +92,14 @@
 				F45B3F222796FED1003DCC31 /* Components */,
 				F45B3F0F27963D96003DCC31 /* HLFIYAApp.swift */,
 				F45B3F1127963D96003DCC31 /* ContentView.swift */,
-				F45B3F1327963D97003DCC31 /* Assets.xcassets */,
-				F45B3F1827963D97003DCC31 /* Persistence.swift */,
-				F45B3F1A27963D97003DCC31 /* HLFIYA.xcdatamodeld */,
-				F45B3F1527963D97003DCC31 /* Preview Content */,
+				F45B3F232796FEDE003DCC31 /* CardView.swift */,
 				F49820E828160B4600035D1C /* BusinessView.swift */,
 				F404FD682818E2D2006D9C5A /* LocationRequestView.swift */,
-				F45B3F232796FEDE003DCC31 /* CardView.swift */,
+				F45B3F1827963D97003DCC31 /* Persistence.swift */,
 				F42D615F281D837B00DBA5C0 /* Utils.swift */,
+				F45B3F1327963D97003DCC31 /* Assets.xcassets */,
+				F45B3F1A27963D97003DCC31 /* HLFIYA.xcdatamodeld */,
+				F45B3F1527963D97003DCC31 /* Preview Content */,
 			);
 			path = HLFIYA;
 			sourceTree = "<group>";
