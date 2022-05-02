@@ -204,6 +204,12 @@ struct BottomBarView: View {
                     }
                     
                     AsyncButton(action: {
+                        await setCategoriesFilter(category: "thai", name: "Thai")
+                    }) {
+                        Text("Thai")
+                    }
+                    
+                    AsyncButton(action: {
                         await setCategoriesFilter(category: "vegan", name: "Vegan")
                     }) {
                         Text("Vegan")
