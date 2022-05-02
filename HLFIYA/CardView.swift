@@ -31,8 +31,11 @@ struct CardView: View {
                     .padding(.leading)
             }
             
+            Color.black
+            
             if userTappedToShowMorePhotos {
                 ImageSliderView(selectedTab: $selectedTab, imageUrls: imageUrls)
+                    .animation(.default, value: selectedTab)
             } else {
                 ImageSliderView(selectedTab: $selectedTab, imageUrls: [business.image_url])
             }
