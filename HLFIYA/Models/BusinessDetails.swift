@@ -78,6 +78,45 @@ struct BusinessDetails: Identifiable, Codable {
             ]
         )
     }
+    
+    static var emptyBusiness: BusinessDetails {
+        BusinessDetails(
+            id: "E8RJkjfdcwgtyoPMjQ_Olg",
+            rating: 0.0,
+            price: "$",
+            phone: "",
+            display_phone: "",
+            alias: "",
+            is_closed: false,
+            categories: [
+                Category(alias: "", title: "")
+            ],
+            review_count: 0,
+            name: "",
+            url: "",
+            coordinates: Coordinates(latitude: 37.7670169511878, longitude: -122.42184275),
+            image_url: "",
+            location: Location(city: "", country: "", address2: "", address3: "", state: "", address1: "", zip_code: "", display_address: [""]),
+            distance: 0.00,
+            transactions: [""],
+            
+            is_claimed: false,
+            photos: [
+                ""
+            ],
+            hours: [
+                Hours(open: [
+                    Hour(is_overnight: false, start: "1100", end: "2000", day: 0),
+                    Hour(is_overnight: false, start: "1100", end: "2000", day: 1),
+                    Hour(is_overnight: false, start: "1100", end: "2000", day: 2),
+                    Hour(is_overnight: false, start: "1100", end: "2000", day: 3),
+                    Hour(is_overnight: false, start: "1100", end: "2000", day: 4),
+                    Hour(is_overnight: false, start: "1100", end: "2000", day: 5),
+                    Hour(is_overnight: false, start: "1100", end: "2000", day: 6),
+                ], hours_type: "Regular", is_open_now: true)
+            ]
+        )
+    }
 }
 
 extension BusinessDetails {
@@ -102,13 +141,13 @@ extension BusinessDetails {
         var display_address: [String]?
     }
     
-    struct Hours: Codable {
+    struct Hours: Codable, Hashable {
         var open: [Hour]?
         var hours_type: String?
         var is_open_now: Bool?
     }
     
-    struct Hour: Codable {
+    struct Hour: Codable, Hashable {
         var is_overnight: Bool?
         var start: String?
         var end: String?

@@ -56,13 +56,32 @@ struct BusinessView: View {
                     HStack {
                         Text("Currently Open:")
                             .foregroundColor(.gray)
-                        Text(isClosed(currentBusiness.is_closed ?? false))
+                        Text(isOpenNow(currentBusiness.hours?[0].is_open_now ?? false))
                     }
                     
-                    HStack {
+                    VStack(alignment: .leading) {
                         Text("Full Hours:")
                             .foregroundColor(.gray)
-                        Text("Show Hours Here")
+                            .padding(.bottom, 2)
+                        
+                        VStack(alignment: .leading) {
+                            ForEach((currentBusiness.hours?[0].open ?? BusinessDetails.emptyBusiness.hours![0].open)!, id: \.self) { chunk in
+                                VStack(alignment: .leading) {
+                                    Text(convertDayNumberToWeekday(dayNumberString: chunk.day ?? 99999))
+                                        .foregroundColor(.secondary)
+                                    
+                                    HStack {
+                                        Text(convertMilitaryTimeToLocalTime(militaryTime: chunk.start ?? ""))
+                                        
+                                        Text("–")
+                                        
+                                        Text(convertMilitaryTimeToLocalTime(militaryTime: chunk.end ?? ""))
+                                    }
+                                    .font(.headline)
+                                }
+                                .padding(.bottom, 5)
+                            }
+                        }
                     }
                     
                     VStack(alignment: .leading) {
@@ -130,12 +149,44 @@ struct BusinessView: View {
         }
     }
     
-    func isClosed(_ closed: Bool) -> String {
-        if closed == true {
-            return "No"
-        } else {
+    func isOpenNow(_ isOpenNow: Bool) -> String {
+        if isOpenNow {
             return "Yes"
+        } else {
+            return "No"
         }
+    }
+    
+    func convertDayNumberToWeekday(dayNumberString: Int) -> String {
+        switch dayNumberString {
+        case 0:
+            return "Monday"
+        case 1:
+            return "Tuesday"
+        case 2:
+            return "Wednesday"
+        case 3:
+            return "Thursday"
+        case 4:
+            return "Friday"
+        case 5:
+            return "Saturday"
+        case 6:
+            return "Sunday"
+        default:
+            return "Unknown"
+        }
+    }
+    
+    func convertMilitaryTimeToLocalTime(militaryTime: String) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "HHmm"
+
+        let date = dateFormatter.date(from: militaryTime)
+        dateFormatter.dateFormat = "h:mm a"
+        let localTime = dateFormatter.string(from: date ?? Date())
+        
+        return localTime
     }
     
     func checkForPhotos(imageUrls: [String]) -> [String] {
