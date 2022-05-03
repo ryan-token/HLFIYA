@@ -33,9 +33,13 @@ struct BottomBarView: View {
             AsyncButton(action: {
                 await refreshBusinesses()
             }) {
-                Image(systemName: "arrow.clockwise.circle.fill")
-                    .font(Font.system(size: 50, design: .rounded))
-                    .foregroundColor(.yellow)
+                VStack(spacing: 5) {
+                    Image(systemName: "arrow.clockwise.circle.fill")
+                        .font(Font.system(size: 50, design: .rounded))
+                        .foregroundColor(.cyan)
+                    Text("Reload")
+                        .foregroundColor(.gray)
+                }
             }
             
             Spacer()
@@ -43,9 +47,13 @@ struct BottomBarView: View {
             Button(action: {
                 showingCategoryOptions = true
             }) {
-                Image(systemName: "line.3.horizontal.decrease.circle.fill")
-                    .font(Font.system(size: 50, design: .rounded))
-                    .foregroundColor(.orange)
+                VStack(spacing: 5) {
+                    Image(systemName: "line.3.horizontal.decrease.circle.fill")
+                        .font(Font.system(size: 50, design: .rounded))
+                        .foregroundColor(.orange)
+                    Text("Category")
+                        .foregroundColor(.gray)
+                }
             }
             
             Spacer()
@@ -53,9 +61,13 @@ struct BottomBarView: View {
             Button(action: {
                 showingPriceOptions = true
             }) {
-                Image(systemName: "dollarsign.circle.fill")
-                    .font(Font.system(size: 50, design: .rounded))
-                    .foregroundColor(.green)
+                VStack(spacing: 5) {
+                    Image(systemName: "dollarsign.circle.fill")
+                        .font(Font.system(size: 50, design: .rounded))
+                        .foregroundColor(.green)
+                    Text("Price")
+                        .foregroundColor(.gray)
+                }
             }
             
             Spacer()
@@ -63,9 +75,13 @@ struct BottomBarView: View {
             Button(action: {
                 showingRadiusSlider = true
             }) {
-                Image(systemName: "map.circle.fill")
-                    .font(Font.system(size: 50, design: .rounded))
-                    .foregroundColor(.pink)
+                VStack(spacing: 5) {
+                    Image(systemName: "map.circle.fill")
+                        .font(Font.system(size: 50, design: .rounded))
+                        .foregroundColor(.pink)
+                    Text("Radius")
+                        .foregroundColor(.gray)
+                }
             }
             
             Spacer()

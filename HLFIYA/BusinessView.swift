@@ -13,6 +13,7 @@ struct BusinessView: View {
     @State private var selectedTab = 1
     
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     
     var business: Business
     
@@ -115,15 +116,23 @@ struct BusinessView: View {
                         }
                     }
                     
-                    Link("Open Website", destination: URL(string: currentBusiness.url ?? "#")!)
+                    Link("See More on Yelp", destination: URL(string: currentBusiness.url ?? "#")!)
                 }
                 
                 HStack {
                     Text("Powered by:")
-                    Image("yelp_logo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 75)
+                    
+                    if (colorScheme == .light) {
+                        Image("yelp_logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 75)
+                    } else {
+                        Image("yelp_logo_dark_bg")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 75)
+                    }
                 }
                 .listRowBackground(Color.clear)
                 

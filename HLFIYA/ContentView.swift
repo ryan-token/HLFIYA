@@ -21,6 +21,9 @@ struct ContentView: View {
     @State private var priceFilter = "1,2,3,4"
     @State private var priceName = "All Prices"
     
+    @State private var businessesSwipedLeft = [Business]()
+    @State private var businessesSwipedRight = [Business]()
+    
     @ObservedObject var locationManager = LocationManager.shared
     
     var body: some View {
@@ -79,7 +82,7 @@ struct ContentView: View {
                         }
                         
                         ForEach($nearbyBusinesses.reversed()) { business in
-                            CardView(business: business, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, totalBusinesses: nearbyBusinesses.count)
+                            CardView(business: business, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, businessesSwipedLeft: $businessesSwipedLeft, businessesSwipedRight: $businessesSwipedRight, totalBusinesses: nearbyBusinesses.count)
                                 .padding(8)
                         }
                         

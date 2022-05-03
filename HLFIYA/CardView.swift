@@ -14,10 +14,14 @@ struct CardView: View {
     @State private var selectedTab = 1
     @State private var imageUrls = [String]()
     @State private var apiError = false
+    @State private var undoTapped = false
     
     @Binding var business: Business
+    @Binding var nearbyBusinesses: [Business]
     @Binding var remainingBusinessesInList: Int
     @Binding var currentBusinessIndex: Int
+    @Binding var businessesSwipedLeft: [Business]
+    @Binding var businessesSwipedRight: [Business]
     
     var totalBusinesses: Int
     
@@ -35,7 +39,6 @@ struct CardView: View {
             
             if userTappedToShowMorePhotos {
                 ImageSliderView(selectedTab: $selectedTab, imageUrls: imageUrls)
-                    .animation(.default, value: selectedTab)
             } else {
                 ImageSliderView(selectedTab: $selectedTab, imageUrls: [business.image_url])
             }
@@ -50,8 +53,18 @@ struct CardView: View {
                         .bold()
                         .padding(.bottom, 10)
                     
-                    StarRatingView(rating: business.rating, label: "")
-                        .padding(.bottom, 15)
+                    HStack {
+                        StarRatingView(rating: business.rating, label: "")
+                            .padding(.bottom, 15)
+                        Spacer()
+                        Button(action: {
+                            undo()
+                        }) {
+                            Image(systemName: "arrow.uturn.backward.circle.fill")
+                                .font(Font.system(size: 40, design: .rounded))
+                                .foregroundColor(totalBusinesses != remainingBusinessesInList ? .yellow : .gray)
+                        }
+                    }
                     
                     PriceView(price: business.price ?? "", label: "")
                     
@@ -70,20 +83,35 @@ struct CardView: View {
             .foregroundColor(.white)
             
             HStack {
-                Image("yes")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 150)
+                Text("HOT 🥵")
+                    .font(Font.system(size: 40, design: .rounded))
+                    .foregroundColor(.orange)
+                    .bold()
+                    .padding(5)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.orange, lineWidth: 4)
+                    )
+                    .rotationEffect(Angle(degrees: -25))
                     .opacity(Double(business.x/10 - 1))
                 
                 Spacer()
                 
-                Image("nope")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 150)
+                Text("NOT 😑")
+                    .font(Font.system(size: 40, design: .rounded))
+                    .foregroundColor(.black)
+                    .bold()
+                    .padding(5)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.black, lineWidth: 4)
+                    )
+                    .rotationEffect(Angle(degrees: 25))
                     .opacity(Double(business.x/10 * -1 - 1))
             }
+            .padding(.top, 35)
+            .padding(.leading, 10)
+            .padding(.trailing, 10)
         }
         .cornerRadius(8)
         .offset(x: business.x, y: business.y)
@@ -117,36 +145,13 @@ struct CardView: View {
                     withAnimation(.interpolatingSpring(mass: 1.0, stiffness: 50, damping: 8, initialVelocity: 0)) {
                         switch value.translation.width {
                         case 0...100:
-                            business.x = 0
-                            business.degree = 0
-                            business.y = 0
-                            print("swiping right")
+                            almostSwipedRight()
                         case let x where x > 100:
-                            business.x = 500
-                            business.degree = 12
-                            remainingBusinessesInList -= 1
-                            if remainingBusinessesInList != 0 {
-                                currentBusinessIndex += 1
-                            }
-                            
-                            showingBusinessDetails.toggle()
-                            
-                            print("swiped right")
-                            print("remaining businesses: \(remainingBusinessesInList)")
+                            swipedRight()
                         case (-100)...(-1):
-                            business.x = 0
-                            business.degree = 0
-                            business.y = 0
-                            print("swiping left")
+                            almostSwipedLeft()
                         case let x where x < -100:
-                            business.x = -500
-                            business.y = -12
-                            remainingBusinessesInList -= 1
-                            if remainingBusinessesInList != 0 {
-                                currentBusinessIndex += 1
-                            }
-                            print("swiped left")
-                            print("remaining businesses: \(remainingBusinessesInList)")
+                            swipedLeft()
                         default:
                             business.x = 0
                             business.y = 0
@@ -175,6 +180,65 @@ struct CardView: View {
                 apiError = true
             }
         }
+    }
+    
+    func undo() {
+        if totalBusinesses != remainingBusinessesInList {
+            withAnimation(.interpolatingSpring(mass: 1.0, stiffness: 50, damping: 100, initialVelocity: 7)) {
+                nearbyBusinesses[currentBusinessIndex-1].x = 0
+                nearbyBusinesses[currentBusinessIndex-1].y = 0
+                nearbyBusinesses[currentBusinessIndex-1].degree = 0.0
+            }
+            
+            remainingBusinessesInList += 1
+            currentBusinessIndex -= 1
+        } else {
+            print("nothing to undo")
+        }
+    }
+    
+    func almostSwipedLeft() {
+        business.x = 0
+        business.degree = 0
+        business.y = 0
+        
+        print("almost swiped left")
+    }
+    
+    func swipedLeft() {
+        business.x = -500
+        business.y = -12
+        
+        remainingBusinessesInList -= 1
+        if remainingBusinessesInList != 0 {
+            currentBusinessIndex += 1
+        }
+        
+        businessesSwipedLeft.append(business)
+        
+        print("swiped left")
+        print("businessesSwipedLeft: \(businessesSwipedLeft)")
+        print("remaining businesses: \(remainingBusinessesInList)")
+    }
+    
+    func almostSwipedRight() {
+        business.x = 0
+        business.degree = 0
+        business.y = 0
+        
+        print("almost swiped right")
+    }
+    
+    func swipedRight() {
+        business.x = 0
+        business.y = 0
+        business.degree = 0
+        
+        businessesSwipedRight.append(business)
+        
+        print("swiped right")
+        
+        showingBusinessDetails.toggle()
     }
 }
 

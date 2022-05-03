@@ -31,6 +31,15 @@ struct ImageSliderView: View {
             }
         }
         .tabViewStyle(PageTabViewStyle())
+        .animation(.default, value: selectedTab)
+        
+        .onTapGesture {
+            if selectedTab == imageUrls.count {
+                selectedTab = 1
+            } else {
+                selectedTab += 1
+            }
+        }
     }
 }
 
