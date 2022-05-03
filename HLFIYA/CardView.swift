@@ -76,6 +76,7 @@ struct CardView: View {
                             .scaledToFit()
                             .frame(width: 30)
                             .padding(.bottom, 4)
+                            .padding(.trailing, 7)
                     }
                 }
             }
