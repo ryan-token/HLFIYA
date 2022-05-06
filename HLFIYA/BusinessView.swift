@@ -20,11 +20,16 @@ struct BusinessView: View {
     var body: some View {
         VStack(alignment: .leading) {
             VStack {
-                Button("Close") {
-                    dismiss()
+                HStack {
+                    Spacer()
+                    
+                    Button("Close") {
+                        dismiss()
+                    }
                 }
+                .padding(.top, 10)
+                .padding(.trailing, 15)
             }
-            .padding()
             
             Spacer()
             

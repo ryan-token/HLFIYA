@@ -15,9 +15,9 @@ struct ContentView: View {
     @State private var showRefreshButton = false
     @State private var apiError = false
     
-    @State private var radiusFilter = 15.0 // miles
-    @State private var categoriesFilter = "food"
-    @State private var categoriesName = "All Food"
+    @State private var radiusFilter = 10.0 // miles
+    @State private var categoriesFilter: Set = ["food"]
+    @State private var categoriesNames = "All Food"
     @State private var priceFilter = "1,2,3,4"
     @State private var priceName = "All Prices"
     
@@ -49,13 +49,13 @@ struct ContentView: View {
                     
                     VStack {
                         HStack {
-                            Text("Category:")
+                            Text("Categories:")
                                 .foregroundColor(.gray)
-                            Text(categoriesName)
+                            Text(categoriesNames)
                                 .bold()
                         }
                         .padding(.bottom, 1)
-                        .animation(.interactiveSpring(), value: categoriesName)
+                        .animation(.interactiveSpring(), value: categoriesFilter)
                         
                         HStack {
                             Text("Price:")
@@ -107,7 +107,7 @@ struct ContentView: View {
                     }
                     .zIndex(1.0)
                     
-                    BottomBarView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, radiusFilter: $radiusFilter, categoriesFilter: $categoriesFilter, categoriesName: $categoriesName, priceFilter: $priceFilter, priceName: $priceName)
+                    BottomBarView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, radiusFilter: $radiusFilter, categoriesFilter: $categoriesFilter, categoriesNames: $categoriesNames, priceFilter: $priceFilter, priceName: $priceName)
                 }
                 
                 .task {
@@ -134,7 +134,7 @@ struct ContentView: View {
     }
     
     // radius is in meters
-    func refreshBusinesses(latitude: Double, longitude: Double, radius: Int, categories: String, price: String) async {
+    func refreshBusinesses(latitude: Double, longitude: Double, radius: Int, categories: Set<String>, price: String) async {
         Task {
             print("fetching new business data")
             do {

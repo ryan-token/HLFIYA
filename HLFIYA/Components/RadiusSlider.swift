@@ -9,44 +9,47 @@ import SwiftUI
 
 struct RadiusSlider: View {
     @Binding var radiusFilter: Double
-    var categoriesFilter: String
-    var priceFilter: String
-    
     @Binding var nearbyBusinesses: [Business]
     @Binding var remainingBusinessesInList: Int
     @Binding var currentBusinessIndex: Int
     @Binding var showRefreshButton: Bool
     @Binding var apiError: Bool
     
+    var categoriesFilter: Set<String>
+    var priceFilter: String
+    
     @ObservedObject var locationManager = LocationManager.shared
     
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        VStack {
-            VStack(alignment: .leading) {
-                AsyncButton(action: {
-                    dismiss()
-                    await refreshBusinesses()
-                }) {
-                    Text("Close")
+        NavigationView {
+            VStack {
+                Spacer()
+                
+                HStack {
+                    Text("Show food within a")
+                    Text("\(String(format:"%.1f", radiusFilter))")
+                        .bold()
+                    Text("mile radius")
+                }
+                
+                Slider(value: $radiusFilter, in: 1...25)
+                    .padding()
+                
+                Spacer()
+            }
+            
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    AsyncButton(action: {
+                        dismiss()
+                        await refreshBusinesses()
+                    }) {
+                        Text("Close")
+                    }
                 }
             }
-            .padding()
-            
-            Spacer()
-            
-            HStack {
-                Text("Show food within a")
-                Text("\(String(format:"%.1f", radiusFilter))")
-                    .bold()
-                Text("mile radius")
-            }
-            
-            Slider(value: $radiusFilter, in: 1...25)
-                .padding()
-            
-            Spacer()
         }
     }
     
