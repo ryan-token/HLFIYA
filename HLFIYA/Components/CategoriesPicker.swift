@@ -59,6 +59,7 @@ struct CategoriesPicker: View {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button("Reset") {
                             categoriesFilter = ["food"]
+                            categoriesNames = "All Food"
                         }
                     }
                     
