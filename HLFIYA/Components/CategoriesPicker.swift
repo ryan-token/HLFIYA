@@ -30,22 +30,26 @@ struct CategoriesPicker: View {
                 List {
                     ForEach(yelpCategories, id: \.self) { yelpCategory in
                         MultiPicker(title: AllCategories().getFormattedCategory(from: yelpCategory), isSelected: categoriesFilter.contains(yelpCategory)) {
+                            // add or remove the selected category
                             if categoriesFilter.contains(yelpCategory) {
                                 categoriesFilter.remove(yelpCategory)
                             } else {
                                 categoriesFilter.insert(yelpCategory)
                             }
                             
+                            // Only allow 'All Food' to be selected if nothing else is selected
                             if categoriesFilter.count > 0 {
                                 categoriesFilter.remove("food")
                             } else {
                                 categoriesFilter.insert("food")
                             }
                             
+                            // If user specifically selects 'All Food', deselect everything else
                             if yelpCategory == "food" {
                                 categoriesFilter = ["food"]
                             }
                             
+                            // Set the categoriesNames option
                             if categoriesFilter.count == 1 {
                                 categoriesNames = AllCategories().getFormattedCategory(from: categoriesFilter.first!)
                             } else {
