@@ -14,6 +14,7 @@ struct BusinessView: View {
     
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.openURL) var openURL
     
     var business: Business
     
@@ -63,6 +64,39 @@ struct BusinessView: View {
                         Text("Currently Open:")
                             .foregroundColor(.gray)
                         Text(isOpenNow(currentBusiness.hours?[0].is_open_now ?? false))
+                            .bold()
+                            .foregroundColor(currentBusiness.hours?[0].is_open_now ?? false ? .green : .red)
+                    }
+                    
+                    HStack {
+                        Text("Phone:")
+                            .foregroundColor(.gray)
+                        Button(action: {
+                            let phone = "tel://"
+                            let phoneNumberformatted = phone + (currentBusiness.phone ?? "555-555-5555")
+                            guard let url = URL(string: phoneNumberformatted) else { return }
+                            UIApplication.shared.open(url)
+                        }) {
+                            Text(currentBusiness.display_phone ?? "")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    
+                    VStack(alignment: .leading) {
+                        Text("Address:")
+                            .foregroundColor(.gray)
+                            .padding(.bottom, 2)
+                        
+                        Button {
+                            openAddressInAppleMaps(latitude: currentBusiness.coordinates?.latitude ?? 0.0, longitude: currentBusiness.coordinates?.longitude ?? 0.0)
+                        } label: {
+                            ForEach(currentBusiness.location?.display_address ?? [""], id: \.self) { addressPortion in
+                                HStack {
+                                    Text(addressPortion)
+                                    Spacer()
+                                }
+                            }
+                        }
                     }
                     
                     VStack(alignment: .leading) {
@@ -89,38 +123,18 @@ struct BusinessView: View {
                             }
                         }
                     }
-                    
-                    VStack(alignment: .leading) {
-                        Text("Address:")
-                            .foregroundColor(.gray)
-                            .padding(.bottom, 2)
-                        
-                        Button {
-                            openAddressInAppleMaps(latitude: currentBusiness.coordinates?.latitude ?? 0.0, longitude: currentBusiness.coordinates?.longitude ?? 0.0)
-                        } label: {
-                            ForEach(currentBusiness.location?.display_address ?? [""], id: \.self) { addressPortion in
-                                HStack {
-                                    Text(addressPortion)
-                                    Spacer()
-                                }
-                            }
-                        }
+                }
+                
+                Section(header: Text("Links")) {
+                    Button("Open DoorDash") {
+                        openAppOrSafari(appToTry: "DoorDash")
                     }
-                    
-                    HStack {
-                        Text("Phone:")
-                            .foregroundColor(.gray)
-                        Button(action: {
-                            let phone = "tel://"
-                            let phoneNumberformatted = phone + (currentBusiness.phone ?? "555-555-5555")
-                            guard let url = URL(string: phoneNumberformatted) else { return }
-                            UIApplication.shared.open(url)
-                        }) {
-                            Text(currentBusiness.display_phone ?? "")
-                                .foregroundColor(.blue)
-                        }
+                    Button("Open Uber Eats") {
+                        openAppOrSafari(appToTry: "Uber Eats")
                     }
-                    
+                    Button("Open OpenTable") {
+                        openAppOrSafari(appToTry: "OpenTable")
+                    }
                     Link("See More on Yelp", destination: URL(string: currentBusiness.url ?? "#")!)
                 }
                 
@@ -215,6 +229,41 @@ struct BusinessView: View {
     func openAddressInAppleMaps (latitude: Double, longitude: Double) {
         guard let url = URL(string:"http://maps.apple.com/?daddr=\(latitude),\(longitude)") else { return }
         UIApplication.shared.open(url)
+    }
+    
+    func openAppOrSafari(appToTry: String) {
+        var urlScheme: String
+        var safariUrl: String
+        
+        switch appToTry {
+        case "DoorDash":
+            urlScheme = "doordash://"
+            let url = "https://www.doordash.com/search/store/\(currentBusiness.name!)"
+            safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        case "Uber Eats":
+            urlScheme = "ubereats://"
+            let url = "https://www.ubereats.com/search?diningMode=DELIVERY&q=\(currentBusiness.name!)"
+            safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        case "OpenTable":
+            urlScheme = "opentable://"
+            let url = "https://www.opentable.com/s?term=\(currentBusiness.name!)"
+            safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        default:
+            urlScheme = "#"
+            safariUrl = "#"
+        }
+        
+        if let customScheme = URL(string: urlScheme) {
+            openURL(customScheme) { accepted in
+                if !accepted {
+                    print("failed to open app")
+                    print("safariUrl: \(safariUrl)")
+                    if let webUrl = URL(string: safariUrl) {
+                        openURL(webUrl)
+                    }
+                }
+            }
+        }
     }
 }
 
