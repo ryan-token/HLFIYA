@@ -23,6 +23,8 @@ struct CardView: View {
     @Binding var businessesSwipedLeft: [Business]
     @Binding var businessesSwipedRight: [Business]
     
+    @Environment(\.managedObjectContext) private var moc
+    
     var totalBusinesses: Int
     
     let cardGradient = Gradient(colors: [Color.black.opacity(0), Color.black.opacity(0.5)])
@@ -217,6 +219,8 @@ struct CardView: View {
         
         businessesSwipedLeft.append(business)
         
+        addSwipeToCoreData(direction: "left")
+        
         print("swiped left")
         print("businessesSwipedLeft: \(businessesSwipedLeft)")
         print("remaining businesses: \(remainingBusinessesInList)")
@@ -237,9 +241,29 @@ struct CardView: View {
         
         businessesSwipedRight.append(business)
         
+        addSwipeToCoreData(direction: "right")
+        
         print("swiped right")
         
         showingBusinessDetails.toggle()
+    }
+    
+    func addSwipeToCoreData(direction: String) {
+        if direction == "right" {
+            let rightSwipe = RightSwipe(context: moc)
+            rightSwipe.name = business.name
+            rightSwipe.uuid = UUID()
+            
+            try? moc.save()
+        } else if direction == "left" {
+            let leftSwipe = LeftSwipe(context: moc)
+            leftSwipe.name = business.name
+            leftSwipe.uuid = UUID()
+            
+            try? moc.save()
+        } else {
+            print("Unknown swipe direction?")
+        }
     }
 }
 

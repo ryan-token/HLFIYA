@@ -22,6 +22,14 @@
 		F45B3F2927970006003DCC31 /* Businesses.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F2827970006003DCC31 /* Businesses.swift */; };
 		F45B3F2B279700FC003DCC31 /* TopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F2A279700FC003DCC31 /* TopBarView.swift */; };
 		F45B3F2D27970140003DCC31 /* BottomBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F2C27970140003DCC31 /* BottomBarView.swift */; };
+		F484972528261C6000C2DB89 /* RightSwipe+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F484972128261C6000C2DB89 /* RightSwipe+CoreDataClass.swift */; };
+		F484972628261C6000C2DB89 /* RightSwipe+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F484972228261C6000C2DB89 /* RightSwipe+CoreDataProperties.swift */; };
+		F484972728261C6000C2DB89 /* LeftSwipe+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F484972328261C6000C2DB89 /* LeftSwipe+CoreDataClass.swift */; };
+		F484972828261C6000C2DB89 /* LeftSwipe+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F484972428261C6000C2DB89 /* LeftSwipe+CoreDataProperties.swift */; };
+		F484972A28261CC500C2DB89 /* Swipe+FetchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F484972928261CC500C2DB89 /* Swipe+FetchRequest.swift */; };
+		F484972F28261D9400C2DB89 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F484972E28261D9400C2DB89 /* CloudKit.framework */; };
+		F48497312826226300C2DB89 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48497302826226300C2DB89 /* SettingsView.swift */; };
+		F484973328262F2C00C2DB89 /* SwipesStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F484973228262F2C00C2DB89 /* SwipesStatsView.swift */; };
 		F486A3C727C5C95D00298DAF /* BusinessFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F486A3C627C5C95D00298DAF /* BusinessFetcher.swift */; };
 		F486A3C927C5E16900298DAF /* AsyncButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F486A3C827C5E16900298DAF /* AsyncButton.swift */; };
 		F49820E928160B4600035D1C /* BusinessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49820E828160B4600035D1C /* BusinessView.swift */; };
@@ -51,6 +59,16 @@
 		F45B3F2827970006003DCC31 /* Businesses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Businesses.swift; sourceTree = "<group>"; };
 		F45B3F2A279700FC003DCC31 /* TopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarView.swift; sourceTree = "<group>"; };
 		F45B3F2C27970140003DCC31 /* BottomBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomBarView.swift; sourceTree = "<group>"; };
+		F484972128261C6000C2DB89 /* RightSwipe+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RightSwipe+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		F484972228261C6000C2DB89 /* RightSwipe+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RightSwipe+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		F484972328261C6000C2DB89 /* LeftSwipe+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LeftSwipe+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		F484972428261C6000C2DB89 /* LeftSwipe+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LeftSwipe+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		F484972928261CC500C2DB89 /* Swipe+FetchRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Swipe+FetchRequest.swift"; sourceTree = "<group>"; };
+		F484972B28261D8000C2DB89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		F484972C28261D8E00C2DB89 /* HLFIYA.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HLFIYA.entitlements; sourceTree = "<group>"; };
+		F484972E28261D9400C2DB89 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		F48497302826226300C2DB89 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F484973228262F2C00C2DB89 /* SwipesStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipesStatsView.swift; sourceTree = "<group>"; };
 		F486A3C627C5C95D00298DAF /* BusinessFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessFetcher.swift; sourceTree = "<group>"; };
 		F486A3C827C5E16900298DAF /* AsyncButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncButton.swift; sourceTree = "<group>"; };
 		F49820E828160B4600035D1C /* BusinessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessView.swift; sourceTree = "<group>"; };
@@ -68,6 +86,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F484972F28261D9400C2DB89 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,6 +98,7 @@
 			children = (
 				F45B3F0E27963D96003DCC31 /* HLFIYA */,
 				F45B3F0D27963D96003DCC31 /* Products */,
+				F484972D28261D9400C2DB89 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -93,17 +113,26 @@
 		F45B3F0E27963D96003DCC31 /* HLFIYA */ = {
 			isa = PBXGroup;
 			children = (
-				F486A3C527C5C94600298DAF /* Services */,
-				F45B3F252796FEEF003DCC31 /* Models */,
-				F45B3F222796FED1003DCC31 /* Components */,
+				F484972C28261D8E00C2DB89 /* HLFIYA.entitlements */,
+				F484972B28261D8000C2DB89 /* Info.plist */,
+				F484972128261C6000C2DB89 /* RightSwipe+CoreDataClass.swift */,
+				F484972228261C6000C2DB89 /* RightSwipe+CoreDataProperties.swift */,
+				F484972328261C6000C2DB89 /* LeftSwipe+CoreDataClass.swift */,
+				F484972428261C6000C2DB89 /* LeftSwipe+CoreDataProperties.swift */,
+				F484972928261CC500C2DB89 /* Swipe+FetchRequest.swift */,
 				F45B3F0F27963D96003DCC31 /* HLFIYAApp.swift */,
 				F4D4073F2824B9E7009805CB /* AllCategories.swift */,
 				F45B3F1127963D96003DCC31 /* ContentView.swift */,
 				F45B3F232796FEDE003DCC31 /* CardView.swift */,
 				F49820E828160B4600035D1C /* BusinessView.swift */,
+				F48497302826226300C2DB89 /* SettingsView.swift */,
+				F484973228262F2C00C2DB89 /* SwipesStatsView.swift */,
 				F404FD682818E2D2006D9C5A /* LocationRequestView.swift */,
 				F45B3F1827963D97003DCC31 /* Persistence.swift */,
 				F42D615F281D837B00DBA5C0 /* Utils.swift */,
+				F486A3C527C5C94600298DAF /* Services */,
+				F45B3F252796FEEF003DCC31 /* Models */,
+				F45B3F222796FED1003DCC31 /* Components */,
 				F45B3F1327963D97003DCC31 /* Assets.xcassets */,
 				F45B3F1A27963D97003DCC31 /* HLFIYA.xcdatamodeld */,
 				F45B3F1527963D97003DCC31 /* Preview Content */,
@@ -143,6 +172,14 @@
 				F49820EA281626A600035D1C /* BusinessDetails.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		F484972D28261D9400C2DB89 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F484972E28261D9400C2DB89 /* CloudKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		F486A3C527C5C94600298DAF /* Services */ = {
@@ -233,18 +270,25 @@
 				F404FD692818E2D2006D9C5A /* LocationRequestView.swift in Sources */,
 				F45B3F1927963D97003DCC31 /* Persistence.swift in Sources */,
 				F45B3F2D27970140003DCC31 /* BottomBarView.swift in Sources */,
+				F484972A28261CC500C2DB89 /* Swipe+FetchRequest.swift in Sources */,
 				F404FD672818DA96006D9C5A /* LocationManager.swift in Sources */,
 				F4D407422824C599009805CB /* MultiPicker.swift in Sources */,
+				F484972528261C6000C2DB89 /* RightSwipe+CoreDataClass.swift in Sources */,
 				F45B3F1227963D96003DCC31 /* ContentView.swift in Sources */,
 				F486A3C727C5C95D00298DAF /* BusinessFetcher.swift in Sources */,
 				F49820EB281626A600035D1C /* BusinessDetails.swift in Sources */,
+				F484972628261C6000C2DB89 /* RightSwipe+CoreDataProperties.swift in Sources */,
+				F484973328262F2C00C2DB89 /* SwipesStatsView.swift in Sources */,
 				F49820EF28177EEF00035D1C /* StarRatingView.swift in Sources */,
+				F48497312826226300C2DB89 /* SettingsView.swift in Sources */,
 				F486A3C927C5E16900298DAF /* AsyncButton.swift in Sources */,
 				F45B3F2B279700FC003DCC31 /* TopBarView.swift in Sources */,
 				F49820E928160B4600035D1C /* BusinessView.swift in Sources */,
 				F45B3F1027963D96003DCC31 /* HLFIYAApp.swift in Sources */,
 				F45B3F242796FEDE003DCC31 /* CardView.swift in Sources */,
 				F49820ED281636ED00035D1C /* ImageSliderView.swift in Sources */,
+				F484972728261C6000C2DB89 /* LeftSwipe+CoreDataClass.swift in Sources */,
+				F484972828261C6000C2DB89 /* LeftSwipe+CoreDataProperties.swift in Sources */,
 				F42D6160281D837B00DBA5C0 /* Utils.swift in Sources */,
 				F49820F128178B2800035D1C /* PriceView.swift in Sources */,
 			);
@@ -374,12 +418,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = HLFIYA/HLFIYA.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"HLFIYA/Preview Content\"";
 				DEVELOPMENT_TEAM = DJAHJZFYK7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HLFIYA/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Please allow location access so we can show you hot local food in your area";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -404,12 +450,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = HLFIYA/HLFIYA.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"HLFIYA/Preview Content\"";
 				DEVELOPMENT_TEAM = DJAHJZFYK7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HLFIYA/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Please allow location access so we can show you hot local food in your area";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
