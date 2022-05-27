@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct BottomBarView: View {
     @State private var showingCategoriesPicker = false
@@ -24,6 +25,10 @@ struct BottomBarView: View {
     @Binding var categoriesNames: String
     @Binding var priceFilter: String
     @Binding var priceName: String
+    
+    @Binding var customLatitude: CLLocationDegrees
+    @Binding var customLongitude: CLLocationDegrees
+    @Binding var customRadius: Double
     
     @ObservedObject var locationManager = LocationManager.shared
     
@@ -120,11 +125,11 @@ struct BottomBarView: View {
             }
             
             .popover(isPresented: $showingCategoriesPicker) {
-                CategoriesPicker(categoriesFilter: $categoriesFilter, categoriesNames: $categoriesNames, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, radiusFilter: radiusFilter, priceFilter: priceFilter)
+                CategoriesPicker(categoriesFilter: $categoriesFilter, categoriesNames: $categoriesNames, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, radiusFilter: radiusFilter, priceFilter: priceFilter, customLatitude: $customLatitude, customLongitude: $customLongitude, customRadius: $customRadius)
             }
             
             .popover(isPresented: $showingRadiusSlider) {
-                RadiusSlider(radiusFilter: $radiusFilter, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, categoriesFilter: categoriesFilter, priceFilter: priceFilter)
+                RadiusSlider(radiusFilter: $radiusFilter, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, categoriesFilter: categoriesFilter, priceFilter: priceFilter, customLatitude: $customLatitude, customLongitude: $customLongitude, customRadius: $customRadius)
             }
         }
     }
@@ -137,11 +142,16 @@ struct BottomBarView: View {
     
     func refreshBusinesses() async {
         if let location = locationManager.location {
-            let latitude = location.coordinate.latitude
-            let longitude = location.coordinate.longitude
+            var latitude = location.coordinate.latitude
+            var longitude = location.coordinate.longitude
+            
+            if customLatitude != 0.000000 && customLongitude != 0.000000 {
+                latitude = customLatitude
+                longitude = customLongitude
+            }
             
             do {
-                let fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: radiusFilter), categories: categoriesFilter, price: priceFilter)
+                let fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: customRadius), categories: categoriesFilter, price: priceFilter)
                 nearbyBusinesses = fetchedBusinesses
                 print(nearbyBusinesses)
                 remainingBusinessesInList = fetchedBusinesses.count

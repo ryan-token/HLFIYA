@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct ContentView: View {
     @State private var currentLocationSet = false
@@ -24,6 +25,10 @@ struct ContentView: View {
     @State private var businessesSwipedLeft = [Business]()
     @State private var businessesSwipedRight = [Business]()
     
+    @State private var customLatitude = CLLocationDegrees()
+    @State private var customLongitude = CLLocationDegrees()
+    @State private var customRadius = 10.0
+    
     @ObservedObject var locationManager = LocationManager.shared
     
     var body: some View {
@@ -32,7 +37,10 @@ struct ContentView: View {
                 LocationRequestView()
             } else {
                 VStack {
-                    TopBarView()
+                    Text("customLatitude: \(customLatitude)")
+                    Text("customLongitude: \(customLongitude)")
+                    Text("customRadius: \(customRadius)")
+                    TopBarView(customLatitude: $customLatitude, customLongitude: $customLongitude, customRadius: $customRadius)
                     
                     if apiError {
                         Text("😕 Error loading businesses")
@@ -69,10 +77,10 @@ struct ContentView: View {
                         HStack {
                             Text("Radius:")
                                 .foregroundColor(.gray)
-                            Text("\(String(format:"%.1f", radiusFilter)) Miles")
+                            Text("\(String(format:"%.1f", customRadius)) Miles")
                                 .bold()
                         }
-                        .animation(.interactiveSpring(), value: radiusFilter)
+                        .animation(.interactiveSpring(), value: customRadius)
                     }
                     
                     ZStack {
@@ -89,10 +97,15 @@ struct ContentView: View {
                         if remainingBusinessesInList == 0 && showRefreshButton {
                             AsyncButton(action: {
                                 if let location = locationManager.location {
-                                    let latitude = location.coordinate.latitude
-                                    let longitude = location.coordinate.longitude
+                                    var latitude = location.coordinate.latitude
+                                    var longitude = location.coordinate.longitude
                                     
-                                    await refreshBusinesses(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: radiusFilter), categories: categoriesFilter, price: priceFilter)
+                                    if customLatitude != 0.000000 && customLongitude != 0.000000 {
+                                        latitude = customLatitude
+                                        longitude = customLongitude
+                                    }
+                                    
+                                    await refreshBusinesses(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: customRadius), categories: categoriesFilter, price: priceFilter)
                                 }
                             }, label: {
                                 HStack {
@@ -107,7 +120,7 @@ struct ContentView: View {
                     }
                     .zIndex(1.0)
                     
-                    BottomBarView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, radiusFilter: $radiusFilter, categoriesFilter: $categoriesFilter, categoriesNames: $categoriesNames, priceFilter: $priceFilter, priceName: $priceName)
+                    BottomBarView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, radiusFilter: $radiusFilter, categoriesFilter: $categoriesFilter, categoriesNames: $categoriesNames, priceFilter: $priceFilter, priceName: $priceName, customLatitude: $customLatitude, customLongitude: $customLongitude, customRadius: $customRadius)
                 }
                 
                 .task {
@@ -118,8 +131,13 @@ struct ContentView: View {
                     }
                     
                     if let location = locationManager.location {
-                        let latitude = location.coordinate.latitude
-                        let longitude = location.coordinate.longitude
+                        var latitude = location.coordinate.latitude
+                        var longitude = location.coordinate.longitude
+                        
+                        if customLatitude != 0.000000 && customLongitude != 0.000000 {
+                            latitude = customLatitude
+                            longitude = customLongitude
+                        }
                         
                         if nearbyBusinesses.isEmpty {
                             print("refreshing businesses")

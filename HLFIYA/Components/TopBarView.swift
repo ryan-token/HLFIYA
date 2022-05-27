@@ -6,15 +6,20 @@
 //
 
 import SwiftUI
-import CoreLocationUI
+import MapKit
 
 struct TopBarView: View {
     @State private var isShowingSettingsView = false
+    @State private var isShowingMapView = false
+    
+    @Binding var customLatitude: CLLocationDegrees
+    @Binding var customLongitude: CLLocationDegrees
+    @Binding var customRadius: Double
     
     var body: some View {
         HStack {
             Button(action: {
-                LocationManager.shared.requestLocation()
+                isShowingMapView.toggle()
             }) {
                 Image(systemName: "location.circle.fill")
                     .font(Font.system(size: 45, design: .rounded))
@@ -29,16 +34,21 @@ struct TopBarView: View {
                     .font(Font.system(size: 45, design: .rounded))
                     .foregroundColor(.gray)
             }
+            
+            .popover(isPresented: $isShowingSettingsView) {
+                SettingsView()
+            }
+            
+            .popover(isPresented: $isShowingMapView) {
+                MapView(customLatitude: $customLatitude, customLongitude: $customLongitude, customRadius: $customRadius)
+            }
         }
         .padding(.horizontal)
-        
-        .popover(isPresented: $isShowingSettingsView) {
-            SettingsView()
-        }
     }
 }
-struct TopBarView_Previews: PreviewProvider {
-    static var previews: some View {
-        TopBarView()
-    }
-}
+
+//struct TopBarView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TopBarView()
+//    }
+//}

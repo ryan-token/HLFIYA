@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct CategoriesPicker: View {
     @Binding var categoriesFilter: Set<String>
@@ -18,6 +19,11 @@ struct CategoriesPicker: View {
     
     var radiusFilter: Double
     var priceFilter: String
+    
+    @Binding var customLatitude: CLLocationDegrees
+    @Binding var customLongitude: CLLocationDegrees
+    @Binding var customRadius: Double
+    
     let yelpCategories = Array(AllCategories().getYelpCategories())
     
     @ObservedObject var locationManager = LocationManager.shared
@@ -83,13 +89,18 @@ struct CategoriesPicker: View {
     
     func refreshBusinesses() async {
         if let location = locationManager.location {
-            let latitude = location.coordinate.latitude
-            let longitude = location.coordinate.longitude
+            var latitude = location.coordinate.latitude
+            var longitude = location.coordinate.longitude
+            
+            if customLatitude != 0.000000 && customLongitude != 0.000000 {
+                latitude = customLatitude
+                longitude = customLongitude
+            }
             
             print("categories: \(categoriesFilter)")
             
             do {
-                let fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: radiusFilter), categories: categoriesFilter, price: priceFilter)
+                let fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: customRadius), categories: categoriesFilter, price: priceFilter)
                 nearbyBusinesses = fetchedBusinesses
                 print(nearbyBusinesses)
                 remainingBusinessesInList = fetchedBusinesses.count

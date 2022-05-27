@@ -22,6 +22,7 @@
 		F45B3F2927970006003DCC31 /* Businesses.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F2827970006003DCC31 /* Businesses.swift */; };
 		F45B3F2B279700FC003DCC31 /* TopBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F2A279700FC003DCC31 /* TopBarView.swift */; };
 		F45B3F2D27970140003DCC31 /* BottomBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F2C27970140003DCC31 /* BottomBarView.swift */; };
+		F47A9D01284074A000161653 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47A9D00284074A000161653 /* MapView.swift */; };
 		F484972528261C6000C2DB89 /* RightSwipe+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F484972128261C6000C2DB89 /* RightSwipe+CoreDataClass.swift */; };
 		F484972628261C6000C2DB89 /* RightSwipe+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F484972228261C6000C2DB89 /* RightSwipe+CoreDataProperties.swift */; };
 		F484972728261C6000C2DB89 /* LeftSwipe+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F484972328261C6000C2DB89 /* LeftSwipe+CoreDataClass.swift */; };
@@ -59,6 +60,7 @@
 		F45B3F2827970006003DCC31 /* Businesses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Businesses.swift; sourceTree = "<group>"; };
 		F45B3F2A279700FC003DCC31 /* TopBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarView.swift; sourceTree = "<group>"; };
 		F45B3F2C27970140003DCC31 /* BottomBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomBarView.swift; sourceTree = "<group>"; };
+		F47A9D00284074A000161653 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		F484972128261C6000C2DB89 /* RightSwipe+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RightSwipe+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
 		F484972228261C6000C2DB89 /* RightSwipe+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RightSwipe+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		F484972328261C6000C2DB89 /* LeftSwipe+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LeftSwipe+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
@@ -125,6 +127,7 @@
 				F45B3F1127963D96003DCC31 /* ContentView.swift */,
 				F45B3F232796FEDE003DCC31 /* CardView.swift */,
 				F49820E828160B4600035D1C /* BusinessView.swift */,
+				F47A9D00284074A000161653 /* MapView.swift */,
 				F48497302826226300C2DB89 /* SettingsView.swift */,
 				F484973228262F2C00C2DB89 /* SwipesStatsView.swift */,
 				F404FD682818E2D2006D9C5A /* LocationRequestView.swift */,
@@ -271,6 +274,7 @@
 				F45B3F1927963D97003DCC31 /* Persistence.swift in Sources */,
 				F45B3F2D27970140003DCC31 /* BottomBarView.swift in Sources */,
 				F484972A28261CC500C2DB89 /* Swipe+FetchRequest.swift in Sources */,
+				F47A9D01284074A000161653 /* MapView.swift in Sources */,
 				F404FD672818DA96006D9C5A /* LocationManager.swift in Sources */,
 				F4D407422824C599009805CB /* MultiPicker.swift in Sources */,
 				F484972528261C6000C2DB89 /* RightSwipe+CoreDataClass.swift in Sources */,
