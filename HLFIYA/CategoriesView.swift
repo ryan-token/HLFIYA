@@ -8,14 +8,14 @@
 import SwiftUI
 import MapKit
 
-struct CategoriesPicker: View {
+struct CategoriesView: View {
+    let yelpCategories = Array(AllCategories().getYelpCategories())
+    
     @Binding var nearbyBusinesses: [Business]
     @Binding var remainingBusinessesInList: Int
     @Binding var currentBusinessIndex: Int
     @Binding var showRefreshButton: Bool
     @Binding var apiError: Bool
-    
-    let yelpCategories = Array(AllCategories().getYelpCategories())
     
     @ObservedObject var filters: FiltersState
     @ObservedObject var locationManager = LocationManager.shared
@@ -59,9 +59,12 @@ struct CategoriesPicker: View {
                 .navigationTitle("Choose Categories")
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
-                        Button("Reset") {
+                        Button(action: {
                             filters.categories = ["food"]
                             filters.categoriesNames = "All Food"
+                        }) {
+                            Text("Reset")
+                                .font(Font.system(.body, design: .rounded))
                         }
                     }
                     
@@ -72,7 +75,8 @@ struct CategoriesPicker: View {
                             let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, price: filters.price)
                             setState(fetchedBusinesses: fetchedBusinesses)
                         }) {
-                            Text("Close")
+                            Text("Save")
+                                .font(Font.system(.body, design: .rounded))
                         }
                     }
                  }
@@ -89,8 +93,8 @@ struct CategoriesPicker: View {
     }
 }
 
-//struct CategoriesPicker_Previews: PreviewProvider {
+//struct CategoriesView_Previews: PreviewProvider {
 //    static var previews: some View {
-//        CategoriesPicker()
+//        CategoriesView()
 //    }
 //}

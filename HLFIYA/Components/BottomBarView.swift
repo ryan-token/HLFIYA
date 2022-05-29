@@ -9,8 +9,7 @@ import SwiftUI
 import MapKit
 
 struct BottomBarView: View {
-    @State private var isShowingCategoriesPicker = false
-    @State private var isShowingCategoryOptions = false
+    @State private var isShowingCategoriesView = false
     @State private var isShowingPriceOptions = false
     @State private var isShowingMapView = false
     
@@ -36,6 +35,7 @@ struct BottomBarView: View {
                         .font(Font.system(size: 50, design: .rounded))
                         .foregroundColor(.cyan)
                     Text("Reload")
+                        .font(Font.system(.body, design: .rounded))
                         .foregroundColor(.gray)
                 }
             }
@@ -43,13 +43,14 @@ struct BottomBarView: View {
             Spacer()
             
             Button(action: {
-                isShowingCategoriesPicker.toggle()
+                isShowingCategoriesView.toggle()
             }) {
                 VStack(spacing: 5) {
                     Image(systemName: "line.3.horizontal.decrease.circle.fill")
                         .font(Font.system(size: 50, design: .rounded))
                         .foregroundColor(.orange)
                     Text("Categories")
+                        .font(Font.system(.body, design: .rounded))
                         .foregroundColor(.gray)
                 }
             }
@@ -64,6 +65,7 @@ struct BottomBarView: View {
                         .font(Font.system(size: 50, design: .rounded))
                         .foregroundColor(.green)
                     Text("Price")
+                        .font(Font.system(.body, design: .rounded))
                         .foregroundColor(.gray)
                 }
             }
@@ -78,6 +80,7 @@ struct BottomBarView: View {
                         .font(Font.system(size: 50, design: .rounded))
                         .foregroundColor(.pink)
                     Text("Location")
+                        .font(Font.system(.body, design: .rounded))
                         .foregroundColor(.gray)
                 }
             }
@@ -115,13 +118,14 @@ struct BottomBarView: View {
                     Text("All Prices")
                 }
             }
+            .font(Font.system(.body, design: .rounded))
             
-            .popover(isPresented: $isShowingCategoriesPicker) {
-                CategoriesPicker(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
+            .popover(isPresented: $isShowingCategoriesView) {
+                CategoriesView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
             }
             
             .popover(isPresented: $isShowingMapView) {
-                MapView(filters: filters)
+                MapView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
             }
         }
     }

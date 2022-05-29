@@ -22,15 +22,21 @@ struct MainView: View {
     @StateObject var filters = FiltersState()
     @ObservedObject var locationManager = LocationManager.shared
     
+    init() {
+        let design = UIFontDescriptor.SystemDesign.rounded
+        let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .largeTitle)
+            .withDesign(design)!
+            .withSymbolicTraits(UIFontDescriptor.SymbolicTraits.traitBold)!
+        let font = UIFont.init(descriptor: descriptor, size: 30)
+        UINavigationBar.appearance().largeTitleTextAttributes = [.font : font]
+    }
+    
     var body: some View {
         Group {
             if locationManager.location == nil {
                 LocationRequestView()
             } else {
                 VStack {
-                    Text("customLatitude: \(filters.customLatitude)")
-                    Text("customLongitude: \(filters.customLongitude)")
-                    Text("customRadius: \(filters.customRadius)")
                     TopBarView()
                     
                     if apiError {
@@ -46,14 +52,13 @@ struct MainView: View {
                             .animation(.none, value: currentBusinessIndex)
                     }
                     
-                    VStack {
+                    VStack(spacing: 10) {
                         HStack {
                             Text("Categories:")
                                 .foregroundColor(.gray)
                             Text(filters.categoriesNames)
                                 .bold()
                         }
-                        .padding(.bottom, 1)
                         .animation(.interactiveSpring(), value: filters.categories)
                         
                         HStack {
@@ -62,7 +67,6 @@ struct MainView: View {
                             Text(filters.priceName)
                                 .bold()
                         }
-                        .padding(.bottom, 1)
                         .animation(.interactiveSpring(), value: filters.priceName)
                         
                         HStack {
@@ -73,6 +77,7 @@ struct MainView: View {
                         }
                         .animation(.interactiveSpring(), value: filters.customRadius)
                     }
+                    .font(Font.system(.body, design: .rounded))
                     
                     ZStack {
                         if nearbyBusinesses.isEmpty {
@@ -81,7 +86,7 @@ struct MainView: View {
                         }
                         
                         ForEach($nearbyBusinesses.reversed()) { business in
-                            CardView(business: business, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, businessesSwipedLeft: $businessesSwipedLeft, businessesSwipedRight: $businessesSwipedRight, totalBusinesses: nearbyBusinesses.count)
+                            CardView(totalBusinesses: nearbyBusinesses.count, business: business, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, businessesSwipedLeft: $businessesSwipedLeft, businessesSwipedRight: $businessesSwipedRight)
                                 .padding(8)
                         }
                         

@@ -9,6 +9,9 @@
 import SwiftUI
 
 struct CardView: View {
+    var totalBusinesses: Int
+    let cardGradient = Gradient(colors: [Color.black.opacity(0), Color.black.opacity(0.5)])
+    
     @State private var showingBusinessDetails = false
     @State private var userTappedToShowMorePhotos = false
     @State private var selectedTab = 1
@@ -24,10 +27,6 @@ struct CardView: View {
     @Binding var businessesSwipedRight: [Business]
     
     @Environment(\.managedObjectContext) private var moc
-    
-    var totalBusinesses: Int
-    
-    let cardGradient = Gradient(colors: [Color.black.opacity(0), Color.black.opacity(0.5)])
     
     var body: some View {
         ZStack(alignment: .topLeading) {

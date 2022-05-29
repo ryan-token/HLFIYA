@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct BusinessView: View {
+    var business: Business
+    
     @State private var currentBusiness = BusinessDetails()
     @State private var apiError = false
     @State private var selectedTab = 1
@@ -15,8 +17,6 @@ struct BusinessView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.openURL) var openURL
-    
-    var business: Business
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -36,6 +36,7 @@ struct BusinessView: View {
             
             if apiError {
                 Text("😕 Error loading businesses")
+                    .font(Font.system(.body, design: .rounded))
                     .foregroundColor(.gray)
                     .padding(.leading)
             }
@@ -117,7 +118,7 @@ struct BusinessView: View {
                                         
                                         Text(convertMilitaryTimeToLocalTime(militaryTime: chunk.end ?? ""))
                                     }
-                                    .font(.headline)
+                                    .font(Font.system(.headline, design: .rounded))
                                 }
                                 .padding(.bottom, 5)
                             }
@@ -156,6 +157,7 @@ struct BusinessView: View {
                 .listRowBackground(Color.clear)
                 
             }
+            .font(Font.system(.body, design: .rounded))
         }
         
         .task {

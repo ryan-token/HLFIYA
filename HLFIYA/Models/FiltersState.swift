@@ -15,5 +15,5 @@ class FiltersState: ObservableObject {
     @Published var priceName = "All Prices"
     @Published var customLatitude = CLLocationDegrees()
     @Published var customLongitude = CLLocationDegrees()
-    @Published var customRadius = 10.0 // miles
+    @Published var customRadius = 5.0 // miles
 }

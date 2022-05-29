@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AsyncButton<Label: View>: View {
     var action: () async -> Void
+    
     @ViewBuilder var label: () -> Label
 
     @State private var isPerformingTask = false

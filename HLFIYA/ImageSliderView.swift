@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct ImageSliderView: View {
-    @Binding private var selectedTab: Int
-    
     var tabOptions = [Int]()
     let imageUrls: [String]
+    
+    @Binding private var selectedTab: Int
     
     init(selectedTab: Binding<Int>, imageUrls: [String]) {
         _selectedTab = selectedTab

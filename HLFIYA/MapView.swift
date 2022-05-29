@@ -9,20 +9,38 @@ import SwiftUI
 import MapKit
 
 struct MapView: View {
+    @State var tracking:MapUserTrackingMode = .follow
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
+    
+    @Binding var nearbyBusinesses: [Business]
+    @Binding var remainingBusinessesInList: Int
+    @Binding var currentBusinessIndex: Int
+    @Binding var showRefreshButton: Bool
+    @Binding var apiError: Bool
     
     @ObservedObject var filters: FiltersState
     @ObservedObject var locationManager = LocationManager.shared
+    
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
         NavigationView {
-            VStack {
-                Text("Set Custom Location")
-                    .font(.largeTitle)
-                Text("The map area showing here will be ")
-                Map(coordinateRegion: $region)
-                    .frame(width: 400, height: 300)
+            VStack(spacing: 10) {
+                Text("Choose Location")
+                    .font(Font.system(.largeTitle, design: .rounded))
+                    .bold()
+                
+                HStack {
+                    Text("Radius:")
+                        .foregroundColor(.gray)
+                    Text("\(String(format:"%.1f", convertDegreesToRadius(degrees: region.span.longitudeDelta))) Miles")
+                        .bold()
+                }
+                .font(Font.system(.body, design: .rounded))
+                
+                Map(coordinateRegion: $region, showsUserLocation: true, userTrackingMode: $tracking)
+                    .clipShape(Circle())
+                    .padding(.horizontal)
             }
             
             .onAppear {
@@ -35,8 +53,7 @@ struct MapView: View {
                         longitude = filters.customLongitude
                     }
                     
-                    let degrees = degreesFromRadius(radius: filters.customRadius)
-                    print("degrees: \(degrees)")
+                    let degrees = convertRadiusToDegrees(radius: filters.customRadius)
                     
                     region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: MKCoordinateSpan(latitudeDelta: degrees, longitudeDelta: degrees))
                 }
@@ -50,8 +67,9 @@ struct MapView: View {
                 filters.customLongitude = newLongitude
             }
             
-            .onChange(of: region.span.latitudeDelta) { newLatitudeDelta in
-                filters.customRadius = radiusFromDegrees(degrees: newLatitudeDelta)
+            .onChange(of: region.span.longitudeDelta) { newLongitudeDelta in
+                print("changing longitude delta")
+                filters.customRadius = convertDegreesToRadius(degrees: newLongitudeDelta)
             }
         
             .toolbar {
@@ -61,34 +79,46 @@ struct MapView: View {
                             let latitude = location.coordinate.latitude
                             let longitude = location.coordinate.longitude
                             
-                            region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
+                            let degrees = convertRadiusToDegrees(radius: 5.0)
+                            
+                            region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: MKCoordinateSpan(latitudeDelta: degrees, longitudeDelta: degrees))
                         }
                     }) {
                         Text("Reset")
+                            .font(Font.system(.body, design: .rounded))
                     }
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     AsyncButton(action: {
                         dismiss()
+                        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, price: filters.price)
+                        setState(fetchedBusinesses: fetchedBusinesses)
                     }) {
-                        Text("Close")
+                        Text("Save")
+                            .font(Font.system(.body, design: .rounded))
                     }
                 }
             }
         }
     }
-}
+    
+    // latitudeDelta is the amount of degrees that are visible on the screen. 1 degree is equal to ~69 miles
+    func convertRadiusToDegrees(radius: Double) -> Double {
+        return radius/69
+    }
 
-// latitudeDelta is the amount of degrees that are visible on the screen. 1 degree is always equal to approx. 69 miles, so you can calculate the diameter of the currently visible area in miles with this diameter = latitudeDelta * 69. This is assuming the screen is in portrait mode and, therefore, latitudeDelta is the larger value. If not, use longitudeDelta instead. I hope I understood your question correctly and this is helpful.
-func degreesFromRadius(radius: Double) -> Double {
-    let degreesFromRadius = radius/69
-    return degreesFromRadius
-}
+    func convertDegreesToRadius(degrees: CLLocationDegrees) -> Double {
+        return Double(degrees)*69
+    }
 
-func radiusFromDegrees(degrees: CLLocationDegrees) -> Double {
-    let radiusFromDegrees = Double(degrees)*69
-    return radiusFromDegrees
+    func setState(fetchedBusinesses: [Business]) {
+        nearbyBusinesses = fetchedBusinesses
+        remainingBusinessesInList = fetchedBusinesses.count
+        currentBusinessIndex = 0
+        showRefreshButton = true
+        apiError = false
+    }
 }
 
 //struct MapView_Previews: PreviewProvider {
