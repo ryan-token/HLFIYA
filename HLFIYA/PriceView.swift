@@ -2,40 +2,98 @@
 //  PriceView.swift
 //  HLFIYA
 //
-//  Created by Ryan Token on 4/25/22.
+//  Created by Ryan Token on 5/29/22.
 //
 
 import SwiftUI
 
 struct PriceView: View {
-    var price: String
-    var label: String
-    var maximumPrice = 4
-    var dollarImage = Image(systemName: "dollarsign.circle")
-    var offColor = Color.gray
-    var onColor = Color.green
+    let priceOptions = AllPrices().getPriceOptions()
+    
+    @Binding var nearbyBusinesses: [Business]
+    @Binding var remainingBusinessesInList: Int
+    @Binding var currentBusinessIndex: Int
+    @Binding var showRefreshButton: Bool
+    @Binding var apiError: Bool
+    
+    @ObservedObject var filters: FiltersState
+    @ObservedObject var locationManager = LocationManager.shared
+    
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        HStack {
-            if label.isEmpty == false {
-                Text(label)
-                    .foregroundColor(.gray)
-            }
-            
-            ForEach(1..<maximumPrice + 1, id: \.self) { possiblePrice in
-                dollarImage
-                    .foregroundColor(possiblePrice > countDollarSigns(from: price) ? offColor : onColor)
+        NavigationView {
+            VStack {
+                List {
+                    ForEach(priceOptions, id: \.self) { priceOption in
+                        MultiPicker(title: AllPrices().getFormattedPrice(from: priceOption), isSelected: filters.prices.contains(priceOption)) {
+                            // add or remove the selected category
+                            if filters.prices.contains(priceOption) {
+                                filters.prices.remove(priceOption)
+                            } else {
+                                filters.prices.insert(priceOption)
+                            }
+                            
+                            // Only allow 'All Prices' to be selected if nothing else is selected
+                            if filters.prices.count == priceOptions.count-1 {
+                                filters.prices = ["All Prices"]
+                            } else {
+                                filters.prices.remove("All Prices")
+                            }
+                            
+                            // If user specifically selects 'All Prices', deselect everything else
+                            if priceOption == "All Prices" {
+                                filters.prices = ["All Prices"]
+                            }
+                            
+                            // Set the categoriesNames option
+                            if filters.prices.count == 1 {
+                                filters.priceName = AllPrices().getFormattedPrice(from: filters.prices.first!)
+                            } else {
+                                filters.priceName = AllPrices().getPriceNames(from: filters.prices)
+                            }
+                        }
+                    }
+                }
+                .navigationTitle("Choose Prices")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {
+                            filters.prices = ["All Prices"]
+                            filters.priceName = "All Prices"
+                        }) {
+                            Text("Reset")
+                                .font(Font.system(.body, design: .rounded))
+                        }
+                    }
+                    
+                    
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        AsyncButton(action: {
+                            dismiss()
+                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+                            setState(fetchedBusinesses: fetchedBusinesses)
+                        }) {
+                            Text("Save")
+                                .font(Font.system(.body, design: .rounded))
+                        }
+                    }
+                 }
             }
         }
     }
     
-    func countDollarSigns(from: String) -> Int {
-        return from.count
+    func setState(fetchedBusinesses: [Business]) {
+        nearbyBusinesses = fetchedBusinesses
+        remainingBusinessesInList = fetchedBusinesses.count
+        currentBusinessIndex = 0
+        showRefreshButton = true
+        apiError = false
     }
 }
 
-struct PriceView_Previews: PreviewProvider {
-    static var previews: some View {
-        PriceView(price: "$$", label: "Price:")
-    }
-}
+//struct PriceView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        CategoriesView()
+//    }
+//}

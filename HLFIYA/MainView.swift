@@ -62,7 +62,7 @@ struct MainView: View {
                         .animation(.interactiveSpring(), value: filters.categories)
                         
                         HStack {
-                            Text("Price:")
+                            Text("Prices:")
                                 .foregroundColor(.gray)
                             Text(filters.priceName)
                                 .bold()
@@ -92,7 +92,7 @@ struct MainView: View {
                         
                         if remainingBusinessesInList == 0 && showRefreshButton {
                             AsyncButton(action: {
-                                let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, price: filters.price)
+                                let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                                 setState(fetchedBusinesses: fetchedBusinesses)
                             }, label: {
                                 HStack {
@@ -119,7 +119,7 @@ struct MainView: View {
                     
                     if nearbyBusinesses.isEmpty {
                         print("refreshing businesses")
-                        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, price: filters.price)
+                        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                         setState(fetchedBusinesses: fetchedBusinesses)
                     } else {
                         print("We already have businesses, not fetching onAppear")
@@ -130,7 +130,7 @@ struct MainView: View {
     }
     
     // radius is in meters
-    static func refreshBusinesses(customLatitude: CLLocationDegrees, customLongitude: CLLocationDegrees, locationManager: LocationManager, customRadius: Double, categories: Set<String>, price: String) async -> [Business] {
+    static func refreshBusinesses(customLatitude: CLLocationDegrees, customLongitude: CLLocationDegrees, locationManager: LocationManager, customRadius: Double, categories: Set<String>, prices: Set<String>) async -> [Business] {
         var latitude: CLLocationDegrees
         var longitude: CLLocationDegrees
         var fetchedBusinesses: [Business]
@@ -148,8 +148,15 @@ struct MainView: View {
             }
         }
         
+        var stringPrices: String
+        if prices == ["All Prices"] {
+            stringPrices = "1,2,3,4"
+        } else {
+            stringPrices = prices.joined(separator: ",")
+        }
+        
         do {
-            fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: customRadius), categories: categories, price: price)
+            fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: customRadius), categories: categories, prices: stringPrices)
         } catch {
             print("Request failed with error: \(error)")
             fetchedBusinesses = []

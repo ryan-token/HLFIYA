@@ -14,13 +14,13 @@ struct BusinessFetcher {
     }
     
     // radius is in meters
-    static func getBusinessesNear(latitude: Double, longitude: Double, radius: Int, categories: Set<String>, price: String) async throws -> [Business] {
+    static func getBusinessesNear(latitude: Double, longitude: Double, radius: Int, categories: Set<String>, prices: String) async throws -> [Business] {
         var userCategories: Set = ["food"]
         if categories == userCategories { userCategories = ["food"] } else { userCategories = categories }
         let formattedCategories = userCategories.joined(separator: ",")
         
         var userPrice = ""
-        if price == "" { userPrice = "1, 2, 3, 4" } else { userPrice = price }
+        if prices == "" { userPrice = "1, 2, 3, 4" } else { userPrice = prices }
         
         print("getting businesses near \(latitude), \(longitude), within a radius of \(radius) meters")
         let endpoint = "https://api.yelp.com/v3/businesses/search?latitude=\(latitude)&longitude=\(longitude)&radius=\(radius)&limit=50&categories=\(formattedCategories)&price=\(userPrice)"

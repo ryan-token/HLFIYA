@@ -1,15 +1,14 @@
 //
-//  CategoriesPicker.swift
+//  CategoriesView.swift
 //  HLFIYA
 //
 //  Created by Ryan Token on 5/5/22.
 //
 
 import SwiftUI
-import MapKit
 
 struct CategoriesView: View {
-    let yelpCategories = Array(AllCategories().getYelpCategories())
+    let yelpCategories = AllCategories().getYelpCategories()
     
     @Binding var nearbyBusinesses: [Business]
     @Binding var remainingBusinessesInList: Int
@@ -72,7 +71,7 @@ struct CategoriesView: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         AsyncButton(action: {
                             dismiss()
-                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, price: filters.price)
+                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                             setState(fetchedBusinesses: fetchedBusinesses)
                         }) {
                             Text("Save")

@@ -68,7 +68,6 @@ struct MapView: View {
             }
             
             .onChange(of: region.span.longitudeDelta) { newLongitudeDelta in
-                print("changing longitude delta")
                 filters.customRadius = convertDegreesToRadius(degrees: newLongitudeDelta)
             }
         
@@ -92,7 +91,7 @@ struct MapView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     AsyncButton(action: {
                         dismiss()
-                        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, price: filters.price)
+                        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                         setState(fetchedBusinesses: fetchedBusinesses)
                     }) {
                         Text("Save")

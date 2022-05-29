@@ -11,7 +11,7 @@ import MapKit
 class FiltersState: ObservableObject {
     @Published var categories: Set = ["food"]
     @Published var categoriesNames = "All Food"
-    @Published var price = "1,2,3,4"
+    @Published var prices: Set = ["All Prices"] // send to api as "1,2,3,4"
     @Published var priceName = "All Prices"
     @Published var customLatitude = CLLocationDegrees()
     @Published var customLongitude = CLLocationDegrees()

@@ -6,11 +6,10 @@
 //
 
 import SwiftUI
-import MapKit
 
 struct BottomBarView: View {
     @State private var isShowingCategoriesView = false
-    @State private var isShowingPriceOptions = false
+    @State private var isShowingPriceView = false
     @State private var isShowingMapView = false
     
     @Binding var nearbyBusinesses: [Business]
@@ -27,7 +26,7 @@ struct BottomBarView: View {
             Spacer()
             
             AsyncButton(action: {
-                let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, price: filters.price)
+                let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                 setState(fetchedBusinesses: fetchedBusinesses)
             }) {
                 VStack(spacing: 5) {
@@ -58,13 +57,13 @@ struct BottomBarView: View {
             Spacer()
             
             Button(action: {
-                isShowingPriceOptions.toggle()
+                isShowingPriceView.toggle()
             }) {
                 VStack(spacing: 5) {
                     Image(systemName: "dollarsign.circle.fill")
                         .font(Font.system(size: 50, design: .rounded))
                         .foregroundColor(.green)
-                    Text("Price")
+                    Text("Prices")
                         .font(Font.system(.body, design: .rounded))
                         .foregroundColor(.gray)
                 }
@@ -87,38 +86,9 @@ struct BottomBarView: View {
             
             Spacer()
             
-            .confirmationDialog("Select a price range", isPresented: $isShowingPriceOptions, titleVisibility: .visible) {
-                AsyncButton(action: {
-                    await setPriceFilter(price: "1", name: "$")
-                }) {
-                    Text("$")
+                .popover(isPresented: $isShowingPriceView) {
+                    PriceView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
                 }
-                
-                AsyncButton(action: {
-                    await setPriceFilter(price: "2", name: "$$")
-                }) {
-                    Text("$$")
-                }
-                
-                AsyncButton(action: {
-                    await setPriceFilter(price: "3", name: "$$$")
-                }) {
-                    Text("$$$")
-                }
-                
-                AsyncButton(action: {
-                    await setPriceFilter(price: "4", name: "$$$$")
-                }) {
-                    Text("$$$$")
-                }
-                
-                AsyncButton(action: {
-                    await setPriceFilter(price: "1,2,3,4", name: "All Prices")
-                }) {
-                    Text("All Prices")
-                }
-            }
-            .font(Font.system(.body, design: .rounded))
             
             .popover(isPresented: $isShowingCategoriesView) {
                 CategoriesView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
@@ -130,10 +100,10 @@ struct BottomBarView: View {
         }
     }
     
-    func setPriceFilter(price: String, name: String) async {
-        filters.price = price
+    func setPriceFilter(prices: Set<String>, name: String) async {
+        filters.prices = prices
         filters.priceName = name
-        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, price: filters.price)
+        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
         setState(fetchedBusinesses: fetchedBusinesses)
     }
     

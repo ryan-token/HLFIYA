@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import MapKit
 
 struct TopBarView: View {
     @State private var isShowingSettingsView = false

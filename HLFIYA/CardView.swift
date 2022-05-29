@@ -67,7 +67,7 @@ struct CardView: View {
                         }
                     }
                     
-                    PriceView(price: business.price ?? "", label: "")
+                    DollarView(price: business.price ?? "", label: "")
                     
                     HStack {
                         Text(business.categories[0].title)
