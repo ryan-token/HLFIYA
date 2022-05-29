@@ -11,10 +11,7 @@ import MapKit
 struct MapView: View {
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
     
-    @Binding var customLatitude: CLLocationDegrees
-    @Binding var customLongitude: CLLocationDegrees
-    @Binding var customRadius: Double
-    
+    @ObservedObject var filters: FiltersState
     @ObservedObject var locationManager = LocationManager.shared
     @Environment(\.dismiss) var dismiss
     
@@ -33,12 +30,12 @@ struct MapView: View {
                     var latitude = location.coordinate.latitude
                     var longitude = location.coordinate.longitude
                     
-                    if ((customLatitude != 0.000000 && customLongitude != 0.000000) && (customLatitude != latitude || customLongitude != longitude)) {
-                        latitude = customLatitude
-                        longitude = customLongitude
+                    if ((filters.customLatitude != 0.000000 && filters.customLongitude != 0.000000) && (filters.customLatitude != latitude || filters.customLongitude != longitude)) {
+                        latitude = filters.customLatitude
+                        longitude = filters.customLongitude
                     }
                     
-                    let degrees = degreesFromRadius(radius: customRadius)
+                    let degrees = degreesFromRadius(radius: filters.customRadius)
                     print("degrees: \(degrees)")
                     
                     region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: MKCoordinateSpan(latitudeDelta: degrees, longitudeDelta: degrees))
@@ -46,15 +43,15 @@ struct MapView: View {
             }
         
             .onChange(of: region.center.latitude) { newLatitude in
-                customLatitude = newLatitude
+                filters.customLatitude = newLatitude
             }
             
             .onChange(of: region.center.longitude) { newLongitude in
-                customLongitude = newLongitude
+                filters.customLongitude = newLongitude
             }
             
             .onChange(of: region.span.latitudeDelta) { newLatitudeDelta in
-                customRadius = radiusFromDegrees(degrees: newLatitudeDelta)
+                filters.customRadius = radiusFromDegrees(degrees: newLatitudeDelta)
             }
         
             .toolbar {

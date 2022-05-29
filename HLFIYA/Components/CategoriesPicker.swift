@@ -9,23 +9,15 @@ import SwiftUI
 import MapKit
 
 struct CategoriesPicker: View {
-    @Binding var categoriesFilter: Set<String>
-    @Binding var categoriesNames: String
     @Binding var nearbyBusinesses: [Business]
     @Binding var remainingBusinessesInList: Int
     @Binding var currentBusinessIndex: Int
     @Binding var showRefreshButton: Bool
     @Binding var apiError: Bool
     
-    var radiusFilter: Double
-    var priceFilter: String
-    
-    @Binding var customLatitude: CLLocationDegrees
-    @Binding var customLongitude: CLLocationDegrees
-    @Binding var customRadius: Double
-    
     let yelpCategories = Array(AllCategories().getYelpCategories())
     
+    @ObservedObject var filters: FiltersState
     @ObservedObject var locationManager = LocationManager.shared
     
     @Environment(\.dismiss) var dismiss
@@ -35,31 +27,31 @@ struct CategoriesPicker: View {
             VStack {
                 List {
                     ForEach(yelpCategories, id: \.self) { yelpCategory in
-                        MultiPicker(title: AllCategories().getFormattedCategory(from: yelpCategory), isSelected: categoriesFilter.contains(yelpCategory)) {
+                        MultiPicker(title: AllCategories().getFormattedCategory(from: yelpCategory), isSelected: filters.categories.contains(yelpCategory)) {
                             // add or remove the selected category
-                            if categoriesFilter.contains(yelpCategory) {
-                                categoriesFilter.remove(yelpCategory)
+                            if filters.categories.contains(yelpCategory) {
+                                filters.categories.remove(yelpCategory)
                             } else {
-                                categoriesFilter.insert(yelpCategory)
+                                filters.categories.insert(yelpCategory)
                             }
                             
                             // Only allow 'All Food' to be selected if nothing else is selected
-                            if categoriesFilter.count > 0 {
-                                categoriesFilter.remove("food")
+                            if filters.categories.count > 0 {
+                                filters.categories.remove("food")
                             } else {
-                                categoriesFilter.insert("food")
+                                filters.categories.insert("food")
                             }
                             
                             // If user specifically selects 'All Food', deselect everything else
                             if yelpCategory == "food" {
-                                categoriesFilter = ["food"]
+                                filters.categories = ["food"]
                             }
                             
                             // Set the categoriesNames option
-                            if categoriesFilter.count == 1 {
-                                categoriesNames = AllCategories().getFormattedCategory(from: categoriesFilter.first!)
+                            if filters.categories.count == 1 {
+                                filters.categoriesNames = AllCategories().getFormattedCategory(from: filters.categories.first!)
                             } else {
-                                categoriesNames = "\(AllCategories().getFormattedCategory(from: categoriesFilter.first!)) and \(categoriesFilter.count-1) More"
+                                filters.categoriesNames = "\(AllCategories().getFormattedCategory(from: filters.categories.first!)) and \(filters.categories.count-1) More"
                             }
                         }
                     }
@@ -68,8 +60,8 @@ struct CategoriesPicker: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button("Reset") {
-                            categoriesFilter = ["food"]
-                            categoriesNames = "All Food"
+                            filters.categories = ["food"]
+                            filters.categoriesNames = "All Food"
                         }
                     }
                     
@@ -77,7 +69,8 @@ struct CategoriesPicker: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         AsyncButton(action: {
                             dismiss()
-                            await refreshBusinesses()
+                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, price: filters.price)
+                            setState(fetchedBusinesses: fetchedBusinesses)
                         }) {
                             Text("Close")
                         }
@@ -87,31 +80,12 @@ struct CategoriesPicker: View {
         }
     }
     
-    func refreshBusinesses() async {
-        if let location = locationManager.location {
-            var latitude = location.coordinate.latitude
-            var longitude = location.coordinate.longitude
-            
-            if customLatitude != 0.000000 && customLongitude != 0.000000 {
-                latitude = customLatitude
-                longitude = customLongitude
-            }
-            
-            print("categories: \(categoriesFilter)")
-            
-            do {
-                let fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: customRadius), categories: categoriesFilter, price: priceFilter)
-                nearbyBusinesses = fetchedBusinesses
-                print(nearbyBusinesses)
-                remainingBusinessesInList = fetchedBusinesses.count
-                currentBusinessIndex = 0
-                showRefreshButton = true
-                apiError = false
-            } catch {
-                print("Request failed with error: \(error)")
-                apiError = true
-            }
-        }
+    func setState(fetchedBusinesses: [Business]) {
+        nearbyBusinesses = fetchedBusinesses
+        remainingBusinessesInList = fetchedBusinesses.count
+        currentBusinessIndex = 0
+        showRefreshButton = true
+        apiError = false
     }
 }
 

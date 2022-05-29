@@ -9,27 +9,18 @@ import SwiftUI
 import MapKit
 
 struct BottomBarView: View {
-    @State private var showingCategoriesPicker = false
-    @State private var showingCategoryOptions = false
-    @State private var showingPriceOptions = false
-    @State private var showingRadiusSlider = false
+    @State private var isShowingCategoriesPicker = false
+    @State private var isShowingCategoryOptions = false
+    @State private var isShowingPriceOptions = false
+    @State private var isShowingMapView = false
     
     @Binding var nearbyBusinesses: [Business]
     @Binding var remainingBusinessesInList: Int
     @Binding var currentBusinessIndex: Int
     @Binding var showRefreshButton: Bool
     @Binding var apiError: Bool
-
-    @Binding var radiusFilter: Double
-    @Binding var categoriesFilter: Set<String>
-    @Binding var categoriesNames: String
-    @Binding var priceFilter: String
-    @Binding var priceName: String
     
-    @Binding var customLatitude: CLLocationDegrees
-    @Binding var customLongitude: CLLocationDegrees
-    @Binding var customRadius: Double
-    
+    @ObservedObject var filters: FiltersState
     @ObservedObject var locationManager = LocationManager.shared
     
     var body: some View {
@@ -37,7 +28,8 @@ struct BottomBarView: View {
             Spacer()
             
             AsyncButton(action: {
-                await refreshBusinesses()
+                let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, price: filters.price)
+                setState(fetchedBusinesses: fetchedBusinesses)
             }) {
                 VStack(spacing: 5) {
                     Image(systemName: "arrow.clockwise.circle.fill")
@@ -51,7 +43,7 @@ struct BottomBarView: View {
             Spacer()
             
             Button(action: {
-                showingCategoriesPicker = true
+                isShowingCategoriesPicker.toggle()
             }) {
                 VStack(spacing: 5) {
                     Image(systemName: "line.3.horizontal.decrease.circle.fill")
@@ -65,7 +57,7 @@ struct BottomBarView: View {
             Spacer()
             
             Button(action: {
-                showingPriceOptions = true
+                isShowingPriceOptions.toggle()
             }) {
                 VStack(spacing: 5) {
                     Image(systemName: "dollarsign.circle.fill")
@@ -79,20 +71,20 @@ struct BottomBarView: View {
             Spacer()
             
             Button(action: {
-                showingRadiusSlider = true
+                isShowingMapView.toggle()
             }) {
                 VStack(spacing: 5) {
                     Image(systemName: "map.circle.fill")
                         .font(Font.system(size: 50, design: .rounded))
                         .foregroundColor(.pink)
-                    Text("Radius")
+                    Text("Location")
                         .foregroundColor(.gray)
                 }
             }
             
             Spacer()
             
-            .confirmationDialog("Select a price range", isPresented: $showingPriceOptions, titleVisibility: .visible) {
+            .confirmationDialog("Select a price range", isPresented: $isShowingPriceOptions, titleVisibility: .visible) {
                 AsyncButton(action: {
                     await setPriceFilter(price: "1", name: "$")
                 }) {
@@ -124,45 +116,29 @@ struct BottomBarView: View {
                 }
             }
             
-            .popover(isPresented: $showingCategoriesPicker) {
-                CategoriesPicker(categoriesFilter: $categoriesFilter, categoriesNames: $categoriesNames, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, radiusFilter: radiusFilter, priceFilter: priceFilter, customLatitude: $customLatitude, customLongitude: $customLongitude, customRadius: $customRadius)
+            .popover(isPresented: $isShowingCategoriesPicker) {
+                CategoriesPicker(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
             }
             
-            .popover(isPresented: $showingRadiusSlider) {
-                RadiusSlider(radiusFilter: $radiusFilter, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, categoriesFilter: categoriesFilter, priceFilter: priceFilter, customLatitude: $customLatitude, customLongitude: $customLongitude, customRadius: $customRadius)
+            .popover(isPresented: $isShowingMapView) {
+                MapView(filters: filters)
             }
         }
     }
     
     func setPriceFilter(price: String, name: String) async {
-        priceFilter = price
-        priceName = name
-        await refreshBusinesses()
+        filters.price = price
+        filters.priceName = name
+        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, price: filters.price)
+        setState(fetchedBusinesses: fetchedBusinesses)
     }
     
-    func refreshBusinesses() async {
-        if let location = locationManager.location {
-            var latitude = location.coordinate.latitude
-            var longitude = location.coordinate.longitude
-            
-            if customLatitude != 0.000000 && customLongitude != 0.000000 {
-                latitude = customLatitude
-                longitude = customLongitude
-            }
-            
-            do {
-                let fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: customRadius), categories: categoriesFilter, price: priceFilter)
-                nearbyBusinesses = fetchedBusinesses
-                print(nearbyBusinesses)
-                remainingBusinessesInList = fetchedBusinesses.count
-                currentBusinessIndex = 0
-                showRefreshButton = true
-                apiError = false
-            } catch {
-                print("Request failed with error: \(error)")
-                apiError = true
-            }
-        }
+    func setState(fetchedBusinesses: [Business]) {
+        nearbyBusinesses = fetchedBusinesses
+        remainingBusinessesInList = fetchedBusinesses.count
+        currentBusinessIndex = 0
+        showRefreshButton = true
+        apiError = false
     }
 }
 
