@@ -11,6 +11,7 @@ import MapKit
 struct MapView: View {
     @State var tracking:MapUserTrackingMode = .follow
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
+    @State private var isShowingRadiusTooLargeAlert = false
     
     @Binding var nearbyBusinesses: [Business]
     @Binding var remainingBusinessesInList: Int
@@ -70,6 +71,12 @@ struct MapView: View {
             .onChange(of: region.span.longitudeDelta) { newLongitudeDelta in
                 filters.customRadius = convertDegreesToRadius(degrees: newLongitudeDelta)
             }
+            
+            .onDisappear {
+                if filters.customRadius > 24.854847 {
+                    filters.customRadius = 24.854847
+                }
+            }
         
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -90,14 +97,22 @@ struct MapView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     AsyncButton(action: {
-                        dismiss()
-                        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
-                        setState(fetchedBusinesses: fetchedBusinesses)
+                        if (filters.customRadius > 24.854847) {
+                            isShowingRadiusTooLargeAlert.toggle()
+                        } else {
+                            dismiss()
+                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+                            setState(fetchedBusinesses: fetchedBusinesses)
+                        }
                     }) {
                         Text("Save")
                             .font(Font.system(.body, design: .rounded))
                     }
                 }
+            }
+            
+            .alert("Radius must be less than 25 miles. Please zoom in.", isPresented: $isShowingRadiusTooLargeAlert) {
+                Button("OK", role: .cancel) { }
             }
         }
     }
