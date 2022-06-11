@@ -13,10 +13,17 @@ struct BusinessView: View {
     @State private var currentBusiness = BusinessDetails()
     @State private var apiError = false
     @State private var selectedTab = 1
+    @State private var listTappedName = ""
+    @State private var isShowingAddedToListAlert = false
+    @State private var isShowingAddedToListErrorAlert = false
+    @State private var isShowingDuplicateAlert = false
+    @State private var isShowingCreateListSheet = false
     
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.openURL) var openURL
+    @Environment(\.managedObjectContext) var moc
+    @FetchRequest(sortDescriptors: [SortDescriptor(\.name)]) var savedLists: FetchedResults<SavedList>
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -51,6 +58,28 @@ struct BusinessView: View {
                 Section(header: Text("Categories")) {
                     ForEach(currentBusiness.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
                         Text(category.title ?? "")
+                    }
+                }
+                
+                Section(header: Text("Add to List")) {
+                    ForEach(savedLists) { list in
+                        Button(action:  {
+                            listTappedName = list.wrappedName
+                            addToList(list: list, id: business.id, name: business.name)
+                        }) {
+                            Text(list.wrappedName)
+                        }
+                    }
+                    
+                    Button(action: {
+                        isShowingCreateListSheet.toggle()
+                    }) {
+                        HStack {
+                            Image(systemName: "plus.square")
+                                .foregroundColor(.green)
+                            Text("Create List")
+                                .foregroundColor(.green)
+                        }
                     }
                 }
                 
@@ -162,6 +191,41 @@ struct BusinessView: View {
         
         .task {
             await getBusiness(id: business.id)
+        }
+        
+        .alert("Added \(business.name) to your \(listTappedName) list", isPresented: $isShowingAddedToListAlert) {
+            Button("OK", role: .cancel) { }
+        }
+        
+        .alert("Error adding \(business.name) to your \(listTappedName) list", isPresented: $isShowingAddedToListErrorAlert) {
+            Button("OK", role: .cancel) { }
+        }
+        
+        .alert("\(business.name) is already in your \(listTappedName) list!", isPresented: $isShowingDuplicateAlert) {
+            Button("OK", role: .cancel) { }
+        }
+        
+        .popover(isPresented: $isShowingCreateListSheet) {
+            CreateListSheet()
+        }
+    }
+    
+    func addToList(list: SavedList, id: String, name: String) {
+        let restaurant = SavedRestaurant(context: moc)
+        print("list restaurants: \(list.restaurantsArray)")
+        if !list.restaurantsArray.contains(where: { $0.name == name }) {
+            restaurant.addToLists(list)
+            restaurant.id = id
+            restaurant.name = name
+
+            do {
+                try moc.save()
+                isShowingAddedToListAlert.toggle()
+            } catch {
+                isShowingAddedToListErrorAlert.toggle()
+            }
+        } else {
+            isShowingDuplicateAlert.toggle()
         }
     }
     

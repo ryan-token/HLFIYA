@@ -9,7 +9,7 @@ import CoreData
 
 extension RightSwipe {
   static var allRightSwipesFetchRequest: NSFetchRequest<RightSwipe> {
-      let request: NSFetchRequest<RightSwipe> = RightSwipe.fetchRequest()
+      let request = RightSwipe.fetchRequest()
       request.sortDescriptors = [NSSortDescriptor(keyPath: \RightSwipe.name, ascending: true)]
 
       return request
@@ -18,7 +18,7 @@ extension RightSwipe {
 
 extension LeftSwipe {
   static var allLeftSwipesFetchRequest: NSFetchRequest<LeftSwipe> {
-      let request: NSFetchRequest<LeftSwipe> = LeftSwipe.fetchRequest()
+      let request = LeftSwipe.fetchRequest()
       request.sortDescriptors = [NSSortDescriptor(keyPath: \LeftSwipe.name, ascending: true)]
 
       return request

@@ -2,7 +2,7 @@
 //  LeftSwipe+CoreDataClass.swift
 //  HLFIYA
 //
-//  Created by Ryan Token on 5/6/22.
+//  Created by Ryan Token on 6/10/22.
 //
 //
 

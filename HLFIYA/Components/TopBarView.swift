@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TopBarView: View {
     @State private var isShowingSettingsView = false
+    @State private var isShowingListsView = false
     
     var body: some View {
         HStack {
@@ -24,14 +25,18 @@ struct TopBarView: View {
             Spacer()
             
             Button(action: {
-                print("does nothing")
+                isShowingListsView.toggle()
             }) {
-                Image(systemName: "person.circle.fill")
+                Image(systemName: "list.bullet.circle.fill")
                     .font(Font.system(size: 45, design: .rounded))
             }
             
             .popover(isPresented: $isShowingSettingsView) {
                 SettingsView()
+            }
+            
+            .popover(isPresented: $isShowingListsView) {
+                ListsView()
             }
         }
         .padding(.horizontal)
