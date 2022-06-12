@@ -61,6 +61,12 @@ struct BusinessView: View {
                     }
                 }
                 
+                Section(header: Text("Photos")) {
+                    ImageSliderView(selectedTab: $selectedTab, imageUrls: checkForPhotos(imageUrls: currentBusiness.photos ?? [""]))
+                        .frame(height: 300)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                }
+                
                 Section(header: Text("Add to List")) {
                     ForEach(savedLists) { list in
                         Button(action:  {
@@ -81,12 +87,6 @@ struct BusinessView: View {
                                 .foregroundColor(.green)
                         }
                     }
-                }
-                
-                Section(header: Text("Photos")) {
-                    ImageSliderView(selectedTab: $selectedTab, imageUrls: checkForPhotos(imageUrls: currentBusiness.photos ?? [""]))
-                        .frame(height: 300)
-                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 }
                 
                 Section(header: Text("Information")) {
