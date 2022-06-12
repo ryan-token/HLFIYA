@@ -16,14 +16,14 @@ struct SwipesStatsView: View {
     
     var body: some View {
         List() {
-            Section(header: Text("Right Swipes").font(.callout).foregroundColor(.gray)) {
-                ForEach(formattedRightSwipes(), id: \.key) { business, count in
+            Section(header: Text("Top 5 Right Swipes").font(.callout).foregroundColor(.gray)) {
+                ForEach(formattedRightSwipes().prefix(5), id: \.key) { business, count in
                     Text("\(business.trimmingCharacters(in: .whitespacesAndNewlines)): \(count)")
                 }
             }
             
-            Section(header: Text("Left Swipes").font(.callout).foregroundColor(.gray)) {
-                ForEach(formattedLeftSwipes(), id: \.key) { business, count in
+            Section(header: Text("Top 5 Left Swipes").font(.callout).foregroundColor(.gray)) {
+                ForEach(formattedLeftSwipes().prefix(5), id: \.key) { business, count in
                     Text("\(business.trimmingCharacters(in: .whitespacesAndNewlines)): \(count)")
                 }
             }

@@ -8,6 +8,7 @@
 import SwiftUI
 import MapKit
 import GoogleMobileAds
+import StoreKit
 
 struct MainView: View {
     @State private var currentLocationSet = false
@@ -16,6 +17,8 @@ struct MainView: View {
     @State private var currentBusinessIndex = 0
     @State private var showRefreshButton = false
     @State private var apiError = false
+    @State private var isShowingError = false
+    @State private var errorTitle = ""
     
     @State private var businessesSwipedLeft = [Business]()
     @State private var businessesSwipedRight = [Business]()
@@ -25,8 +28,6 @@ struct MainView: View {
     @ObservedObject var locationManager = LocationManager.shared
     
     init() {
-        storeManager.fetchProducts()
-        
         let design = UIFontDescriptor.SystemDesign.rounded
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .largeTitle)
             .withDesign(design)!
@@ -37,9 +38,6 @@ struct MainView: View {
     
     var body: some View {
         Group {
-            if locationManager.location == nil {
-                LocationRequestView()
-            } else {
                 VStack {
                     TopBarView()
                     
@@ -116,14 +114,13 @@ struct MainView: View {
                     
                     if storeManager.purchasedIds.isEmpty {
                         VStack(alignment: .trailing, spacing: 0) {
-                            if (storeManager.products.first != nil) {
-                                Button(action: {
-                                    storeManager.purchase()
+                            if let removeAdsProduct = storeManager.products.first {
+                                AsyncButton(action: {
+                                    await purchaseRemoveAds(product: removeAdsProduct)
                                 }) {
                                     Text("Remove Ads")
                                         .font(Font.system(.callout, design: .rounded))
                                 }
-                                
                             }
                             GADBannerViewController()
                                 .frame(width: GADAdSizeBanner.size.width, height: GADAdSizeBanner.size.height)
@@ -146,12 +143,12 @@ struct MainView: View {
                         print("We already have businesses, not fetching onAppear")
                     }
                 }
-            }
         }
+        .environmentObject(storeManager)
         
-        .onAppear {
-            storeManager.fetchProducts()
-        }
+        .alert(isPresented: $isShowingError, content: {
+            Alert(title: Text(errorTitle), message: nil, dismissButton: .default(Text("Okay")))
+        })
     }
     
     // radius is in meters
@@ -203,6 +200,21 @@ struct MainView: View {
             apiError = true
         } else {
             apiError = false
+        }
+    }
+    
+    func purchaseRemoveAds(product: Product) async {
+        do {
+            if try await storeManager.purchase(product) != nil {
+                print("Purchase was successful")
+            }
+        } catch StoreError.failedVerification {
+            HapticGenerator.playErrorHaptic()
+            errorTitle = "Your purchase could not be verified by the App Store"
+            isShowingError.toggle()
+        } catch {
+            HapticGenerator.playErrorHaptic()
+            print("Failed purchase for \(product.id): \(error)")
         }
     }
 }

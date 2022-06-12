@@ -53,6 +53,8 @@
 		F4BC0C272855303A00D76EE5 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = F4BC0C262855303A00D76EE5 /* GoogleMobileAds */; };
 		F4BC0C2A2855308E00D76EE5 /* GADBannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC0C292855308E00D76EE5 /* GADBannerViewController.swift */; };
 		F4BC0C2D28555FA100D76EE5 /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC0C2C28555FA100D76EE5 /* StoreManager.swift */; };
+		F4BC0C302856468100D76EE5 /* HapticGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC0C2F2856468100D76EE5 /* HapticGenerator.swift */; };
+		F4BC0C3228564F3C00D76EE5 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC0C3128564F3C00D76EE5 /* AboutView.swift */; };
 		F4D4073E2824B45D009805CB /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D4073D2824B45D009805CB /* CategoriesView.swift */; };
 		F4D407402824B9E7009805CB /* AllCategories.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D4073F2824B9E7009805CB /* AllCategories.swift */; };
 		F4D407422824C599009805CB /* MultiPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D407412824C599009805CB /* MultiPicker.swift */; };
@@ -108,6 +110,8 @@
 		F4BC0C292855308E00D76EE5 /* GADBannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GADBannerViewController.swift; sourceTree = "<group>"; };
 		F4BC0C2C28555FA100D76EE5 /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
 		F4BC0C2E285563EE00D76EE5 /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
+		F4BC0C2F2856468100D76EE5 /* HapticGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticGenerator.swift; sourceTree = "<group>"; };
+		F4BC0C3128564F3C00D76EE5 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		F4D4073D2824B45D009805CB /* CategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesView.swift; sourceTree = "<group>"; };
 		F4D4073F2824B9E7009805CB /* AllCategories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllCategories.swift; sourceTree = "<group>"; };
 		F4D407412824C599009805CB /* MultiPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiPicker.swift; sourceTree = "<group>"; };
@@ -159,11 +163,13 @@
 				F47A9D0628441BCB00161653 /* PriceView.swift */,
 				F47A9D00284074A000161653 /* MapView.swift */,
 				F48497302826226300C2DB89 /* SettingsView.swift */,
+				F4BC0C3128564F3C00D76EE5 /* AboutView.swift */,
 				F4BC0C1D2854FB2700D76EE5 /* ListsView.swift */,
 				F4BC0C1F2854FEE300D76EE5 /* SavedRestaurantsView.swift */,
 				F4BC0C2328550FF000D76EE5 /* SavedRestaurantsDetailsView.swift */,
 				F484973228262F2C00C2DB89 /* SwipesStatsView.swift */,
 				F404FD682818E2D2006D9C5A /* LocationRequestView.swift */,
+				F4BC0C2F2856468100D76EE5 /* HapticGenerator.swift */,
 				F42D615F281D837B00DBA5C0 /* Utils.swift */,
 				F45B3F1827963D97003DCC31 /* Persistence.swift */,
 				F486A3C527C5C94600298DAF /* Services */,
@@ -368,6 +374,7 @@
 				F4BC0C2A2855308E00D76EE5 /* GADBannerViewController.swift in Sources */,
 				F48497312826226300C2DB89 /* SettingsView.swift in Sources */,
 				F4130FA2285419ED0007D7E0 /* LeftSwipe+CoreDataProperties.swift in Sources */,
+				F4BC0C3228564F3C00D76EE5 /* AboutView.swift in Sources */,
 				F4130FAC28541A870007D7E0 /* SavedRestaurant+FetchRequest.swift in Sources */,
 				F486A3C927C5E16900298DAF /* AsyncButton.swift in Sources */,
 				F45B3F2B279700FC003DCC31 /* TopBarView.swift in Sources */,
@@ -382,6 +389,7 @@
 				F47A9D0A28441C7600161653 /* AllPrices.swift in Sources */,
 				F4BC0C1E2854FB2700D76EE5 /* ListsView.swift in Sources */,
 				F42D6160281D837B00DBA5C0 /* Utils.swift in Sources */,
+				F4BC0C302856468100D76EE5 /* HapticGenerator.swift in Sources */,
 				F4BC0C2D28555FA100D76EE5 /* StoreManager.swift in Sources */,
 				F4130FAA28541A3D0007D7E0 /* SavedList+FetchRequest.swift in Sources */,
 				F49820F128178B2800035D1C /* DollarView.swift in Sources */,
