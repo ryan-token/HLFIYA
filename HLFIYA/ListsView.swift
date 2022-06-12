@@ -25,6 +25,12 @@ struct ListsView: View {
                         .isDetailLink(false)
                     }
                     .onDelete(perform: removeList)
+                    
+                    if (savedLists.isEmpty) {
+                        Text("Create lists to easily save places for later")
+                            .font(Font.system(.body, design: .rounded))
+                            .foregroundColor(.gray)
+                    }
                 }
                 
                 Button(action: {

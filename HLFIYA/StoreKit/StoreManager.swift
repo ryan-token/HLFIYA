@@ -60,7 +60,9 @@ class StoreManager: ObservableObject {
         
         switch state {
         case .verified(let transaction):
-            purchasedIds.insert(transaction.productID)
+            DispatchQueue.main.async {
+                self.purchasedIds.insert(transaction.productID)
+            }
         case .unverified(_, _):
             print("Unverified transaction")
         }
@@ -109,10 +111,14 @@ class StoreManager: ObservableObject {
         print("updating purchased IDs")
         if transaction.revocationDate == nil {
             //If the App Store has not revoked the transaction, add it to the list of `purchasedIdentifiers`.
-            purchasedIds.insert(transaction.productID)
+            DispatchQueue.main.async {
+                self.purchasedIds.insert(transaction.productID)
+            }
         } else {
             //If the App Store has revoked this transaction, remove it from the list of `purchasedIdentifiers`.
-            purchasedIds.remove(transaction.productID)
+            DispatchQueue.main.async {
+                self.purchasedIds.remove(transaction.productID)
+            }
         }
     }
     

@@ -9,7 +9,7 @@ import SwiftUI
 import CoreLocation
 
 struct LocationRequestView: View {
-    private let clLocationManager = CLLocationManager()
+    private let manager = CLLocationManager()
     @ObservedObject var locationManager = LocationManager.shared
     
     var body: some View {
@@ -55,7 +55,7 @@ struct LocationRequestView: View {
                     }
                     
                     if CLLocationManager.locationServicesEnabled() {
-                        switch clLocationManager.authorizationStatus {
+                        switch manager.authorizationStatus {
                         case .notDetermined:
                             Text("")
                         case .restricted, .denied:
