@@ -50,6 +50,9 @@
 		F4BC0C202854FEE300D76EE5 /* SavedRestaurantsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC0C1F2854FEE300D76EE5 /* SavedRestaurantsView.swift */; };
 		F4BC0C222855017100D76EE5 /* CreateListSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC0C212855017100D76EE5 /* CreateListSheet.swift */; };
 		F4BC0C2428550FF000D76EE5 /* SavedRestaurantsDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC0C2328550FF000D76EE5 /* SavedRestaurantsDetailsView.swift */; };
+		F4BC0C272855303A00D76EE5 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = F4BC0C262855303A00D76EE5 /* GoogleMobileAds */; };
+		F4BC0C2A2855308E00D76EE5 /* GADBannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC0C292855308E00D76EE5 /* GADBannerViewController.swift */; };
+		F4BC0C2D28555FA100D76EE5 /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4BC0C2C28555FA100D76EE5 /* StoreManager.swift */; };
 		F4D4073E2824B45D009805CB /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D4073D2824B45D009805CB /* CategoriesView.swift */; };
 		F4D407402824B9E7009805CB /* AllCategories.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D4073F2824B9E7009805CB /* AllCategories.swift */; };
 		F4D407422824C599009805CB /* MultiPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D407412824C599009805CB /* MultiPicker.swift */; };
@@ -102,6 +105,9 @@
 		F4BC0C1F2854FEE300D76EE5 /* SavedRestaurantsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedRestaurantsView.swift; sourceTree = "<group>"; };
 		F4BC0C212855017100D76EE5 /* CreateListSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateListSheet.swift; sourceTree = "<group>"; };
 		F4BC0C2328550FF000D76EE5 /* SavedRestaurantsDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedRestaurantsDetailsView.swift; sourceTree = "<group>"; };
+		F4BC0C292855308E00D76EE5 /* GADBannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GADBannerViewController.swift; sourceTree = "<group>"; };
+		F4BC0C2C28555FA100D76EE5 /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
+		F4BC0C2E285563EE00D76EE5 /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
 		F4D4073D2824B45D009805CB /* CategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesView.swift; sourceTree = "<group>"; };
 		F4D4073F2824B9E7009805CB /* AllCategories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllCategories.swift; sourceTree = "<group>"; };
 		F4D407412824C599009805CB /* MultiPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiPicker.swift; sourceTree = "<group>"; };
@@ -112,6 +118,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4BC0C272855303A00D76EE5 /* GoogleMobileAds in Frameworks */,
 				F484972F28261D9400C2DB89 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -139,6 +146,8 @@
 		F45B3F0E27963D96003DCC31 /* HLFIYA */ = {
 			isa = PBXGroup;
 			children = (
+				F4BC0C2B28555F0100D76EE5 /* StoreKit */,
+				F4BC0C282855306C00D76EE5 /* Ads */,
 				F47A9D0828441C6100161653 /* Utils */,
 				F484972C28261D8E00C2DB89 /* HLFIYA.entitlements */,
 				F484972B28261D8000C2DB89 /* Info.plist */,
@@ -238,6 +247,23 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		F4BC0C282855306C00D76EE5 /* Ads */ = {
+			isa = PBXGroup;
+			children = (
+				F4BC0C292855308E00D76EE5 /* GADBannerViewController.swift */,
+			);
+			path = Ads;
+			sourceTree = "<group>";
+		};
+		F4BC0C2B28555F0100D76EE5 /* StoreKit */ = {
+			isa = PBXGroup;
+			children = (
+				F4BC0C2C28555FA100D76EE5 /* StoreManager.swift */,
+				F4BC0C2E285563EE00D76EE5 /* Products.storekit */,
+			);
+			path = StoreKit;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -254,6 +280,9 @@
 			dependencies = (
 			);
 			name = HLFIYA;
+			packageProductDependencies = (
+				F4BC0C262855303A00D76EE5 /* GoogleMobileAds */,
+			);
 			productName = HLFIYA;
 			productReference = F45B3F0C27963D96003DCC31 /* HLFIYA.app */;
 			productType = "com.apple.product-type.application";
@@ -282,6 +311,9 @@
 				Base,
 			);
 			mainGroup = F45B3F0327963D96003DCC31;
+			packageReferences = (
+				F4BC0C252855303A00D76EE5 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+			);
 			productRefGroup = F45B3F0D27963D96003DCC31 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -333,6 +365,7 @@
 				F4BC0C2428550FF000D76EE5 /* SavedRestaurantsDetailsView.swift in Sources */,
 				F4130FA4285419ED0007D7E0 /* SavedRestaurant+CoreDataProperties.swift in Sources */,
 				F49820EF28177EEF00035D1C /* StarRatingView.swift in Sources */,
+				F4BC0C2A2855308E00D76EE5 /* GADBannerViewController.swift in Sources */,
 				F48497312826226300C2DB89 /* SettingsView.swift in Sources */,
 				F4130FA2285419ED0007D7E0 /* LeftSwipe+CoreDataProperties.swift in Sources */,
 				F4130FAC28541A870007D7E0 /* SavedRestaurant+FetchRequest.swift in Sources */,
@@ -349,6 +382,7 @@
 				F47A9D0A28441C7600161653 /* AllPrices.swift in Sources */,
 				F4BC0C1E2854FB2700D76EE5 /* ListsView.swift in Sources */,
 				F42D6160281D837B00DBA5C0 /* Utils.swift in Sources */,
+				F4BC0C2D28555FA100D76EE5 /* StoreManager.swift in Sources */,
 				F4130FAA28541A3D0007D7E0 /* SavedList+FetchRequest.swift in Sources */,
 				F49820F128178B2800035D1C /* DollarView.swift in Sources */,
 			);
@@ -559,6 +593,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F4BC0C252855303A00D76EE5 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F4BC0C262855303A00D76EE5 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4BC0C252855303A00D76EE5 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		F45B3F1A27963D97003DCC31 /* HLFIYA.xcdatamodeld */ = {

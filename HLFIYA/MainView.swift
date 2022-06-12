@@ -7,6 +7,7 @@
 
 import SwiftUI
 import MapKit
+import GoogleMobileAds
 
 struct MainView: View {
     @State private var currentLocationSet = false
@@ -20,9 +21,12 @@ struct MainView: View {
     @State private var businessesSwipedRight = [Business]()
     
     @StateObject var filters = FiltersState()
+    @StateObject var storeManager = StoreManager()
     @ObservedObject var locationManager = LocationManager.shared
     
     init() {
+        storeManager.fetchProducts()
+        
         let design = UIFontDescriptor.SystemDesign.rounded
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .largeTitle)
             .withDesign(design)!
@@ -108,6 +112,23 @@ struct MainView: View {
                     .zIndex(1.0)
                     
                     BottomBarView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
+                    
+                    
+                    if storeManager.purchasedIds.isEmpty {
+                        VStack(alignment: .trailing, spacing: 0) {
+                            if (storeManager.products.first != nil) {
+                                Button(action: {
+                                    storeManager.purchase()
+                                }) {
+                                    Text("Remove Ads")
+                                        .font(Font.system(.callout, design: .rounded))
+                                }
+                                
+                            }
+                            GADBannerViewController()
+                                .frame(width: GADAdSizeBanner.size.width, height: GADAdSizeBanner.size.height)
+                        }
+                    }
                 }
                 
                 .task {
@@ -126,6 +147,10 @@ struct MainView: View {
                     }
                 }
             }
+        }
+        
+        .onAppear {
+            storeManager.fetchProducts()
         }
     }
     
