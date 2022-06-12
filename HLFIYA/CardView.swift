@@ -90,6 +90,8 @@ struct CardView: View {
                     .foregroundColor(.orange)
                     .bold()
                     .padding(5)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
                             .stroke(Color.orange, lineWidth: 4)
@@ -104,6 +106,8 @@ struct CardView: View {
                     .foregroundColor(.black)
                     .bold()
                     .padding(5)
+                    .background(Color.gray)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
                             .stroke(Color.black, lineWidth: 4)
