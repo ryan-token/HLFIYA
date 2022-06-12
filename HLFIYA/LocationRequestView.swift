@@ -59,12 +59,30 @@ struct LocationRequestView: View {
                         case .notDetermined:
                             Text("")
                         case .restricted, .denied:
-                            Text("Location services are disabled. Enable location services by going to the Settings app -> HLFIYA -> Location -> and selecting 'While Using the App'")
-                                .foregroundColor(.gray)
-                                .font(Font.system(.body, design: .rounded))
-                                .fixedSize(horizontal: false, vertical: true)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal)
+                            VStack(spacing: 0) {
+                                Text("Location services are disabled")
+                                    .foregroundColor(.red)
+                                    .font(Font.system(.body, design: .rounded))
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal)
+                                
+                                Button(action: {
+                                    UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                                }) {
+                                    Text("Allow Location in Settings")
+                                        .padding()
+                                        .font(Font.system(.headline, design: .rounded))
+                                        .foregroundColor(.white)
+                                }
+                                .frame(width: UIScreen.main.bounds.width)
+                                .padding(.horizontal, -32)
+                                .background(Color.red)
+                                .clipShape(Capsule())
+                                .padding()
+                            }
+                            .padding(.top, 30)
+                            
                         case .authorizedAlways, .authorizedWhenInUse:
                             Text("")
                         @unknown default:

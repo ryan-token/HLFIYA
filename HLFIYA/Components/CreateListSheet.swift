@@ -17,6 +17,7 @@ struct CreateListSheet: View {
         NavigationView {
             VStack {
                 TextField("List Name", text: $listName)
+                    .textInputAutocapitalization(.words)
                     .font(Font.system(.largeTitle, design: .rounded))
                     .padding()
                     .background(Color(UIColor.systemGray5))

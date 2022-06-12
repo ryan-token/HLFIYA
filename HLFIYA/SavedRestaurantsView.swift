@@ -29,9 +29,8 @@ struct SavedRestaurantsView: View {
             .onDelete(perform: { offsets in
                 removeRestaurantFromList(at: offsets, from: list)
             })
-        
-            .navigationTitle(list.wrappedName)
         }
+        .navigationTitle(list.wrappedName)
     }
     
     func removeRestaurantFromList(at offsets: IndexSet, from list: SavedList) {

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ListsView: View {
     @State private var isShowingCreateListSheet = false
+    @State private var editMode = EditMode.inactive
     
     @Environment(\.dismiss) var dismiss
     @Environment(\.managedObjectContext) var moc
@@ -45,6 +46,7 @@ struct ListsView: View {
                     }
                 }
             }
+            .environment(\.editMode, $editMode)
             
             .popover(isPresented: $isShowingCreateListSheet) {
                 CreateListSheet()
