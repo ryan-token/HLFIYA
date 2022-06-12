@@ -48,16 +48,23 @@ struct CardView: View {
             LinearGradient(gradient: cardGradient, startPoint: .top, endPoint: .bottom)
             
             VStack {
+                if currentBusinessIndex == 0 {
+                    Text("Swipe ← to skip, swipe → for details")
+                        .foregroundColor(.white)
+                        .font(Font.system(.caption, design: .rounded))
+                        .padding(8)
+                        .background(Color.gray.opacity(0.6))
+                        .clipShape(Capsule())
+                        .padding(.top)
+                }
                 Spacer()
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 0) {
                     Text(business.name)
                         .font(Font.system(.largeTitle, design: .rounded))
                         .bold()
-                        .padding(.bottom, 10)
                     
                     HStack {
                         StarRatingView(rating: business.rating, label: "")
-                            .padding(.bottom, 15)
                         Spacer()
                         Button(action: {
                             undo()
@@ -78,13 +85,13 @@ struct CardView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 30)
-                            .padding(.bottom, 4)
+                            .padding(.bottom, 12)
                             .padding(.trailing, 7)
                     }
                     .accessibilityLabel("Yelp Logo")
                 }
             }
-            .padding()
+            .padding(.horizontal)
             .foregroundColor(.white)
             
             HStack {
