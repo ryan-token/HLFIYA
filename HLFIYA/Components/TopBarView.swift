@@ -21,6 +21,7 @@ struct TopBarView: View {
                     .font(Font.system(size: 45, design: .rounded))
                     .foregroundColor(.gray)
             }
+            .accessibilityLabel("Settings")
             
             Spacer()
             
@@ -30,6 +31,7 @@ struct TopBarView: View {
                 Image(systemName: "list.bullet.circle.fill")
                     .font(Font.system(size: 45, design: .rounded))
             }
+            .accessibilityLabel("Lists")
             
             .popover(isPresented: $isShowingSettingsView) {
                 SettingsView()

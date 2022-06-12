@@ -27,6 +27,7 @@ struct DollarView: View {
                     .foregroundColor(possiblePrice > countDollarSigns(from: price) ? offColor : onColor)
             }
         }
+        .accessibilityLabel("Price: \(price.count) dollar signs")
     }
     
     func countDollarSigns(from: String) -> Int {

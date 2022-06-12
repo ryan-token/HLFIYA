@@ -66,6 +66,7 @@ struct CardView: View {
                                 .font(Font.system(size: 40, design: .rounded))
                                 .foregroundColor(totalBusinesses != remainingBusinessesInList ? .yellow : .gray)
                         }
+                        .accessibilityLabel("Undo")
                     }
                     
                     DollarView(price: business.price ?? "", label: "")
@@ -80,6 +81,7 @@ struct CardView: View {
                             .padding(.bottom, 4)
                             .padding(.trailing, 7)
                     }
+                    .accessibilityLabel("Yelp Logo")
                 }
             }
             .padding()

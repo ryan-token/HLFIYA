@@ -28,6 +28,7 @@ struct StarRatingView: View {
                     .foregroundColor(Double(number) > rating + 0.5 ? offColor : onColor)
             }
         }
+        .accessibilityLabel("Rating: \(rating, specifier: "%.1f") stars")
     }
     
     func starImage(for number: Int) -> Image {

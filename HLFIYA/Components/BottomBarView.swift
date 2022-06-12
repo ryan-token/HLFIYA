@@ -38,6 +38,7 @@ struct BottomBarView: View {
                         .foregroundColor(.gray)
                 }
             }
+            .accessibilityLabel("Reload Restaurants")
             
             Spacer()
             
@@ -53,6 +54,7 @@ struct BottomBarView: View {
                         .foregroundColor(.gray)
                 }
             }
+            .accessibilityLabel("Select Categories")
             
             Spacer()
             
@@ -68,6 +70,7 @@ struct BottomBarView: View {
                         .foregroundColor(.gray)
                 }
             }
+            .accessibilityLabel("Select Prices")
             
             Spacer()
             
@@ -83,6 +86,7 @@ struct BottomBarView: View {
                         .foregroundColor(.gray)
                 }
             }
+            .accessibilityLabel("Select Location")
             
             Spacer()
             

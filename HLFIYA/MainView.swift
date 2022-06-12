@@ -87,11 +87,12 @@ struct MainView: View {
                     if nearbyBusinesses.isEmpty && apiError == false {
                         ProgressView()
                             .frame(maxHeight: .infinity)
-                    }
-                    
-                    ForEach($nearbyBusinesses.reversed()) { business in
-                        CardView(totalBusinesses: nearbyBusinesses.count, business: business, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, businessesSwipedLeft: $businessesSwipedLeft, businessesSwipedRight: $businessesSwipedRight)
-                            .padding(8)
+                    } else {
+                        ForEach($nearbyBusinesses.reversed()) { business in
+                            CardView(totalBusinesses: nearbyBusinesses.count, business: business, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, businessesSwipedLeft: $businessesSwipedLeft, businessesSwipedRight: $businessesSwipedRight)
+                                .padding(8)
+                        }
+                        .accessibilityLabel("\(nearbyBusinesses[currentBusinessIndex].name), \(nearbyBusinesses[currentBusinessIndex].rating, specifier: "%.1f") stars, \(nearbyBusinesses[currentBusinessIndex].price?.count ?? -1) dollar signs, \(nearbyBusinesses[currentBusinessIndex].categories.first?.title ?? ""). Swipe left to skip, swipe right for details.")
                     }
                     
                     if remainingBusinessesInList == 0 && showRefreshButton {

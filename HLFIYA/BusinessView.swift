@@ -75,6 +75,7 @@ struct BusinessView: View {
                         }) {
                             Text(list.wrappedName)
                         }
+                        .accessibilityLabel("Add to \(list.wrappedName) list")
                     }
                     
                     Button(action: {
@@ -147,6 +148,7 @@ struct BusinessView: View {
                                         
                                         Text(convertMilitaryTimeToLocalTime(militaryTime: chunk.end ?? ""))
                                     }
+                                    .accessibilityLabel("\(convertDayNumberToWeekday(dayNumberString: chunk.day ?? 99999)) hours: \(convertMilitaryTimeToLocalTime(militaryTime: chunk.start ?? "")) to \(convertMilitaryTimeToLocalTime(militaryTime: chunk.end ?? ""))")
                                     .font(Font.system(.headline, design: .rounded))
                                 }
                                 .padding(.bottom, 5)
@@ -183,6 +185,7 @@ struct BusinessView: View {
                             .frame(width: 75)
                     }
                 }
+                .accessibilityLabel("Powered by Yelp")
                 .listRowBackground(Color.clear)
                 
             }
