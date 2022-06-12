@@ -38,6 +38,9 @@ struct MainView: View {
     
     var body: some View {
         Group {
+            if locationManager.location == nil {
+                LocationRequestView()
+            } else {
                 VStack {
                     TopBarView()
                     
@@ -82,7 +85,7 @@ struct MainView: View {
                     .font(Font.system(.body, design: .rounded))
                     
                     ZStack {
-                        if nearbyBusinesses.isEmpty {
+                        if nearbyBusinesses.isEmpty && apiError == false {
                             ProgressView()
                                 .frame(maxHeight: .infinity)
                         }
@@ -129,12 +132,6 @@ struct MainView: View {
                 }
                 
                 .task {
-                    if !currentLocationSet {
-                        print("requesting location...")
-                        LocationManager.shared.requestLocation()
-                        currentLocationSet = true
-                    }
-                    
                     if nearbyBusinesses.isEmpty {
                         print("refreshing businesses")
                         let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
@@ -143,6 +140,7 @@ struct MainView: View {
                         print("We already have businesses, not fetching onAppear")
                     }
                 }
+            }
         }
         .environmentObject(storeManager)
         

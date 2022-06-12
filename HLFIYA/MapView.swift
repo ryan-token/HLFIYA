@@ -95,6 +95,14 @@ struct MapView: View {
                     }
                 }
                 
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        LocationManager.shared.requestLocation()
+                    }) {
+                        Text("Get Current Location")
+                    }
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     AsyncButton(action: {
                         if (filters.customRadius > 24.854847) {

@@ -6,8 +6,12 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct LocationRequestView: View {
+    private let clLocationManager = CLLocationManager()
+    @ObservedObject var locationManager = LocationManager.shared
+    
     var body: some View {
         ZStack {
             Color(.white).ignoresSafeArea()
@@ -21,10 +25,6 @@ struct LocationRequestView: View {
                 
                 Text("Would you like to *explore* HOT 🥵 LOCAL 📍 FOOD  in your area?")
                     .font(.system(size: 28, weight: .bold))
-                    .multilineTextAlignment(.center)
-                    .padding()
-                
-                Text("Start sharing your location")
                     .multilineTextAlignment(.center)
                     .padding()
                 
@@ -46,12 +46,30 @@ struct LocationRequestView: View {
                     .padding()
                     
                     Button {
-                        print("Dismiss")
+                        locationManager.location = CLLocation(latitude: 36.14203247996243, longitude: -95.97570631738338)
                     } label: {
                         Text("Maybe Later")
                             .padding()
                             .font(Font.system(.headline, design: .rounded))
                             .foregroundColor(.gray)
+                    }
+                    
+                    if CLLocationManager.locationServicesEnabled() {
+                        switch clLocationManager.authorizationStatus {
+                        case .notDetermined:
+                            Text("")
+                        case .restricted, .denied:
+                            Text("Location services are disabled. Enable location services by going to the Settings app -> HLFIYA -> Location -> and selecting 'While Using the App'")
+                                .foregroundColor(.gray)
+                                .font(Font.system(.body, design: .rounded))
+                                .fixedSize(horizontal: false, vertical: true)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                        case .authorizedAlways, .authorizedWhenInUse:
+                            Text("")
+                        @unknown default:
+                            Text("")
+                        }
                     }
                 }
                 .padding(.bottom, 32)
