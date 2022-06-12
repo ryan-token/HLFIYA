@@ -37,116 +37,114 @@ struct MainView: View {
     }
     
     var body: some View {
-        Group {
-            if locationManager.location == nil {
-                LocationRequestView()
-            } else {
-                VStack {
-                    TopBarView()
-                    
-                    if apiError {
-                        Text("😕 Error loading businesses")
-                            .foregroundColor(.gray)
-                    }
-                    
-                    if !nearbyBusinesses.isEmpty {
-                        Text(nearbyBusinesses[currentBusinessIndex].location.city)
-                            .font(Font.system(.title, design: .rounded))
-                            .bold()
-                            .padding(5)
-                            .animation(.none, value: currentBusinessIndex)
-                    }
-                    
-                    VStack(spacing: 10) {
-                        HStack {
-                            Text("Categories:")
-                                .foregroundColor(.gray)
-                            Text(filters.categoriesNames)
-                                .bold()
-                        }
-                        .animation(.interactiveSpring(), value: filters.categories)
-                        
-                        HStack {
-                            Text("Prices:")
-                                .foregroundColor(.gray)
-                            Text(filters.priceName)
-                                .bold()
-                        }
-                        .animation(.interactiveSpring(), value: filters.priceName)
-                        
-                        HStack {
-                            Text("Radius:")
-                                .foregroundColor(.gray)
-                            Text("\(String(format:"%.1f", filters.customRadius)) Miles")
-                                .bold()
-                        }
-                        .animation(.interactiveSpring(), value: filters.customRadius)
-                    }
-                    .font(Font.system(.body, design: .rounded))
-                    
-                    ZStack {
-                        if nearbyBusinesses.isEmpty && apiError == false {
-                            ProgressView()
-                                .frame(maxHeight: .infinity)
-                        }
-                        
-                        ForEach($nearbyBusinesses.reversed()) { business in
-                            CardView(totalBusinesses: nearbyBusinesses.count, business: business, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, businessesSwipedLeft: $businessesSwipedLeft, businessesSwipedRight: $businessesSwipedRight)
-                                .padding(8)
-                        }
-                        
-                        if remainingBusinessesInList == 0 && showRefreshButton {
-                            AsyncButton(action: {
-                                let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
-                                setState(fetchedBusinesses: fetchedBusinesses)
-                            }, label: {
-                                HStack {
-                                    Image(systemName: "arrow.clockwise.circle")
-                                    Text("Refresh Food")
-                                }
-                                .frame(width: 150, height: 100)
-                                .font(Font.system(.headline, design: .rounded))
-                                .foregroundColor(.red)
-                            })
-                        }
-                    }
-                    .zIndex(1.0)
-                    
-                    BottomBarView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
-                    
-                    
-                    if storeManager.purchasedIds.isEmpty {
-                        VStack(alignment: .trailing, spacing: 0) {
-                            if let removeAdsProduct = storeManager.products.first {
-                                AsyncButton(action: {
-                                    await purchaseRemoveAds(product: removeAdsProduct)
-                                }) {
-                                    Text("Remove Ads")
-                                        .font(Font.system(.callout, design: .rounded))
-                                }
-                            }
-                            GADBannerViewController()
-                                .frame(width: GADAdSizeBanner.size.width, height: GADAdSizeBanner.size.height)
-                        }
-                    }
+        if locationManager.location == nil {
+            LocationRequestView()
+        } else {
+            VStack {
+                TopBarView()
+                
+                if apiError {
+                    Text("😕 Error loading businesses")
+                        .foregroundColor(.gray)
                 }
                 
-                .task {
-                    if nearbyBusinesses.isEmpty {
-                        print("refreshing businesses")
-                        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
-                        setState(fetchedBusinesses: fetchedBusinesses)
-                    } else {
-                        print("We already have businesses, not fetching onAppear")
+                if !nearbyBusinesses.isEmpty {
+                    Text(nearbyBusinesses[currentBusinessIndex].location.city)
+                        .font(Font.system(.title, design: .rounded))
+                        .bold()
+                        .padding(5)
+                        .animation(.none, value: currentBusinessIndex)
+                }
+                
+                VStack(spacing: 10) {
+                    HStack {
+                        Text("Categories:")
+                            .foregroundColor(.gray)
+                        Text(filters.categoriesNames)
+                            .bold()
+                    }
+                    .animation(.interactiveSpring(), value: filters.categories)
+                    
+                    HStack {
+                        Text("Prices:")
+                            .foregroundColor(.gray)
+                        Text(filters.priceName)
+                            .bold()
+                    }
+                    .animation(.interactiveSpring(), value: filters.priceName)
+                    
+                    HStack {
+                        Text("Radius:")
+                            .foregroundColor(.gray)
+                        Text("\(String(format:"%.1f", filters.customRadius)) Miles")
+                            .bold()
+                    }
+                    .animation(.interactiveSpring(), value: filters.customRadius)
+                }
+                .font(Font.system(.body, design: .rounded))
+                
+                ZStack {
+                    if nearbyBusinesses.isEmpty && apiError == false {
+                        ProgressView()
+                            .frame(maxHeight: .infinity)
+                    }
+                    
+                    ForEach($nearbyBusinesses.reversed()) { business in
+                        CardView(totalBusinesses: nearbyBusinesses.count, business: business, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, businessesSwipedLeft: $businessesSwipedLeft, businessesSwipedRight: $businessesSwipedRight)
+                            .padding(8)
+                    }
+                    
+                    if remainingBusinessesInList == 0 && showRefreshButton {
+                        AsyncButton(action: {
+                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+                            setState(fetchedBusinesses: fetchedBusinesses)
+                        }, label: {
+                            HStack {
+                                Image(systemName: "arrow.clockwise.circle")
+                                Text("Refresh Food")
+                            }
+                            .frame(width: 150, height: 100)
+                            .font(Font.system(.headline, design: .rounded))
+                            .foregroundColor(.red)
+                        })
+                    }
+                }
+                .zIndex(1.0)
+                
+                BottomBarView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
+                
+                
+                if storeManager.purchasedIds.isEmpty {
+                    VStack(alignment: .trailing, spacing: 0) {
+                        if let removeAdsProduct = storeManager.products.first {
+                            AsyncButton(action: {
+                                await purchaseRemoveAds(product: removeAdsProduct)
+                            }) {
+                                Text("Remove Ads")
+                                    .font(Font.system(.callout, design: .rounded))
+                            }
+                        }
+                        GADBannerViewController()
+                            .frame(width: GADAdSizeBanner.size.width, height: GADAdSizeBanner.size.height)
                     }
                 }
             }
+            
+            .task {
+                if nearbyBusinesses.isEmpty {
+                    print("refreshing businesses")
+                    let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+                    setState(fetchedBusinesses: fetchedBusinesses)
+                } else {
+                    print("We already have businesses, not fetching onAppear")
+                }
+            }
+            .environmentObject(storeManager)
+            
+            .alert(isPresented: $isShowingError, content: {
+                Alert(title: Text(errorTitle), message: nil, dismissButton: .default(Text("Okay")))
+            })
         }
-        .environmentObject(storeManager)
-        
-        .alert(isPresented: $isShowingError, content: {
-            Alert(title: Text(errorTitle), message: nil, dismissButton: .default(Text("Okay")))
-        })
     }
     
     // radius is in meters

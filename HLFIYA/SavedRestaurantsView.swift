@@ -17,7 +17,6 @@ struct SavedRestaurantsView: View {
         List {
             if (list.restaurantsArray.isEmpty) {
                 Text("No places added to your \(list.wrappedName) list. Swipe right on a card to add some!")
-                    .font(Font.system(.body, design: .rounded))
                     .foregroundColor(.gray)
             }
             
@@ -30,6 +29,8 @@ struct SavedRestaurantsView: View {
                 removeRestaurantFromList(at: offsets, from: list)
             })
         }
+        .font(Font.system(.body, design: .rounded))
+        
         .navigationTitle(list.wrappedName)
     }
     

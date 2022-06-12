@@ -92,6 +92,8 @@ struct LocationRequestView: View {
                 }
                 .padding(.bottom, 32)
             }
+            .font(Font.system(.body, design: .rounded))
+            
             .foregroundColor(.red)
         }
     }

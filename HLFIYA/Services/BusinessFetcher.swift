@@ -47,6 +47,7 @@ struct BusinessFetcher {
         let businesses = response.businesses
         let shuffledBusinesses = businesses?.shuffled()
         
+        HapticGenerator.playSuccessHaptic()
         return shuffledBusinesses ?? Business.emptyBusinesses
     }
     

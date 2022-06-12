@@ -45,7 +45,8 @@ struct SettingsView: View {
                             Image(systemName: "heart.square.fill")
                                 .font(.title)
                                 .foregroundColor(.red)
-                            Text("Rate")
+                            Text("Rate on the App Store")
+                                .font(Font.system(.body, design: .rounded))
                                 .foregroundColor(.primary)
                         }
                     }
@@ -60,6 +61,7 @@ struct SettingsView: View {
                                 .font(.title)
                                 .foregroundColor(.mint)
                             Text("Feature Request")
+                                .font(Font.system(.body, design: .rounded))
                                 .foregroundColor(.primary)
                         }
                     }
@@ -73,6 +75,7 @@ struct SettingsView: View {
                                 .font(.title)
                                 .foregroundColor(.blue)
                             Text("About")
+                                .font(Font.system(.body, design: .rounded))
                                 .foregroundColor(.primary)
                         }
                     }
@@ -86,6 +89,7 @@ struct SettingsView: View {
                                 .font(.title)
                                 .foregroundColor(.gray)
                             Text("Terms & Privacy Policy")
+                                .font(Font.system(.body, design: .rounded))
                                 .foregroundColor(.primary)
                         }
                     }
@@ -103,6 +107,7 @@ struct SettingsView: View {
                             ]
                         )
                     }
+                    .font(Font.system(.body, design: .rounded))
                 }
                 
                 Section(header: Text("Stats")) {
@@ -112,6 +117,7 @@ struct SettingsView: View {
                                 .font(.title)
                                 .foregroundColor(.purple)
                             Text("Swipes")
+                                .font(Font.system(.body, design: .rounded))
                         }
                     }
                 }

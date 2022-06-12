@@ -29,10 +29,10 @@ struct ListsView: View {
                     
                     if (savedLists.isEmpty) {
                         Text("Create lists to easily save places for later")
-                            .font(Font.system(.body, design: .rounded))
                             .foregroundColor(.gray)
                     }
                 }
+                .font(Font.system(.body, design: .rounded))
                 
                 Button(action: {
                     isShowingCreateListSheet.toggle()
@@ -42,9 +42,9 @@ struct ListsView: View {
                             .foregroundColor(.green)
                         Text("Create List")
                             .foregroundColor(.green)
-                            .font(Font.system(.headline, design: .rounded))
                     }
                 }
+                .font(Font.system(.headline, design: .rounded))
             }
             .environment(\.editMode, $editMode)
             

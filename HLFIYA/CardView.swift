@@ -32,6 +32,7 @@ struct CardView: View {
         ZStack(alignment: .topLeading) {
             if apiError {
                 Text("😕 Error loading business photos")
+                    .font(Font.system(.body, design: .rounded))
                     .foregroundColor(.gray)
                     .padding(.leading)
             }

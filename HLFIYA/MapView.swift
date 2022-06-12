@@ -7,8 +7,11 @@
 
 import SwiftUI
 import MapKit
+import CoreLocation
 
 struct MapView: View {
+    private let manager = CLLocationManager()
+    
     @State var tracking:MapUserTrackingMode = .follow
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
     @State private var isShowingRadiusTooLargeAlert = false
@@ -80,26 +83,40 @@ struct MapView: View {
         
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        if let location = locationManager.location {
-                            let latitude = location.coordinate.latitude
-                            let longitude = location.coordinate.longitude
+                    if CLLocationManager.locationServicesEnabled() {
+                        switch manager.authorizationStatus {
+                        case .notDetermined:
+                            Button(action: {
+                                LocationManager.shared.requestLocation()
+                            }) {
+                                Text("Request Current Location")
+                                    .font(Font.system(.body, design: .rounded))
+                            }
+                        case .restricted, .denied:
+                            Button(action: {
+                                UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                            }) {
+                                Text("Allow Location in Settings")
+                                    .font(Font.system(.body, design: .rounded))
+                            }
                             
-                            let degrees = convertRadiusToDegrees(radius: 5.0)
-                            
-                            region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: MKCoordinateSpan(latitudeDelta: degrees, longitudeDelta: degrees))
+                        case .authorizedAlways, .authorizedWhenInUse:
+                            Button(action: {
+                                if let location = locationManager.location {
+                                    let latitude = location.coordinate.latitude
+                                    let longitude = location.coordinate.longitude
+                                    
+                                    let degrees = convertRadiusToDegrees(radius: 5.0)
+                                    
+                                    region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: MKCoordinateSpan(latitudeDelta: degrees, longitudeDelta: degrees))
+                                }
+                            }) {
+                                Text("Reset to Current Location")
+                                    .font(Font.system(.body, design: .rounded))
+                            }
+                        @unknown default:
+                            Text("")
                         }
-                    }) {
-                        Text("Reset")
-                            .font(Font.system(.body, design: .rounded))
-                    }
-                }
-                
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        LocationManager.shared.requestLocation()
-                    }) {
-                        Text("Get Current Location")
                     }
                 }
                 

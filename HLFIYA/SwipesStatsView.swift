@@ -28,6 +28,7 @@ struct SwipesStatsView: View {
                 }
             }
         }
+        .font(Font.system(.body, design: .rounded))
         .listStyle(.sidebar)
         
         .navigationTitle("Swipe Stats")
