@@ -27,6 +27,9 @@ struct MainView: View {
     @StateObject var storeManager = StoreManager()
     @ObservedObject var locationManager = LocationManager.shared
     
+    @Environment(\.managedObjectContext) var moc
+    @AppStorage("userHasOpenedAppBefore") var userHasOpenedAppBefore = false
+    
     init() {
         let design = UIFontDescriptor.SystemDesign.rounded
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .largeTitle)
@@ -140,6 +143,19 @@ struct MainView: View {
                     print("We already have businesses, not fetching onAppear")
                 }
             }
+            
+            .onAppear() {
+                if !userHasOpenedAppBefore {
+                    print("User hasn't opened the app before; adding a Favorites list")
+                    let favoritesList = SavedList(context: moc)
+                    favoritesList.name = "Favorites"
+
+                    try? moc.save()
+                    
+                    userHasOpenedAppBefore = true
+                }
+            }
+            
             .environmentObject(storeManager)
             
             .alert(isPresented: $isShowingError, content: {
