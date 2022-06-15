@@ -13,12 +13,15 @@ struct AllCategories {
     init() {
         allCategories = [
             "food",
+            "beer_and_wine",
             "breakfast_brunch",
+            "breweries",
             "british",
             "burgers",
             "chinese",
+            "cocktailbars",
+            "coffee",
             "comfortfood",
-            "fooddeliveryservices",
             "hotdogs",
             "foodtrucks",
             "french",
@@ -36,7 +39,8 @@ struct AllCategories {
             "sushi",
             "thai",
             "vegan",
-            "vegetarian"
+            "vegetarian",
+            "wineries"
         ]
     }
     
@@ -48,18 +52,24 @@ struct AllCategories {
         switch yelpCategory {
         case "food":
             return "All Food"
+        case "beer_and_wine":
+            return "Beer, Wine, & Spirits"
         case "breakfast_brunch":
             return "Breakfast & Brunch"
+        case "breweries":
+            return "Breweries"
         case "british":
             return "British"
         case "burgers":
             return "Burgers"
         case "chinese":
             return "Chinese"
+        case "cocktailbars":
+            return "Cocktail Bars"
+        case "coffee":
+            return "Coffee & Tea"
         case "comfortfood":
             return "Comfort Food"
-        case "fooddeliveryservices":
-            return "Delivery Options"
         case "hotdogs":
             return "Fast Food"
         case "foodtrucks":
@@ -96,6 +106,8 @@ struct AllCategories {
             return "Vegan"
         case "vegetarian":
             return "Vegetarian"
+        case "wineries":
+            return "Wineries"
         default:
             return "Unknown"
         }
