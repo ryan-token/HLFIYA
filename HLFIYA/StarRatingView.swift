@@ -9,7 +9,8 @@ import SwiftUI
 
 struct StarRatingView: View {
     var rating: Double
-    var label: String
+    var label: String?
+    var reviewCount: Int?
     var maximumRating = 5
     var halfStarImage = Image(systemName: "star.leadinghalf.filled")
     var fullStarImage = Image(systemName: "star.fill")
@@ -18,7 +19,7 @@ struct StarRatingView: View {
     
     var body: some View {
         HStack {
-            if label.isEmpty == false {
+            if let label = label {
                 Text(label)
                     .foregroundColor(.gray)
             }
@@ -27,8 +28,14 @@ struct StarRatingView: View {
                 starImage(for: number)
                     .foregroundColor(Double(number) > rating + 0.5 ? offColor : onColor)
             }
+            
+            if let reviewCount = reviewCount {
+                Spacer()
+                Text("(\(reviewCount))")
+                    .foregroundColor(.gray)
+            }
         }
-        .accessibilityLabel("Rating: \(rating, specifier: "%.1f") stars")
+        .accessibilityLabel("Yelp rating: \(rating, specifier: "%.1f") stars")
     }
     
     func starImage(for number: Int) -> Image {

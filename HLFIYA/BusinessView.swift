@@ -42,7 +42,7 @@ struct BusinessView: View {
             Spacer()
             
             if apiError {
-                Text("😕 Error loading businesses")
+                Text("😕 Error loading business details")
                     .font(Font.system(.body, design: .rounded))
                     .foregroundColor(.gray)
                     .padding(.leading)
@@ -50,7 +50,7 @@ struct BusinessView: View {
             
             List {
                 Section(header: Text(currentBusiness.name ?? "")) {
-                    StarRatingView(rating: currentBusiness.rating ?? 0.0, label: "Rating:")
+                    StarRatingView(rating: currentBusiness.rating ?? 0.0, label: "Rating:", reviewCount: currentBusiness.review_count)
                     DollarView(price: currentBusiness.price ?? "", label: "Price:")
                 }
                 .headerProminence(.increased)

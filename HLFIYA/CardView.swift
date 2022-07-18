@@ -64,7 +64,7 @@ struct CardView: View {
                         .bold()
                     
                     HStack {
-                        StarRatingView(rating: business.rating, label: "")
+                        StarRatingView(rating: business.rating)
                         Spacer()
                         Button(action: {
                             undo()
