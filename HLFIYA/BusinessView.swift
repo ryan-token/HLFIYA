@@ -83,9 +83,9 @@ struct BusinessView: View {
                     }) {
                         HStack {
                             Image(systemName: "plus.square")
-                                .foregroundColor(.green)
+                                .foregroundColor(Color(UIColor(named: "fuchsia")!))
                             Text("Create List")
-                                .foregroundColor(.green)
+                                .foregroundColor(Color(UIColor(named: "fuchsia")!))
                         }
                     }
                 }

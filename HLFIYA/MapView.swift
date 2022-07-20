@@ -33,6 +33,7 @@ struct MapView: View {
                 Text("Choose Location")
                     .font(Font.system(.largeTitle, design: .rounded))
                     .bold()
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
                 
                 HStack {
                     Text("Radius:")

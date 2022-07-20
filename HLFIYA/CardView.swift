@@ -280,8 +280,8 @@ struct CardView: View {
     }
 }
 
-//struct CardView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        CardView(business: Business.data[0])
-//    }
-//}
+struct CardView_Previews: PreviewProvider {
+    static var previews: some View {
+        CardView(totalBusinesses: 50, business: .constant(Business.data[0]), nearbyBusinesses: .constant(Business.data), remainingBusinessesInList: .constant(45), currentBusinessIndex: .constant(5), businessesSwipedLeft: .constant([Business.data[0]]), businessesSwipedRight: .constant([Business.data[1]]))
+    }
+}

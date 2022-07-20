@@ -17,6 +17,10 @@ struct SettingsView: View {
     @State private var isShowingError = false
     @State private var errorTitle = ""
     
+    init() {
+        UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor(named: "fuchsia")!]
+    }
+    
     var body: some View {
         NavigationView {
             Form {

@@ -39,9 +39,9 @@ struct ListsView: View {
                 }) {
                     HStack {
                         Image(systemName: "plus.square")
-                            .foregroundColor(.green)
+                            .foregroundColor(Color(UIColor(named: "fuchsia")!))
                         Text("Create List")
-                            .foregroundColor(.green)
+                            .foregroundColor(Color(UIColor(named: "fuchsia")!))
                     }
                 }
                 .font(Font.system(.headline, design: .rounded))

@@ -40,9 +40,9 @@ struct MainView: View {
     }
     
     var body: some View {
-        if locationManager.location == nil {
-            LocationRequestView()
-        } else {
+//        if locationManager.location == nil {
+//            LocationRequestView()
+//        } else {
             VStack {
                 TopBarView()
                 
@@ -54,6 +54,7 @@ struct MainView: View {
                 if !nearbyBusinesses.isEmpty {
                     Text(nearbyBusinesses[currentBusinessIndex].location.city)
                         .font(Font.system(.title, design: .rounded))
+                        .foregroundColor(Color(UIColor(named: "fuchsia")!))
                         .bold()
                         .padding(5)
                         .animation(.none, value: currentBusinessIndex)
@@ -77,9 +78,9 @@ struct MainView: View {
                     .animation(.interactiveSpring(), value: filters.priceName)
                     
                     HStack {
-                        Text("Radius:")
+                        Text("Location:")
                             .foregroundColor(.gray)
-                        Text("\(String(format:"%.1f", filters.customRadius)) Miles")
+                        Text("Within \(String(format:"%.1f", filters.customRadius)) Miles")
                             .bold()
                     }
                     .animation(.interactiveSpring(), value: filters.customRadius)
@@ -161,7 +162,6 @@ struct MainView: View {
             .alert(isPresented: $isShowingError, content: {
                 Alert(title: Text(errorTitle), message: nil, dismissButton: .default(Text("Okay")))
             })
-        }
     }
     
     // radius is in meters
