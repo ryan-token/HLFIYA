@@ -98,7 +98,7 @@ struct LocationRequestView: View {
                         case .restricted, .denied:
                             VStack(spacing: 0) {
                                 Text("Location services are disabled")
-                                    .foregroundColor(.red)
+                                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
                                     .font(Font.system(.body, design: .rounded))
                                     .fixedSize(horizontal: false, vertical: true)
                                     .multilineTextAlignment(.center)
@@ -114,7 +114,7 @@ struct LocationRequestView: View {
                                 }
                                 .frame(width: UIScreen.main.bounds.width)
                                 .padding(.horizontal, -32)
-                                .background(Color.red)
+                                .background(Color(UIColor(named: "fuchsia")!))
                                 .clipShape(Capsule())
                                 .padding()
                             }

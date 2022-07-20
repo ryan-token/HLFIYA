@@ -40,9 +40,9 @@ struct MainView: View {
     }
     
     var body: some View {
-//        if locationManager.location == nil {
-//            LocationRequestView()
-//        } else {
+        if locationManager.location == nil {
+            LocationRequestView()
+        } else {
             VStack {
                 TopBarView()
                 
@@ -162,6 +162,7 @@ struct MainView: View {
             .alert(isPresented: $isShowingError, content: {
                 Alert(title: Text(errorTitle), message: nil, dismissButton: .default(Text("Okay")))
             })
+        }
     }
     
     // radius is in meters
