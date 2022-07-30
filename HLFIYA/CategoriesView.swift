@@ -16,8 +16,8 @@ struct CategoriesView: View {
     @Binding var showRefreshButton: Bool
     @Binding var apiError: Bool
     
+    @EnvironmentObject var locationViewModel: LocationViewModel
     @ObservedObject var filters: FiltersState
-    @ObservedObject var locationManager = LocationManager.shared
     
     @Environment(\.dismiss) var dismiss
     
@@ -71,7 +71,7 @@ struct CategoriesView: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         AsyncButton(action: {
                             dismiss()
-                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                             setState(fetchedBusinesses: fetchedBusinesses)
                         }) {
                             Text("Save")
@@ -81,6 +81,7 @@ struct CategoriesView: View {
                  }
             }
         }
+        .navigationViewStyle(.stack)
     }
     
     func setState(fetchedBusinesses: [Business]) {

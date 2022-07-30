@@ -62,6 +62,7 @@ struct ListsView: View {
                 }
             }
         }
+        .navigationViewStyle(.stack)
     }
     
     func removeList(at offsets: IndexSet) {

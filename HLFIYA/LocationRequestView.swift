@@ -9,7 +9,8 @@ import SwiftUI
 import CoreLocation
 
 struct LocationRequestView: View {
-    private let manager = CLLocationManager()
+    @EnvironmentObject var locationViewModel: LocationViewModel
+    @AppStorage("userHasOpenedAppBefore") var userHasOpenedAppBefore = false
     
     @State private var showGetReady = false
     @State private var showHot = false
@@ -17,13 +18,11 @@ struct LocationRequestView: View {
     @State private var showFood = false
     @State private var showAllowLocation = false
     @State private var showMaybeLater = false
-    
-    @ObservedObject var locationManager = LocationManager.shared
+
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         ZStack {
-            
             VStack {
                 Spacer()
                 
@@ -64,7 +63,7 @@ struct LocationRequestView: View {
                 VStack {
                     if showAllowLocation {
                         Button {
-                            LocationManager.shared.requestLocation()
+                            locationViewModel.requestPermission()
                         } label: {
                             Text("Allow Location")
                                 .padding()
@@ -73,15 +72,19 @@ struct LocationRequestView: View {
                         }
                         .frame(width: UIScreen.main.bounds.width)
                         .padding(.horizontal, -32)
+                        .if(locationViewModel.authorizationStatus.rawValue == 2) { view in
+                            view.background(Color.gray)
+                        }
                         .background(colorScheme == .dark ? Color.white : Color.black)
                         .clipShape(Capsule())
                         .padding()
                         .animation(.default, value: showAllowLocation)
+                        .disabled(locationViewModel.authorizationStatus.rawValue == 2 ? true : false)
                     }
                     
                     if showMaybeLater {
                         Button {
-                            locationManager.location = CLLocation(latitude: 36.14203247996243, longitude: -95.97570631738338)
+                            locationViewModel.location = CLLocation(latitude: 36.14203247996243, longitude: -95.97570631738338)
                         } label: {
                             Text("Maybe Later")
                                 .padding()
@@ -91,40 +94,38 @@ struct LocationRequestView: View {
                         }
                     }
                     
-                    if CLLocationManager.locationServicesEnabled() {
-                        switch manager.authorizationStatus {
-                        case .notDetermined:
-                            Text("")
-                        case .restricted, .denied:
-                            VStack(spacing: 0) {
-                                Text("Location services are disabled")
-                                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                                    .font(Font.system(.body, design: .rounded))
-                                    .fixedSize(horizontal: false, vertical: true)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal)
-                                
-                                Button(action: {
-                                    UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
-                                }) {
-                                    Text("Allow Location in Settings")
-                                        .padding()
-                                        .font(Font.system(.headline, design: .rounded))
-                                        .foregroundColor(.white)
-                                }
-                                .frame(width: UIScreen.main.bounds.width)
-                                .padding(.horizontal, -32)
-                                .background(Color(UIColor(named: "fuchsia")!))
-                                .clipShape(Capsule())
-                                .padding()
-                            }
-                            .padding(.top, 30)
+                    switch locationViewModel.authorizationStatus {
+                    case .notDetermined:
+                        Text("")
+                    case .restricted, .denied:
+                        VStack(spacing: 0) {
+                            Text("Location services are disabled")
+                                .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                                .font(Font.system(.body, design: .rounded))
+                                .fixedSize(horizontal: false, vertical: true)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
                             
-                        case .authorizedAlways, .authorizedWhenInUse:
-                            Text("")
-                        @unknown default:
-                            Text("")
+                            Button(action: {
+                                UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                            }) {
+                                Text("Allow Location in Settings")
+                                    .padding()
+                                    .font(Font.system(.headline, design: .rounded))
+                                    .foregroundColor(.white)
+                            }
+                            .frame(width: UIScreen.main.bounds.width)
+                            .padding(.horizontal, -32)
+                            .background(Color(UIColor(named: "fuchsia")!))
+                            .clipShape(Capsule())
+                            .padding()
                         }
+                        .padding(.top, 30)
+                        
+                    case .authorizedAlways, .authorizedWhenInUse:
+                        Text("")
+                    @unknown default:
+                        Text("")
                     }
                 }
                 .padding(.bottom, 32)
@@ -134,39 +135,49 @@ struct LocationRequestView: View {
             .foregroundColor(Color(UIColor(named: "fuchsia")!))
         }
         .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                withAnimation {
-                    showGetReady.toggle()
+            print("authorization status: \(locationViewModel.authorizationStatus.rawValue)")
+            if (userHasOpenedAppBefore) {
+                showGetReady.toggle()
+                showHot.toggle()
+                showLocal.toggle()
+                showFood.toggle()
+                showAllowLocation.toggle()
+                showMaybeLater.toggle()
+            } else {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    withAnimation {
+                        showGetReady.toggle()
+                    }
                 }
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                withAnimation {
-                    showHot.toggle()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    withAnimation {
+                        showHot.toggle()
+                    }
                 }
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                withAnimation {
-                    showLocal.toggle()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                    withAnimation {
+                        showLocal.toggle()
+                    }
                 }
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                withAnimation {
-                    showFood.toggle()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                    withAnimation {
+                        showFood.toggle()
+                    }
                 }
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
-                withAnimation {
-                    showAllowLocation.toggle()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
+                    withAnimation {
+                        showAllowLocation.toggle()
+                    }
                 }
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
-                withAnimation {
-                    showMaybeLater.toggle()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
+                    withAnimation {
+                        showMaybeLater.toggle()
+                    }
                 }
             }
         }

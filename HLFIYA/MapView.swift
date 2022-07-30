@@ -10,8 +10,6 @@ import MapKit
 import CoreLocation
 
 struct MapView: View {
-    private let manager = CLLocationManager()
-    
     @State var tracking:MapUserTrackingMode = .follow
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
     @State private var isShowingRadiusTooLargeAlert = false
@@ -23,7 +21,7 @@ struct MapView: View {
     @Binding var apiError: Bool
     
     @ObservedObject var filters: FiltersState
-    @ObservedObject var locationManager = LocationManager.shared
+    @EnvironmentObject var locationViewModel: LocationViewModel
     
     @Environment(\.dismiss) var dismiss
     
@@ -49,7 +47,7 @@ struct MapView: View {
             }
             
             .onAppear {
-                if let location = locationManager.location {
+                if let location = locationViewModel.location {
                     var latitude = location.coordinate.latitude
                     var longitude = location.coordinate.longitude
                     
@@ -84,40 +82,38 @@ struct MapView: View {
         
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    if CLLocationManager.locationServicesEnabled() {
-                        switch manager.authorizationStatus {
-                        case .notDetermined:
-                            Button(action: {
-                                LocationManager.shared.requestLocation()
-                            }) {
-                                Text("Request Current Location")
-                                    .font(Font.system(.body, design: .rounded))
-                            }
-                        case .restricted, .denied:
-                            Button(action: {
-                                UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
-                            }) {
-                                Text("Allow Location in Settings")
-                                    .font(Font.system(.body, design: .rounded))
-                            }
-                            
-                        case .authorizedAlways, .authorizedWhenInUse:
-                            Button(action: {
-                                if let location = locationManager.location {
-                                    let latitude = location.coordinate.latitude
-                                    let longitude = location.coordinate.longitude
-                                    
-                                    let degrees = convertRadiusToDegrees(radius: 5.0)
-                                    
-                                    region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: MKCoordinateSpan(latitudeDelta: degrees, longitudeDelta: degrees))
-                                }
-                            }) {
-                                Text("Reset to Current Location")
-                                    .font(Font.system(.body, design: .rounded))
-                            }
-                        @unknown default:
-                            Text("")
+                    switch locationViewModel.authorizationStatus{
+                    case .notDetermined:
+                        Button(action: {
+                            locationViewModel.requestPermission()
+                        }) {
+                            Text("Request Current Location")
+                                .font(Font.system(.body, design: .rounded))
                         }
+                    case .restricted, .denied:
+                        Button(action: {
+                            UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                        }) {
+                            Text("Allow Location in Settings")
+                                .font(Font.system(.body, design: .rounded))
+                        }
+                        
+                    case .authorizedAlways, .authorizedWhenInUse:
+                        Button(action: {
+                            if let location = locationViewModel.location {
+                                let latitude = location.coordinate.latitude
+                                let longitude = location.coordinate.longitude
+                                
+                                let degrees = convertRadiusToDegrees(radius: 5.0)
+                                
+                                region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: MKCoordinateSpan(latitudeDelta: degrees, longitudeDelta: degrees))
+                            }
+                        }) {
+                            Text("Reset to Current Location")
+                                .font(Font.system(.body, design: .rounded))
+                        }
+                    @unknown default:
+                        Text("")
                     }
                 }
                 
@@ -127,7 +123,7 @@ struct MapView: View {
                             isShowingRadiusTooLargeAlert.toggle()
                         } else {
                             dismiss()
-                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                             setState(fetchedBusinesses: fetchedBusinesses)
                         }
                     }) {
@@ -141,6 +137,7 @@ struct MapView: View {
                 Button("OK", role: .cancel) { }
             }
         }
+        .navigationViewStyle(.stack)
     }
     
     // latitudeDelta is the amount of degrees that are visible on the screen. 1 degree is equal to ~69 miles

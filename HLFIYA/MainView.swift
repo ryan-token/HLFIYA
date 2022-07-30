@@ -25,7 +25,7 @@ struct MainView: View {
     
     @StateObject var filters = FiltersState()
     @StateObject var storeManager = StoreManager()
-    @ObservedObject var locationManager = LocationManager.shared
+    @EnvironmentObject var locationViewModel: LocationViewModel
     
     @Environment(\.managedObjectContext) var moc
     @AppStorage("userHasOpenedAppBefore") var userHasOpenedAppBefore = false
@@ -40,133 +40,129 @@ struct MainView: View {
     }
     
     var body: some View {
-        if locationManager.location == nil {
-            LocationRequestView()
-        } else {
-            VStack {
-                TopBarView()
-                
-                if apiError {
-                    Text("😕 Error loading businesses")
+        VStack {
+            TopBarView()
+            
+            if apiError {
+                Text("😕 Error loading businesses")
+                    .foregroundColor(.gray)
+            }
+            
+            if !nearbyBusinesses.isEmpty {
+                Text(nearbyBusinesses[currentBusinessIndex].location.city)
+                    .font(Font.system(.title, design: .rounded))
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                    .bold()
+                    .padding(5)
+                    .animation(.none, value: currentBusinessIndex)
+            }
+            
+            VStack(spacing: 10) {
+                HStack {
+                    Text("Categories:")
                         .foregroundColor(.gray)
-                }
-                
-                if !nearbyBusinesses.isEmpty {
-                    Text(nearbyBusinesses[currentBusinessIndex].location.city)
-                        .font(Font.system(.title, design: .rounded))
-                        .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                    Text(filters.categoriesNames)
                         .bold()
-                        .padding(5)
-                        .animation(.none, value: currentBusinessIndex)
                 }
+                .animation(.interactiveSpring(), value: filters.categories)
                 
-                VStack(spacing: 10) {
-                    HStack {
-                        Text("Categories:")
-                            .foregroundColor(.gray)
-                        Text(filters.categoriesNames)
-                            .bold()
-                    }
-                    .animation(.interactiveSpring(), value: filters.categories)
-                    
-                    HStack {
-                        Text("Prices:")
-                            .foregroundColor(.gray)
-                        Text(filters.priceName)
-                            .bold()
-                    }
-                    .animation(.interactiveSpring(), value: filters.priceName)
-                    
-                    HStack {
-                        Text("Location:")
-                            .foregroundColor(.gray)
-                        Text("Within \(String(format:"%.1f", filters.customRadius)) Miles")
-                            .bold()
-                    }
-                    .animation(.interactiveSpring(), value: filters.customRadius)
+                HStack {
+                    Text("Prices:")
+                        .foregroundColor(.gray)
+                    Text(filters.priceName)
+                        .bold()
                 }
-                .font(Font.system(.body, design: .rounded))
+                .animation(.interactiveSpring(), value: filters.priceName)
                 
-                ZStack {
-                    if nearbyBusinesses.isEmpty && apiError == false {
-                        ProgressView()
-                            .frame(maxHeight: .infinity)
-                    } else {
-                        ForEach($nearbyBusinesses.reversed()) { business in
-                            CardView(totalBusinesses: nearbyBusinesses.count, business: business, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, businessesSwipedLeft: $businessesSwipedLeft, businessesSwipedRight: $businessesSwipedRight)
-                                .padding(8)
-                        }
-                        .accessibilityLabel("\(nearbyBusinesses[currentBusinessIndex].name), \(nearbyBusinesses[currentBusinessIndex].rating, specifier: "%.1f") stars, \(nearbyBusinesses[currentBusinessIndex].price?.count ?? -1) dollar signs, \(nearbyBusinesses[currentBusinessIndex].categories.first?.title ?? ""). Swipe left to skip, swipe right for details.")
-                    }
-                    
-                    if remainingBusinessesInList == 0 && showRefreshButton {
-                        AsyncButton(action: {
-                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
-                            setState(fetchedBusinesses: fetchedBusinesses)
-                        }, label: {
-                            HStack {
-                                Image(systemName: "arrow.clockwise.circle")
-                                Text("Refresh Food")
-                            }
-                            .frame(width: 150, height: 100)
-                            .font(Font.system(.headline, design: .rounded))
-                            .foregroundColor(.red)
-                        })
-                    }
+                HStack {
+                    Text("Location:")
+                        .foregroundColor(.gray)
+                    Text("Within \(String(format:"%.1f", filters.customRadius)) Miles")
+                        .bold()
                 }
-                .zIndex(1.0)
-                
-                BottomBarView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
-                
-                
-                if storeManager.purchasedIds.isEmpty {
-                    VStack(alignment: .trailing, spacing: 0) {
-                        if let removeAdsProduct = storeManager.products.first {
-                            AsyncButton(action: {
-                                await purchaseRemoveAds(product: removeAdsProduct)
-                            }) {
-                                Text("Remove Ads")
-                                    .font(Font.system(.callout, design: .rounded))
-                            }
-                        }
-                        GADBannerViewController()
-                            .frame(width: GADAdSizeBanner.size.width, height: GADAdSizeBanner.size.height)
-                    }
-                }
+                .animation(.interactiveSpring(), value: filters.customRadius)
             }
+            .font(Font.system(.body, design: .rounded))
             
-            .task {
-                if nearbyBusinesses.isEmpty {
-                    print("refreshing businesses")
-                    let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
-                    setState(fetchedBusinesses: fetchedBusinesses)
+            ZStack {
+                if nearbyBusinesses.isEmpty && apiError == false {
+                    ProgressView()
+                        .frame(maxHeight: .infinity)
                 } else {
-                    print("We already have businesses, not fetching onAppear")
+                    ForEach($nearbyBusinesses.reversed()) { business in
+                        CardView(totalBusinesses: nearbyBusinesses.count, business: business, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, businessesSwipedLeft: $businessesSwipedLeft, businessesSwipedRight: $businessesSwipedRight)
+                            .padding(8)
+                    }
+                    .accessibilityLabel("\(nearbyBusinesses[currentBusinessIndex].name), \(nearbyBusinesses[currentBusinessIndex].rating, specifier: "%.1f") stars, \(nearbyBusinesses[currentBusinessIndex].price?.count ?? -1) dollar signs, \(nearbyBusinesses[currentBusinessIndex].categories.first?.title ?? ""). Swipe left to skip, swipe right for details.")
+                }
+                
+                if remainingBusinessesInList == 0 && showRefreshButton {
+                    AsyncButton(action: {
+                        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+                        setState(fetchedBusinesses: fetchedBusinesses)
+                    }, label: {
+                        HStack {
+                            Image(systemName: "arrow.clockwise.circle")
+                            Text("Refresh Food")
+                        }
+                        .frame(width: 150, height: 100)
+                        .font(Font.system(.headline, design: .rounded))
+                        .foregroundColor(.red)
+                    })
                 }
             }
+            .zIndex(1.0)
             
-            .onAppear() {
-                if !userHasOpenedAppBefore {
-                    print("User hasn't opened the app before; adding a Favorites list")
-                    let favoritesList = SavedList(context: moc)
-                    favoritesList.name = "Favorites"
-
-                    try? moc.save()
-                    
-                    userHasOpenedAppBefore = true
+            BottomBarView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
+            
+            
+            if storeManager.purchasedIds.isEmpty {
+                VStack(alignment: .trailing, spacing: 0) {
+                    if let removeAdsProduct = storeManager.products.first {
+                        AsyncButton(action: {
+                            await purchaseRemoveAds(product: removeAdsProduct)
+                        }) {
+                            Text("Remove Ads")
+                                .font(Font.system(.callout, design: .rounded))
+                        }
+                    }
+                    GADBannerViewController()
+                        .frame(width: GADAdSizeBanner.size.width, height: GADAdSizeBanner.size.height)
                 }
             }
-            
-            .environmentObject(storeManager)
-            
-            .alert(isPresented: $isShowingError, content: {
-                Alert(title: Text(errorTitle), message: nil, dismissButton: .default(Text("Okay")))
-            })
         }
+        
+        .task {
+            if nearbyBusinesses.isEmpty {
+                print("refreshing businesses")
+                let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+                setState(fetchedBusinesses: fetchedBusinesses)
+            } else {
+                print("We already have businesses, not fetching onAppear")
+            }
+        }
+        
+        .onAppear() {
+            if !userHasOpenedAppBefore {
+                print("User hasn't opened the app before; adding a Favorites list")
+                let favoritesList = SavedList(context: moc)
+                favoritesList.name = "Favorites"
+
+                try? moc.save()
+                
+                userHasOpenedAppBefore = true
+            }
+        }
+        
+        .environmentObject(storeManager)
+        
+        .alert(isPresented: $isShowingError, content: {
+            Alert(title: Text(errorTitle), message: nil, dismissButton: .default(Text("Okay")))
+        })
     }
     
     // radius is in meters
-    static func refreshBusinesses(customLatitude: CLLocationDegrees, customLongitude: CLLocationDegrees, locationManager: LocationManager, customRadius: Double, categories: Set<String>, prices: Set<String>) async -> [Business] {
+    static func refreshBusinesses(customLatitude: CLLocationDegrees, customLongitude: CLLocationDegrees, locationViewModel: LocationViewModel, customRadius: Double, categories: Set<String>, prices: Set<String>) async -> [Business] {
         var latitude: CLLocationDegrees
         var longitude: CLLocationDegrees
         var fetchedBusinesses: [Business]
@@ -175,7 +171,7 @@ struct MainView: View {
             latitude = customLatitude
             longitude = customLongitude
         } else {
-            if let currentLocation = locationManager.location {
+            if let currentLocation = locationViewModel.location {
                 latitude = currentLocation.coordinate.latitude
                 longitude = currentLocation.coordinate.longitude
             } else {

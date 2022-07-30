@@ -163,6 +163,7 @@ struct SettingsView: View {
                 }
             }
         }
+        .navigationViewStyle(.stack)
     }
     
     func requestReviewManually() {

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F404FD672818DA96006D9C5A /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F404FD662818DA96006D9C5A /* LocationManager.swift */; };
+		F404FD672818DA96006D9C5A /* LocationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F404FD662818DA96006D9C5A /* LocationViewModel.swift */; };
 		F404FD692818E2D2006D9C5A /* LocationRequestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F404FD682818E2D2006D9C5A /* LocationRequestView.swift */; };
 		F4130FA1285419ED0007D7E0 /* LeftSwipe+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4130F99285419ED0007D7E0 /* LeftSwipe+CoreDataClass.swift */; };
 		F4130FA2285419ED0007D7E0 /* LeftSwipe+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4130F9A285419ED0007D7E0 /* LeftSwipe+CoreDataProperties.swift */; };
@@ -19,6 +19,7 @@
 		F4130FA8285419ED0007D7E0 /* SavedList+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4130FA0285419ED0007D7E0 /* SavedList+CoreDataProperties.swift */; };
 		F4130FAA28541A3D0007D7E0 /* SavedList+FetchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4130FA928541A3D0007D7E0 /* SavedList+FetchRequest.swift */; };
 		F4130FAC28541A870007D7E0 /* SavedRestaurant+FetchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4130FAB28541A870007D7E0 /* SavedRestaurant+FetchRequest.swift */; };
+		F4253B842895C5F800DE59CB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4253B832895C5F800DE59CB /* ContentView.swift */; };
 		F42D615E281D7D1000DBA5C0 /* AsyncImageHack.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42D615D281D7D1000DBA5C0 /* AsyncImageHack.swift */; };
 		F42D6160281D837B00DBA5C0 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42D615F281D837B00DBA5C0 /* Utils.swift */; };
 		F45B3F1027963D96003DCC31 /* HLFIYAApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B3F0F27963D96003DCC31 /* HLFIYAApp.swift */; };
@@ -35,6 +36,7 @@
 		F47A9D052843F6E500161653 /* FiltersState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47A9D042843F6E500161653 /* FiltersState.swift */; };
 		F47A9D0728441BCB00161653 /* PriceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47A9D0628441BCB00161653 /* PriceView.swift */; };
 		F47A9D0A28441C7600161653 /* AllPrices.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47A9D0928441C7600161653 /* AllPrices.swift */; };
+		F48456F12895DA910037A1B7 /* View+If.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48456F02895DA910037A1B7 /* View+If.swift */; };
 		F484972A28261CC500C2DB89 /* Swipe+FetchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F484972928261CC500C2DB89 /* Swipe+FetchRequest.swift */; };
 		F484972F28261D9400C2DB89 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F484972E28261D9400C2DB89 /* CloudKit.framework */; };
 		F48497312826226300C2DB89 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48497302826226300C2DB89 /* SettingsView.swift */; };
@@ -61,7 +63,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		F404FD662818DA96006D9C5A /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		F404FD662818DA96006D9C5A /* LocationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationViewModel.swift; sourceTree = "<group>"; };
 		F404FD682818E2D2006D9C5A /* LocationRequestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRequestView.swift; sourceTree = "<group>"; };
 		F4130F99285419ED0007D7E0 /* LeftSwipe+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LeftSwipe+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
 		F4130F9A285419ED0007D7E0 /* LeftSwipe+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LeftSwipe+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
@@ -73,6 +75,7 @@
 		F4130FA0285419ED0007D7E0 /* SavedList+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedList+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		F4130FA928541A3D0007D7E0 /* SavedList+FetchRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedList+FetchRequest.swift"; sourceTree = "<group>"; };
 		F4130FAB28541A870007D7E0 /* SavedRestaurant+FetchRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedRestaurant+FetchRequest.swift"; sourceTree = "<group>"; };
+		F4253B832895C5F800DE59CB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F42D615D281D7D1000DBA5C0 /* AsyncImageHack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImageHack.swift; sourceTree = "<group>"; };
 		F42D615F281D837B00DBA5C0 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		F45B3F0C27963D96003DCC31 /* HLFIYA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HLFIYA.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -90,6 +93,7 @@
 		F47A9D042843F6E500161653 /* FiltersState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiltersState.swift; sourceTree = "<group>"; };
 		F47A9D0628441BCB00161653 /* PriceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceView.swift; sourceTree = "<group>"; };
 		F47A9D0928441C7600161653 /* AllPrices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllPrices.swift; sourceTree = "<group>"; };
+		F48456F02895DA910037A1B7 /* View+If.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+If.swift"; sourceTree = "<group>"; };
 		F484972928261CC500C2DB89 /* Swipe+FetchRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Swipe+FetchRequest.swift"; sourceTree = "<group>"; };
 		F484972B28261D8000C2DB89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F484972C28261D8E00C2DB89 /* HLFIYA.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HLFIYA.entitlements; sourceTree = "<group>"; };
@@ -156,6 +160,7 @@
 				F484972C28261D8E00C2DB89 /* HLFIYA.entitlements */,
 				F484972B28261D8000C2DB89 /* Info.plist */,
 				F45B3F0F27963D96003DCC31 /* HLFIYAApp.swift */,
+				F4253B832895C5F800DE59CB /* ContentView.swift */,
 				F45B3F1127963D96003DCC31 /* MainView.swift */,
 				F45B3F232796FEDE003DCC31 /* CardView.swift */,
 				F49820E828160B4600035D1C /* BusinessView.swift */,
@@ -189,6 +194,7 @@
 				F4130F9F285419ED0007D7E0 /* SavedList+CoreDataClass.swift */,
 				F4130FA0285419ED0007D7E0 /* SavedList+CoreDataProperties.swift */,
 				F45B3F1527963D97003DCC31 /* Preview Content */,
+				F48456F02895DA910037A1B7 /* View+If.swift */,
 			);
 			path = HLFIYA;
 			sourceTree = "<group>";
@@ -248,7 +254,7 @@
 			isa = PBXGroup;
 			children = (
 				F486A3C627C5C95D00298DAF /* BusinessFetcher.swift */,
-				F404FD662818DA96006D9C5A /* LocationManager.swift */,
+				F404FD662818DA96006D9C5A /* LocationViewModel.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -348,17 +354,19 @@
 			files = (
 				F45B3F1C27963D97003DCC31 /* HLFIYA.xcdatamodeld in Sources */,
 				F42D615E281D7D1000DBA5C0 /* AsyncImageHack.swift in Sources */,
+				F4253B842895C5F800DE59CB /* ContentView.swift in Sources */,
 				F4D407402824B9E7009805CB /* AllCategories.swift in Sources */,
 				F4D4073E2824B45D009805CB /* CategoriesView.swift in Sources */,
 				F45B3F2927970006003DCC31 /* Businesses.swift in Sources */,
 				F4130FA6285419ED0007D7E0 /* RightSwipe+CoreDataProperties.swift in Sources */,
 				F404FD692818E2D2006D9C5A /* LocationRequestView.swift in Sources */,
+				F48456F12895DA910037A1B7 /* View+If.swift in Sources */,
 				F4130FA7285419ED0007D7E0 /* SavedList+CoreDataClass.swift in Sources */,
 				F45B3F1927963D97003DCC31 /* Persistence.swift in Sources */,
 				F45B3F2D27970140003DCC31 /* BottomBarView.swift in Sources */,
 				F484972A28261CC500C2DB89 /* Swipe+FetchRequest.swift in Sources */,
 				F47A9D01284074A000161653 /* MapView.swift in Sources */,
-				F404FD672818DA96006D9C5A /* LocationManager.swift in Sources */,
+				F404FD672818DA96006D9C5A /* LocationViewModel.swift in Sources */,
 				F4BC0C202854FEE300D76EE5 /* SavedRestaurantsView.swift in Sources */,
 				F4D407422824C599009805CB /* MultiPicker.swift in Sources */,
 				F45B3F1227963D96003DCC31 /* MainView.swift in Sources */,

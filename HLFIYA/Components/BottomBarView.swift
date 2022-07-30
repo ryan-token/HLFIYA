@@ -18,15 +18,15 @@ struct BottomBarView: View {
     @Binding var showRefreshButton: Bool
     @Binding var apiError: Bool
     
+    @EnvironmentObject var locationViewModel: LocationViewModel
     @ObservedObject var filters: FiltersState
-    @ObservedObject var locationManager = LocationManager.shared
     
     var body: some View {
         HStack {
             Spacer()
             
             AsyncButton(action: {
-                let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+                let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                 setState(fetchedBusinesses: fetchedBusinesses)
             }) {
                 VStack(spacing: 5) {
@@ -107,7 +107,7 @@ struct BottomBarView: View {
     func setPriceFilter(prices: Set<String>, name: String) async {
         filters.prices = prices
         filters.priceName = name
-        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationManager: locationManager, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
         setState(fetchedBusinesses: fetchedBusinesses)
     }
     

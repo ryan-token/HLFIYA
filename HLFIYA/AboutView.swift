@@ -120,6 +120,7 @@ struct AboutView: View {
                 }
             }
         }
+        .navigationViewStyle(.stack)
     }
     
     func openCatchUpAppStoreLink() {
