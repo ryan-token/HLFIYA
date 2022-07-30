@@ -31,7 +31,6 @@ struct MapView: View {
                 Text("Choose Location")
                     .font(Font.system(.largeTitle, design: .rounded))
                     .bold()
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
                 
                 HStack {
                     Text("Radius:")
@@ -88,14 +87,14 @@ struct MapView: View {
                             locationViewModel.requestPermission()
                         }) {
                             Text("Request Current Location")
-                                .font(Font.system(.body, design: .rounded))
+                                .font(Font.system(.headline, design: .rounded))
                         }
                     case .restricted, .denied:
                         Button(action: {
                             UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
                         }) {
                             Text("Allow Location in Settings")
-                                .font(Font.system(.body, design: .rounded))
+                                .font(Font.system(.headline, design: .rounded))
                         }
                         
                     case .authorizedAlways, .authorizedWhenInUse:
@@ -110,7 +109,7 @@ struct MapView: View {
                             }
                         }) {
                             Text("Reset to Current Location")
-                                .font(Font.system(.body, design: .rounded))
+                                .font(Font.system(.headline, design: .rounded))
                         }
                     @unknown default:
                         Text("")
@@ -128,7 +127,7 @@ struct MapView: View {
                         }
                     }) {
                         Text("Save")
-                            .font(Font.system(.body, design: .rounded))
+                            .font(Font.system(.headline, design: .rounded))
                     }
                 }
             }
@@ -138,6 +137,7 @@ struct MapView: View {
             }
         }
         .navigationViewStyle(.stack)
+        .accentColor(Color(UIColor(named: "fuchsia")!))
     }
     
     // latitudeDelta is the amount of degrees that are visible on the screen. 1 degree is equal to ~69 miles

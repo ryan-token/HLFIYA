@@ -17,10 +17,6 @@ struct SettingsView: View {
     @State private var isShowingError = false
     @State private var errorTitle = ""
     
-    init() {
-        UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor(named: "fuchsia")!]
-    }
-    
     var body: some View {
         NavigationView {
             Form {
@@ -149,7 +145,7 @@ struct SettingsView: View {
                         restorePurchases()
                     }) {
                         Text("Restore Purchases")
-                            .font(Font.system(.body, design: .rounded))
+                            .font(Font.system(.headline, design: .rounded))
                     }
                 }
                 
@@ -158,12 +154,13 @@ struct SettingsView: View {
                         dismiss()
                     }) {
                         Text("Close")
-                            .font(Font.system(.body, design: .rounded))
+                            .font(Font.system(.headline, design: .rounded))
                     }
                 }
             }
         }
         .navigationViewStyle(.stack)
+        .accentColor(Color(UIColor(named: "fuchsia")!))
     }
     
     func requestReviewManually() {

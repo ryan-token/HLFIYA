@@ -34,6 +34,7 @@ struct BusinessView: View {
                     Button("Close") {
                         dismiss()
                     }
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
                 }
                 .padding(.top, 10)
                 .padding(.trailing, 15)
@@ -55,12 +56,6 @@ struct BusinessView: View {
                 }
                 .headerProminence(.increased)
                 
-                Section(header: Text("Categories")) {
-                    ForEach(currentBusiness.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
-                        Text(category.title ?? "")
-                    }
-                }
-                
                 Section(header: Text("Photos")) {
                     ImageSliderView(selectedTab: $selectedTab, imageUrls: checkForPhotos(imageUrls: currentBusiness.photos ?? [""]))
                         .frame(height: 300)
@@ -77,16 +72,23 @@ struct BusinessView: View {
                         }
                         .accessibilityLabel("Add to \(list.wrappedName) list")
                     }
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
                     
                     Button(action: {
                         isShowingCreateListSheet.toggle()
                     }) {
                         HStack {
                             Image(systemName: "plus.square")
-                                .foregroundColor(Color(UIColor(named: "fuchsia")!))
                             Text("Create List")
-                                .foregroundColor(Color(UIColor(named: "fuchsia")!))
                         }
+                        .font(Font.system(.headline, design: .rounded))
+                        .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                    }
+                }
+                
+                Section(header: Text("Categories")) {
+                    ForEach(currentBusiness.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
+                        Text(category.title ?? "")
                     }
                 }
                 
@@ -109,7 +111,7 @@ struct BusinessView: View {
                             UIApplication.shared.open(url)
                         }) {
                             Text(currentBusiness.display_phone ?? "")
-                                .foregroundColor(.blue)
+                                .foregroundColor(Color(UIColor(named: "fuchsia")!))
                         }
                     }
                     
@@ -128,6 +130,7 @@ struct BusinessView: View {
                                 }
                             }
                         }
+                        .foregroundColor(Color(UIColor(named: "fuchsia")!))
                     }
                     
                     VStack(alignment: .leading) {
@@ -154,6 +157,7 @@ struct BusinessView: View {
                                 .padding(.bottom, 5)
                             }
                         }
+                        .foregroundColor(.primary)
                     }
                 }
                 
@@ -161,13 +165,20 @@ struct BusinessView: View {
                     Button("Open DoorDash") {
                         openAppOrSafari(appToTry: "DoorDash")
                     }
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                    
                     Button("Open Uber Eats") {
                         openAppOrSafari(appToTry: "Uber Eats")
                     }
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                    
                     Button("Open OpenTable") {
                         openAppOrSafari(appToTry: "OpenTable")
                     }
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                    
                     Link("See More on Yelp", destination: URL(string: currentBusiness.url ?? "#")!)
+                        .foregroundColor(Color(UIColor(named: "fuchsia")!))
                 }
                 
                 HStack {

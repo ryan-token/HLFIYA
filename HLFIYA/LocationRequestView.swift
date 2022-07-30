@@ -32,7 +32,7 @@ struct LocationRequestView: View {
                 
                 if showGetReady {
                     Text("Get ready for some")
-                        .font(.system(size: 28, weight: .bold))
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
                         .multilineTextAlignment(.center)
                         .foregroundColor(colorScheme == .dark ? .white : .black)
                         .padding()
@@ -41,19 +41,19 @@ struct LocationRequestView: View {
                 VStack (spacing: 5) {
                     if showHot {
                         Text("HOT 🥵")
-                            .font(.system(size: 28, weight: .bold))
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
                             .multilineTextAlignment(.center)
                     }
                     
                     if showLocal {
                         Text("LOCAL 📍")
-                            .font(.system(size: 28, weight: .bold))
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
                             .multilineTextAlignment(.center)
                     }
                     
                     if showFood {
                         Text("FOOD 🍔")
-                            .font(.system(size: 28, weight: .bold))
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
                             .multilineTextAlignment(.center)
                     }
                 }

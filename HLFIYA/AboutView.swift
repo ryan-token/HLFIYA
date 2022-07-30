@@ -45,7 +45,8 @@ struct AboutView: View {
                                     .font(.title)
                                     .foregroundColor(.red)
                                 Text("Rate on the App Store")
-                                    .font(Font.system(.body, design: .rounded))
+                                    .font(Font.system(.headline, design: .rounded))
+                                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
                             }
                         }
                     }
@@ -116,11 +117,13 @@ struct AboutView: View {
                         dismiss()
                     }) {
                         Text("Done")
+                            .font(Font.system(.headline, design: .rounded))
                     }
                 }
             }
         }
         .navigationViewStyle(.stack)
+        .accentColor(Color(UIColor(named: "fuchsia")!))
     }
     
     func openCatchUpAppStoreLink() {

@@ -97,14 +97,14 @@ struct CardView: View {
             HStack {
                 Text("HOT 🥵")
                     .font(Font.system(size: 40, design: .rounded))
-                    .foregroundColor(.orange)
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
                     .bold()
                     .padding(5)
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.orange, lineWidth: 4)
+                            .stroke(Color(UIColor(named: "fuchsia")!), lineWidth: 4)
                     )
                     .rotationEffect(Angle(degrees: -25))
                     .opacity(Double(business.x/10 - 1))

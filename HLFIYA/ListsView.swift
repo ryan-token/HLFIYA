@@ -59,10 +59,12 @@ struct ListsView: View {
                     Button("Close") {
                         dismiss()
                     }
+                    .font(Font.system(.headline, design: .rounded))
                 }
             }
         }
         .navigationViewStyle(.stack)
+        .accentColor(Color(UIColor(named: "fuchsia")!))
     }
     
     func removeList(at offsets: IndexSet) {

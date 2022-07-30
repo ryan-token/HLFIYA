@@ -55,7 +55,9 @@ struct CategoriesView: View {
                         }
                     }
                 }
+                .foregroundColor(.primary)
                 .navigationTitle("Choose Categories")
+                
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
@@ -63,7 +65,7 @@ struct CategoriesView: View {
                             filters.categoriesNames = "All Food"
                         }) {
                             Text("Reset")
-                                .font(Font.system(.body, design: .rounded))
+                                .font(Font.system(.headline, design: .rounded))
                         }
                     }
                     
@@ -75,13 +77,14 @@ struct CategoriesView: View {
                             setState(fetchedBusinesses: fetchedBusinesses)
                         }) {
                             Text("Save")
-                                .font(Font.system(.body, design: .rounded))
+                                .font(Font.system(.headline, design: .rounded))
                         }
                     }
                  }
             }
         }
         .navigationViewStyle(.stack)
+        .accentColor(Color(UIColor(named: "fuchsia")!))
     }
     
     func setState(fetchedBusinesses: [Business]) {

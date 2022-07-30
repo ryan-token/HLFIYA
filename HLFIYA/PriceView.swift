@@ -55,7 +55,9 @@ struct PriceView: View {
                         }
                     }
                 }
+                .foregroundColor(.primary)
                 .navigationTitle("Choose Prices")
+                
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
@@ -63,7 +65,7 @@ struct PriceView: View {
                             filters.priceName = "All Prices"
                         }) {
                             Text("Reset")
-                                .font(Font.system(.body, design: .rounded))
+                                .font(Font.system(.headline, design: .rounded))
                         }
                     }
                     
@@ -75,13 +77,14 @@ struct PriceView: View {
                             setState(fetchedBusinesses: fetchedBusinesses)
                         }) {
                             Text("Save")
-                                .font(Font.system(.body, design: .rounded))
+                                .font(Font.system(.headline, design: .rounded))
                         }
                     }
                  }
             }
         }
         .navigationViewStyle(.stack)
+        .accentColor(Color(UIColor(named: "fuchsia")!))
     }
     
     func setState(fetchedBusinesses: [Business]) {

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreData
 import MapKit
 import GoogleMobileAds
 import StoreKit
@@ -51,7 +52,6 @@ struct MainView: View {
             if !nearbyBusinesses.isEmpty {
                 Text(nearbyBusinesses[currentBusinessIndex].location.city)
                     .font(Font.system(.title, design: .rounded))
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
                     .bold()
                     .padding(5)
                     .animation(.none, value: currentBusinessIndex)
@@ -143,7 +143,7 @@ struct MainView: View {
         }
         
         .onAppear() {
-            if !userHasOpenedAppBefore {
+            if !userHasOpenedAppBefore && !itemExists("Favorites") {
                 print("User hasn't opened the app before; adding a Favorites list")
                 let favoritesList = SavedList(context: moc)
                 favoritesList.name = "Favorites"
@@ -226,6 +226,12 @@ struct MainView: View {
             HapticGenerator.playErrorHaptic()
             print("Failed purchase for \(product.id): \(error)")
         }
+    }
+    
+    private func itemExists(_ item: String) -> Bool {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "SavedList")
+        fetchRequest.predicate = NSPredicate(format: "name == %@", item)
+        return ((try? moc.count(for: fetchRequest)) ?? 0) > 0
     }
 }
 

@@ -32,6 +32,7 @@ struct CreateListSheet: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .font(Font.system(.headline, design: .rounded))
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -45,9 +46,11 @@ struct CreateListSheet: View {
                         
                         dismiss()
                     }
+                    .font(Font.system(.headline, design: .rounded))
                 }
             }
         }
+        .accentColor(Color(UIColor(named: "fuchsia")!))
     }
 }
 

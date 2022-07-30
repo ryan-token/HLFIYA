@@ -17,9 +17,9 @@ struct TopBarView: View {
             Button(action: {
                 isShowingSettingsView.toggle()
             }) {
-                Image(systemName: "gear.circle.fill")
-                    .font(Font.system(size: 45, design: .rounded))
-                    .foregroundColor(.gray)
+                Image(systemName: "gear")
+                    .font(Font.system(size: 30, weight: .semibold, design: .rounded))
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
             }
             .accessibilityLabel("Settings")
             
@@ -28,8 +28,9 @@ struct TopBarView: View {
             Button(action: {
                 isShowingListsView.toggle()
             }) {
-                Image(systemName: "list.bullet.circle.fill")
-                    .font(Font.system(size: 45, design: .rounded))
+                Image(systemName: "list.bullet")
+                    .font(Font.system(size: 30, weight: .semibold, design: .rounded))
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
             }
             .accessibilityLabel("Lists")
             
@@ -45,8 +46,8 @@ struct TopBarView: View {
     }
 }
 
-//struct TopBarView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        TopBarView()
-//    }
-//}
+struct TopBarView_Previews: PreviewProvider {
+    static var previews: some View {
+        TopBarView()
+    }
+}
