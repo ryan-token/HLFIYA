@@ -143,13 +143,19 @@ struct MainView: View {
         }
         
         .onAppear() {
+            if locationViewModel.location == nil {
+                locationViewModel.location = CLLocation(latitude: 36.14203247996243, longitude: -95.97570631738338)
+            }
+            
             if !userHasOpenedAppBefore && !itemExists("Favorites") {
                 print("User hasn't opened the app before; adding a Favorites list")
                 let favoritesList = SavedList(context: moc)
                 favoritesList.name = "Favorites"
 
                 try? moc.save()
-                
+            }
+            
+            if !userHasOpenedAppBefore {
                 userHasOpenedAppBefore = true
             }
         }
@@ -175,8 +181,8 @@ struct MainView: View {
                 latitude = currentLocation.coordinate.latitude
                 longitude = currentLocation.coordinate.longitude
             } else {
-                latitude = 0.000000
-                longitude = 0.000000
+                latitude = 36.14203247996243
+                longitude = -95.97570631738338
             }
         }
         

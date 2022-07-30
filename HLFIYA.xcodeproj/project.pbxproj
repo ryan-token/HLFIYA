@@ -193,8 +193,8 @@
 				F4130F9E285419ED0007D7E0 /* RightSwipe+CoreDataProperties.swift */,
 				F4130F9F285419ED0007D7E0 /* SavedList+CoreDataClass.swift */,
 				F4130FA0285419ED0007D7E0 /* SavedList+CoreDataProperties.swift */,
-				F45B3F1527963D97003DCC31 /* Preview Content */,
 				F48456F02895DA910037A1B7 /* View+If.swift */,
+				F45B3F1527963D97003DCC31 /* Preview Content */,
 			);
 			path = HLFIYA;
 			sourceTree = "<group>";
