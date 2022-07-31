@@ -35,11 +35,16 @@ struct PriceView: View {
                                 filters.prices.insert(priceOption)
                             }
                             
-                            // Only allow 'All Prices' to be selected if nothing else is selected
+                            // Only allow 'All Food' to be selected if nothing else is selected
+                            if filters.prices.count > 0 {
+                                filters.prices.remove("All Prices")
+                            } else {
+                                filters.prices = ["All Prices"]
+                            }
+                            
+                            // select 'All Prices' if user manually selects all of them
                             if filters.prices.count == priceOptions.count-1 {
                                 filters.prices = ["All Prices"]
-                            } else {
-                                filters.prices.remove("All Prices")
                             }
                             
                             // If user specifically selects 'All Prices', deselect everything else

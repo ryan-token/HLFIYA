@@ -36,10 +36,14 @@ struct CategoriesView: View {
                             }
                             
                             // Only allow 'All Food' to be selected if nothing else is selected
+                            if filters.categories.count > 0 {
+                                filters.categories.remove("food")
+                            } else {
+                                filters.categories = ["food"]
+                            }
+                            
                             if filters.categories.count == yelpCategories.count-1 {
                                 filters.categories = ["food"]
-                            } else {
-                                filters.categories.remove("food")
                             }
                             
                             // If user specifically selects 'All Food', deselect everything else
