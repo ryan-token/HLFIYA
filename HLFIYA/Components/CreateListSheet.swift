@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct CreateListSheet: View {
+    @FocusState private var listNameInFocus: Bool
+    
     @Environment(\.dismiss) var dismiss
     @Environment(\.managedObjectContext) var moc
     
@@ -17,6 +19,7 @@ struct CreateListSheet: View {
         NavigationView {
             VStack {
                 TextField("List Name", text: $listName)
+                    .focused($listNameInFocus)
                     .textInputAutocapitalization(.words)
                     .font(Font.system(.largeTitle, design: .rounded))
                     .padding()
@@ -51,6 +54,12 @@ struct CreateListSheet: View {
             }
         }
         .accentColor(Color(UIColor(named: "fuchsia")!))
+        
+        .onAppear() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                listNameInFocus = true
+              }
+        }
     }
 }
 
