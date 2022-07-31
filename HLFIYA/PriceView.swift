@@ -10,10 +10,11 @@ import SwiftUI
 struct PriceView: View {
     let priceOptions = AllPrices().getPriceOptions()
     
-    @Binding var nearbyBusinesses: [Business]
-    @Binding var remainingBusinessesInList: Int
-    @Binding var currentBusinessIndex: Int
+    @Binding var nearbyRestaurants: [Business]
+    @Binding var remainingRestaurantsInList: Int
+    @Binding var currentRestaurantIndex: Int
     @Binding var showRefreshButton: Bool
+    @Binding var noResultsFound: Bool
     @Binding var apiError: Bool
     
     @EnvironmentObject var locationViewModel: LocationViewModel
@@ -88,11 +89,16 @@ struct PriceView: View {
     }
     
     func setState(fetchedBusinesses: [Business]) {
-        nearbyBusinesses = fetchedBusinesses
-        remainingBusinessesInList = fetchedBusinesses.count
-        currentBusinessIndex = 0
+        nearbyRestaurants = fetchedBusinesses
+        remainingRestaurantsInList = fetchedBusinesses.count
+        currentRestaurantIndex = 0
         showRefreshButton = true
         apiError = false
+        if fetchedBusinesses.isEmpty {
+            noResultsFound = true
+        } else {
+            noResultsFound = false
+        }
     }
 }
 

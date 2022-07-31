@@ -12,10 +12,11 @@ struct BottomBarView: View {
     @State private var isShowingPriceView = false
     @State private var isShowingMapView = false
     
-    @Binding var nearbyBusinesses: [Business]
-    @Binding var remainingBusinessesInList: Int
-    @Binding var currentBusinessIndex: Int
+    @Binding var nearbyRestaurants: [Business]
+    @Binding var remainingRestaurantsInList: Int
+    @Binding var currentRestaurantIndex: Int
     @Binding var showRefreshButton: Bool
+    @Binding var noResultsFound: Bool
     @Binding var apiError: Bool
     
     @EnvironmentObject var locationViewModel: LocationViewModel
@@ -90,16 +91,16 @@ struct BottomBarView: View {
             
             Spacer()
             
-                .popover(isPresented: $isShowingPriceView) {
-                    PriceView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
-                }
-            
+            .popover(isPresented: $isShowingPriceView) {
+                PriceView(nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, showRefreshButton: $showRefreshButton, noResultsFound: $noResultsFound, apiError: $apiError, filters: filters)
+            }
+        
             .popover(isPresented: $isShowingCategoriesView) {
-                CategoriesView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
+                CategoriesView(nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, showRefreshButton: $showRefreshButton, noResultsFound: $noResultsFound, apiError: $apiError, filters: filters)
             }
             
             .popover(isPresented: $isShowingMapView) {
-                MapView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
+                MapView(nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, showRefreshButton: $showRefreshButton, noResultsFound: $noResultsFound, apiError: $apiError, filters: filters)
             }
         }
     }
@@ -112,11 +113,16 @@ struct BottomBarView: View {
     }
     
     func setState(fetchedBusinesses: [Business]) {
-        nearbyBusinesses = fetchedBusinesses
-        remainingBusinessesInList = fetchedBusinesses.count
-        currentBusinessIndex = 0
+        nearbyRestaurants = fetchedBusinesses
+        remainingRestaurantsInList = fetchedBusinesses.count
+        currentRestaurantIndex = 0
         showRefreshButton = true
         apiError = false
+        if fetchedBusinesses.isEmpty {
+            noResultsFound = true
+        } else {
+            noResultsFound = false
+        }
     }
 }
 

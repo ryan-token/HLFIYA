@@ -13,16 +13,17 @@ import StoreKit
 
 struct MainView: View {
     @State private var currentLocationSet = false
-    @State private var nearbyBusinesses = [Business]()
-    @State private var remainingBusinessesInList = Int()
-    @State private var currentBusinessIndex = 0
+    @State private var nearbyRestaurants = [Business]()
+    @State private var remainingRestaurantsInList = Int()
+    @State private var currentRestaurantIndex = 0
     @State private var showRefreshButton = false
+    @State private var noResultsFound = false
     @State private var apiError = false
     @State private var isShowingError = false
     @State private var errorTitle = ""
     
-    @State private var businessesSwipedLeft = [Business]()
-    @State private var businessesSwipedRight = [Business]()
+    @State private var restaurantsSwipedLeft = [Business]()
+    @State private var restaurantsSwipedRight = [Business]()
     
     @StateObject var filters = FiltersState()
     @StateObject var storeManager = StoreManager()
@@ -45,16 +46,16 @@ struct MainView: View {
             TopBarView()
             
             if apiError {
-                Text("😕 Error loading businesses")
+                Text("😕 Error loading restaurants")
                     .foregroundColor(.gray)
             }
             
-            if !nearbyBusinesses.isEmpty {
-                Text(nearbyBusinesses[currentBusinessIndex].location.city)
+            if !nearbyRestaurants.isEmpty {
+                Text(nearbyRestaurants[currentRestaurantIndex].location.city)
                     .font(Font.system(.title, design: .rounded))
                     .bold()
                     .padding(5)
-                    .animation(.none, value: currentBusinessIndex)
+                    .animation(.none, value: currentRestaurantIndex)
             }
             
             VStack(spacing: 10) {
@@ -85,18 +86,27 @@ struct MainView: View {
             .font(Font.system(.body, design: .rounded))
             
             ZStack {
-                if nearbyBusinesses.isEmpty && apiError == false {
+                if noResultsFound {
+                    VStack {
+                        Spacer()
+                        Text("No results found. Try changing the filters at the bottom")
+                            .foregroundColor(.gray)
+                        Spacer()
+                    }
+                } else if nearbyRestaurants.isEmpty && apiError == false {
                     ProgressView()
                         .frame(maxHeight: .infinity)
                 } else {
-                    ForEach($nearbyBusinesses.reversed()) { business in
-                        CardView(totalBusinesses: nearbyBusinesses.count, business: business, nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, businessesSwipedLeft: $businessesSwipedLeft, businessesSwipedRight: $businessesSwipedRight)
-                            .padding(8)
+                    if !nearbyRestaurants.isEmpty {
+                        ForEach($nearbyRestaurants.reversed()) { restaurant in
+                            CardView(totalRestaurants: nearbyRestaurants.count, restaurant: restaurant, nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, restaurantsSwipedLeft: $restaurantsSwipedLeft, restaurantsSwipedRight: $restaurantsSwipedRight)
+                                .padding(8)
+                        }
+                        .accessibilityLabel("\(nearbyRestaurants[currentRestaurantIndex].name), \(nearbyRestaurants[currentRestaurantIndex].rating, specifier: "%.1f") stars, \(nearbyRestaurants[currentRestaurantIndex].price?.count ?? -1) dollar signs, \(nearbyRestaurants[currentRestaurantIndex].categories.first?.title ?? ""). Swipe left to skip, swipe right for details.")
                     }
-                    .accessibilityLabel("\(nearbyBusinesses[currentBusinessIndex].name), \(nearbyBusinesses[currentBusinessIndex].rating, specifier: "%.1f") stars, \(nearbyBusinesses[currentBusinessIndex].price?.count ?? -1) dollar signs, \(nearbyBusinesses[currentBusinessIndex].categories.first?.title ?? ""). Swipe left to skip, swipe right for details.")
                 }
                 
-                if remainingBusinessesInList == 0 && showRefreshButton {
+                if remainingRestaurantsInList == 0 && showRefreshButton && !noResultsFound {
                     AsyncButton(action: {
                         let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                         setState(fetchedBusinesses: fetchedBusinesses)
@@ -113,7 +123,7 @@ struct MainView: View {
             }
             .zIndex(1.0)
             
-            BottomBarView(nearbyBusinesses: $nearbyBusinesses, remainingBusinessesInList: $remainingBusinessesInList, currentBusinessIndex: $currentBusinessIndex, showRefreshButton: $showRefreshButton, apiError: $apiError, filters: filters)
+            BottomBarView(nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, showRefreshButton: $showRefreshButton, noResultsFound: $noResultsFound, apiError: $apiError, filters: filters)
             
             
             if storeManager.purchasedIds.isEmpty {
@@ -124,6 +134,7 @@ struct MainView: View {
                         }) {
                             Text("Remove Ads")
                                 .font(Font.system(.callout, design: .rounded))
+                                .foregroundColor(Color(UIColor(named: "fuchsia")!))
                         }
                     }
                     GADBannerViewController()
@@ -133,12 +144,12 @@ struct MainView: View {
         }
         
         .task {
-            if nearbyBusinesses.isEmpty {
-                print("refreshing businesses")
+            if nearbyRestaurants.isEmpty {
+                print("refreshing restaurants")
                 let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                 setState(fetchedBusinesses: fetchedBusinesses)
             } else {
-                print("We already have businesses, not fetching onAppear")
+                print("We already have restaurants, not fetching onAppear")
             }
         }
         
@@ -195,6 +206,7 @@ struct MainView: View {
         
         do {
             fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: customRadius), categories: categories, prices: stringPrices)
+            print("fetched Businesses: \(fetchedBusinesses)")
         } catch {
             print("Request failed with error: \(error)")
             fetchedBusinesses = []
@@ -204,11 +216,14 @@ struct MainView: View {
     }
     
     func setState(fetchedBusinesses: [Business]) {
-        nearbyBusinesses = fetchedBusinesses
-        remainingBusinessesInList = fetchedBusinesses.count
-        currentBusinessIndex = 0
+        nearbyRestaurants = fetchedBusinesses
+        remainingRestaurantsInList = fetchedBusinesses.count
+        currentRestaurantIndex = 0
         showRefreshButton = true
         apiError = false
+        if fetchedBusinesses.isEmpty {
+            noResultsFound = true
+        }
     }
     
     func checkForApiError(fetchedBusinesses: [Business]) {

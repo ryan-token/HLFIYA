@@ -10,47 +10,78 @@ import SwiftUI
 struct SavedRestaurantsDetailsView: View {
     var restaurantId: String
     
-    @State private var currentBusiness = BusinessDetails()
+    @State private var currentRestaurant = BusinessDetails()
+    @State private var listTappedName = ""
+    @State private var isShowingCreateListSheet = false
+    @State private var isShowingAddedToListAlert = false
+    @State private var isShowingAddedToListErrorAlert = false
+    @State private var isShowingDuplicateAlert = false
     @State private var selectedTab = 1
     @State private var apiError = false
     
+    @Environment(\.managedObjectContext) var moc
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.openURL) var openURL
+    @FetchRequest(sortDescriptors: [SortDescriptor(\.name)]) var savedLists: FetchedResults<SavedList>
     
     var body: some View {
         List {
             if apiError {
-                Text("😕 Error loading details")
+                Text("😕 Error loading business details")
                     .font(Font.system(.body, design: .rounded))
                     .foregroundColor(.gray)
                     .padding(.leading)
             }
             
-            Section(header: Text(currentBusiness.name ?? "")) {
-                StarRatingView(rating: currentBusiness.rating ?? 0.0, label: "Rating:")
-                DollarView(price: currentBusiness.price ?? "", label: "Price:")
+            Section(header: Text(currentRestaurant.name ?? "")) {
+                StarRatingView(rating: currentRestaurant.rating ?? 0.0, label: "Rating:", reviewCount: currentRestaurant.review_count)
+                DollarView(price: currentRestaurant.price ?? "", label: "Price:")
             }
             .headerProminence(.increased)
             
-            Section(header: Text("Categories")) {
-                ForEach(currentBusiness.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
-                    Text(category.title ?? "")
+            Section(header: Text("Photos")) {
+                ImageSliderView(selectedTab: $selectedTab, imageUrls: checkForPhotos(imageUrls: currentRestaurant.photos ?? [""]))
+                    .frame(height: 300)
+                    .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            }
+            
+            Section(header: Text("Add to List")) {
+                ForEach(savedLists) { list in
+                    Button(action:  {
+                        listTappedName = list.wrappedName
+                        addToList(list: list, id: currentRestaurant.id ?? "", name: currentRestaurant.name ?? "")
+                    }) {
+                        Text(list.wrappedName)
+                    }
+                    .accessibilityLabel("Add to \(list.wrappedName) list")
+                }
+                .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                
+                Button(action: {
+                    isShowingCreateListSheet.toggle()
+                }) {
+                    HStack {
+                        Image(systemName: "plus.square")
+                        Text("Create List")
+                    }
+                    .font(Font.system(.headline, design: .rounded))
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
                 }
             }
             
-            Section(header: Text("Photos")) {
-                ImageSliderView(selectedTab: $selectedTab, imageUrls: checkForPhotos(imageUrls: currentBusiness.photos ?? [""]))
-                    .frame(height: 300)
-                    .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            Section(header: Text("Categories")) {
+                ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
+                    Text(category.title ?? "")
+                }
             }
             
             Section(header: Text("Information")) {
                 HStack {
                     Text("Currently Open:")
                         .foregroundColor(.gray)
-                    Text(isOpenNow(currentBusiness.hours?[0].is_open_now ?? false))
+                    Text(isOpenNow(currentRestaurant.hours?[0].is_open_now ?? false))
                         .bold()
-                        .foregroundColor(currentBusiness.hours?[0].is_open_now ?? false ? .green : .red)
+                        .foregroundColor(currentRestaurant.hours?[0].is_open_now ?? false ? .green : .red)
                 }
                 
                 HStack {
@@ -58,12 +89,12 @@ struct SavedRestaurantsDetailsView: View {
                         .foregroundColor(.gray)
                     Button(action: {
                         let phone = "tel://"
-                        let phoneNumberformatted = phone + (currentBusiness.phone ?? "555-555-5555")
+                        let phoneNumberformatted = phone + (currentRestaurant.phone ?? "555-555-5555")
                         guard let url = URL(string: phoneNumberformatted) else { return }
                         UIApplication.shared.open(url)
                     }) {
-                        Text(currentBusiness.display_phone ?? "")
-                            .foregroundColor(.blue)
+                        Text(currentRestaurant.display_phone ?? "")
+                            .foregroundColor(Color(UIColor(named: "fuchsia")!))
                     }
                 }
                 
@@ -73,15 +104,16 @@ struct SavedRestaurantsDetailsView: View {
                         .padding(.bottom, 2)
                     
                     Button {
-                        openAddressInAppleMaps(latitude: currentBusiness.coordinates?.latitude ?? 0.0, longitude: currentBusiness.coordinates?.longitude ?? 0.0)
+                        openAddressInAppleMaps(latitude: currentRestaurant.coordinates?.latitude ?? 0.0, longitude: currentRestaurant.coordinates?.longitude ?? 0.0)
                     } label: {
-                        ForEach(currentBusiness.location?.display_address ?? [""], id: \.self) { addressPortion in
+                        ForEach(currentRestaurant.location?.display_address ?? [""], id: \.self) { addressPortion in
                             HStack {
                                 Text(addressPortion)
                                 Spacer()
                             }
                         }
                     }
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
                 }
                 
                 VStack(alignment: .leading) {
@@ -90,7 +122,7 @@ struct SavedRestaurantsDetailsView: View {
                         .padding(.bottom, 2)
                     
                     VStack(alignment: .leading) {
-                        ForEach((currentBusiness.hours?[0].open ?? BusinessDetails.emptyBusiness.hours![0].open)!, id: \.self) { chunk in
+                        ForEach((currentRestaurant.hours?[0].open ?? BusinessDetails.emptyBusiness.hours![0].open)!, id: \.self) { chunk in
                             VStack(alignment: .leading) {
                                 Text(convertDayNumberToWeekday(dayNumberString: chunk.day ?? 99999))
                                     .foregroundColor(.secondary)
@@ -102,11 +134,13 @@ struct SavedRestaurantsDetailsView: View {
                                     
                                     Text(convertMilitaryTimeToLocalTime(militaryTime: chunk.end ?? ""))
                                 }
+                                .accessibilityLabel("\(convertDayNumberToWeekday(dayNumberString: chunk.day ?? 99999)) hours: \(convertMilitaryTimeToLocalTime(militaryTime: chunk.start ?? "")) to \(convertMilitaryTimeToLocalTime(militaryTime: chunk.end ?? ""))")
                                 .font(Font.system(.headline, design: .rounded))
                             }
                             .padding(.bottom, 5)
                         }
                     }
+                    .foregroundColor(.primary)
                 }
             }
             
@@ -114,13 +148,20 @@ struct SavedRestaurantsDetailsView: View {
                 Button("Open DoorDash") {
                     openAppOrSafari(appToTry: "DoorDash")
                 }
+                .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                
                 Button("Open Uber Eats") {
                     openAppOrSafari(appToTry: "Uber Eats")
                 }
+                .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                
                 Button("Open OpenTable") {
                     openAppOrSafari(appToTry: "OpenTable")
                 }
-                Link("See More on Yelp", destination: URL(string: currentBusiness.url ?? "#")!)
+                .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                
+                Link("See More on Yelp", destination: URL(string: currentRestaurant.url ?? "#")!)
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
             }
             
             HStack {
@@ -138,7 +179,9 @@ struct SavedRestaurantsDetailsView: View {
                         .frame(width: 75)
                 }
             }
+            .accessibilityLabel("Powered by Yelp")
             .listRowBackground(Color.clear)
+            
         }
         .font(Font.system(.body, design: .rounded))
         
@@ -148,13 +191,29 @@ struct SavedRestaurantsDetailsView: View {
         .task {
             await getBusiness(id: restaurantId)
         }
+        
+        .alert("Added \(currentRestaurant.name ?? "") to your \(listTappedName) list", isPresented: $isShowingAddedToListAlert) {
+            Button("OK", role: .cancel) { }
+        }
+        
+        .alert("Error adding \(currentRestaurant.name ?? "") to your \(listTappedName) list", isPresented: $isShowingAddedToListErrorAlert) {
+            Button("OK", role: .cancel) { }
+        }
+        
+        .alert("\(currentRestaurant.name ?? "") is already in your \(listTappedName) list!", isPresented: $isShowingDuplicateAlert) {
+            Button("OK", role: .cancel) { }
+        }
+        
+        .popover(isPresented: $isShowingCreateListSheet) {
+            CreateListSheet()
+        }
     }
     
     func getBusiness(id: String) async {
         Task {
             do {
                 let businessDetails = try await BusinessFetcher.getBusiness(id: id)
-                currentBusiness = businessDetails
+                currentRestaurant = businessDetails
                 apiError = false
             } catch {
                 print("Request failed with error: \(error)")
@@ -217,6 +276,25 @@ struct SavedRestaurantsDetailsView: View {
         UIApplication.shared.open(url)
     }
     
+    func addToList(list: SavedList, id: String, name: String) {
+        let restaurant = SavedRestaurant(context: moc)
+        print("list restaurants: \(list.restaurantsArray)")
+        if !list.restaurantsArray.contains(where: { $0.name == name }) {
+            restaurant.addToLists(list)
+            restaurant.id = id
+            restaurant.name = name
+
+            do {
+                try moc.save()
+                isShowingAddedToListAlert.toggle()
+            } catch {
+                isShowingAddedToListErrorAlert.toggle()
+            }
+        } else {
+            isShowingDuplicateAlert.toggle()
+        }
+    }
+    
     func openAppOrSafari(appToTry: String) {
         var urlScheme: String
         var safariUrl: String
@@ -224,15 +302,15 @@ struct SavedRestaurantsDetailsView: View {
         switch appToTry {
         case "DoorDash":
             urlScheme = "doordash://"
-            let url = "https://www.doordash.com/search/store/\(currentBusiness.name!)"
+            let url = "https://www.doordash.com/search/store/\(currentRestaurant.name!)"
             safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         case "Uber Eats":
             urlScheme = "ubereats://"
-            let url = "https://www.ubereats.com/search?diningMode=DELIVERY&q=\(currentBusiness.name!)"
+            let url = "https://www.ubereats.com/search?diningMode=DELIVERY&q=\(currentRestaurant.name!)"
             safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         case "OpenTable":
             urlScheme = "opentable://"
-            let url = "https://www.opentable.com/s?term=\(currentBusiness.name!)"
+            let url = "https://www.opentable.com/s?term=\(currentRestaurant.name!)"
             safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         default:
             urlScheme = "#"

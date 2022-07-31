@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-struct BusinessView: View {
-    var business: Business
+struct RestaurantDetailsView: View {
+    var restaurant: Business
     
-    @State private var currentBusiness = BusinessDetails()
+    @State private var currentRestaurant = BusinessDetails()
     @State private var apiError = false
     @State private var selectedTab = 1
     @State private var listTappedName = ""
@@ -50,14 +50,14 @@ struct BusinessView: View {
             }
             
             List {
-                Section(header: Text(currentBusiness.name ?? "")) {
-                    StarRatingView(rating: currentBusiness.rating ?? 0.0, label: "Rating:", reviewCount: currentBusiness.review_count)
-                    DollarView(price: currentBusiness.price ?? "", label: "Price:")
+                Section(header: Text(currentRestaurant.name ?? "")) {
+                    StarRatingView(rating: currentRestaurant.rating ?? 0.0, label: "Rating:", reviewCount: currentRestaurant.review_count)
+                    DollarView(price: currentRestaurant.price ?? "", label: "Price:")
                 }
                 .headerProminence(.increased)
                 
                 Section(header: Text("Photos")) {
-                    ImageSliderView(selectedTab: $selectedTab, imageUrls: checkForPhotos(imageUrls: currentBusiness.photos ?? [""]))
+                    ImageSliderView(selectedTab: $selectedTab, imageUrls: checkForPhotos(imageUrls: currentRestaurant.photos ?? [""]))
                         .frame(height: 300)
                         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 }
@@ -66,7 +66,7 @@ struct BusinessView: View {
                     ForEach(savedLists) { list in
                         Button(action:  {
                             listTappedName = list.wrappedName
-                            addToList(list: list, id: business.id, name: business.name)
+                            addToList(list: list, id: restaurant.id, name: restaurant.name)
                         }) {
                             Text(list.wrappedName)
                         }
@@ -87,7 +87,7 @@ struct BusinessView: View {
                 }
                 
                 Section(header: Text("Categories")) {
-                    ForEach(currentBusiness.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
+                    ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
                         Text(category.title ?? "")
                     }
                 }
@@ -96,9 +96,9 @@ struct BusinessView: View {
                     HStack {
                         Text("Currently Open:")
                             .foregroundColor(.gray)
-                        Text(isOpenNow(currentBusiness.hours?[0].is_open_now ?? false))
+                        Text(isOpenNow(currentRestaurant.hours?[0].is_open_now ?? false))
                             .bold()
-                            .foregroundColor(currentBusiness.hours?[0].is_open_now ?? false ? .green : .red)
+                            .foregroundColor(currentRestaurant.hours?[0].is_open_now ?? false ? .green : .red)
                     }
                     
                     HStack {
@@ -106,11 +106,11 @@ struct BusinessView: View {
                             .foregroundColor(.gray)
                         Button(action: {
                             let phone = "tel://"
-                            let phoneNumberformatted = phone + (currentBusiness.phone ?? "555-555-5555")
+                            let phoneNumberformatted = phone + (currentRestaurant.phone ?? "555-555-5555")
                             guard let url = URL(string: phoneNumberformatted) else { return }
                             UIApplication.shared.open(url)
                         }) {
-                            Text(currentBusiness.display_phone ?? "")
+                            Text(currentRestaurant.display_phone ?? "")
                                 .foregroundColor(Color(UIColor(named: "fuchsia")!))
                         }
                     }
@@ -121,9 +121,9 @@ struct BusinessView: View {
                             .padding(.bottom, 2)
                         
                         Button {
-                            openAddressInAppleMaps(latitude: currentBusiness.coordinates?.latitude ?? 0.0, longitude: currentBusiness.coordinates?.longitude ?? 0.0)
+                            openAddressInAppleMaps(latitude: currentRestaurant.coordinates?.latitude ?? 0.0, longitude: currentRestaurant.coordinates?.longitude ?? 0.0)
                         } label: {
-                            ForEach(currentBusiness.location?.display_address ?? [""], id: \.self) { addressPortion in
+                            ForEach(currentRestaurant.location?.display_address ?? [""], id: \.self) { addressPortion in
                                 HStack {
                                     Text(addressPortion)
                                     Spacer()
@@ -139,7 +139,7 @@ struct BusinessView: View {
                             .padding(.bottom, 2)
                         
                         VStack(alignment: .leading) {
-                            ForEach((currentBusiness.hours?[0].open ?? BusinessDetails.emptyBusiness.hours![0].open)!, id: \.self) { chunk in
+                            ForEach((currentRestaurant.hours?[0].open ?? BusinessDetails.emptyBusiness.hours![0].open)!, id: \.self) { chunk in
                                 VStack(alignment: .leading) {
                                     Text(convertDayNumberToWeekday(dayNumberString: chunk.day ?? 99999))
                                         .foregroundColor(.secondary)
@@ -177,7 +177,7 @@ struct BusinessView: View {
                     }
                     .foregroundColor(Color(UIColor(named: "fuchsia")!))
                     
-                    Link("See More on Yelp", destination: URL(string: currentBusiness.url ?? "#")!)
+                    Link("See More on Yelp", destination: URL(string: currentRestaurant.url ?? "#")!)
                         .foregroundColor(Color(UIColor(named: "fuchsia")!))
                 }
                 
@@ -204,18 +204,18 @@ struct BusinessView: View {
         }
         
         .task {
-            await getBusiness(id: business.id)
+            await getBusiness(id: restaurant.id)
         }
         
-        .alert("Added \(business.name) to your \(listTappedName) list", isPresented: $isShowingAddedToListAlert) {
+        .alert("Added \(restaurant.name) to your \(listTappedName) list", isPresented: $isShowingAddedToListAlert) {
             Button("OK", role: .cancel) { }
         }
         
-        .alert("Error adding \(business.name) to your \(listTappedName) list", isPresented: $isShowingAddedToListErrorAlert) {
+        .alert("Error adding \(restaurant.name) to your \(listTappedName) list", isPresented: $isShowingAddedToListErrorAlert) {
             Button("OK", role: .cancel) { }
         }
         
-        .alert("\(business.name) is already in your \(listTappedName) list!", isPresented: $isShowingDuplicateAlert) {
+        .alert("\(restaurant.name) is already in your \(listTappedName) list!", isPresented: $isShowingDuplicateAlert) {
             Button("OK", role: .cancel) { }
         }
         
@@ -247,7 +247,7 @@ struct BusinessView: View {
         Task {
             do {
                 let businessDetails = try await BusinessFetcher.getBusiness(id: id)
-                currentBusiness = businessDetails
+                currentRestaurant = businessDetails
                 print(businessDetails)
                 apiError = false
             } catch {
@@ -318,15 +318,15 @@ struct BusinessView: View {
         switch appToTry {
         case "DoorDash":
             urlScheme = "doordash://"
-            let url = "https://www.doordash.com/search/store/\(currentBusiness.name!)"
+            let url = "https://www.doordash.com/search/store/\(currentRestaurant.name!)"
             safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         case "Uber Eats":
             urlScheme = "ubereats://"
-            let url = "https://www.ubereats.com/search?diningMode=DELIVERY&q=\(currentBusiness.name!)"
+            let url = "https://www.ubereats.com/search?diningMode=DELIVERY&q=\(currentRestaurant.name!)"
             safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         case "OpenTable":
             urlScheme = "opentable://"
-            let url = "https://www.opentable.com/s?term=\(currentBusiness.name!)"
+            let url = "https://www.opentable.com/s?term=\(currentRestaurant.name!)"
             safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
         default:
             urlScheme = "#"
@@ -349,6 +349,6 @@ struct BusinessView: View {
 
 struct BusinessView_Previews: PreviewProvider {
     static var previews: some View {
-        BusinessView(business: Business.data[0])
+        RestaurantDetailsView(restaurant: Business.data[0])
     }
 }

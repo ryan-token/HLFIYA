@@ -9,29 +9,29 @@
 import SwiftUI
 
 struct CardView: View {
-    var totalBusinesses: Int
+    var totalRestaurants: Int
     let cardGradient = Gradient(colors: [Color.black.opacity(0), Color.black.opacity(0.5)])
     
-    @State private var showingBusinessDetails = false
+    @State private var showingRestaurantDetails = false
     @State private var userTappedToShowMorePhotos = false
     @State private var selectedTab = 1
     @State private var imageUrls = [String]()
     @State private var apiError = false
     @State private var undoTapped = false
     
-    @Binding var business: Business
-    @Binding var nearbyBusinesses: [Business]
-    @Binding var remainingBusinessesInList: Int
-    @Binding var currentBusinessIndex: Int
-    @Binding var businessesSwipedLeft: [Business]
-    @Binding var businessesSwipedRight: [Business]
+    @Binding var restaurant: Business
+    @Binding var nearbyRestaurants: [Business]
+    @Binding var remainingRestaurantsInList: Int
+    @Binding var currentRestaurantIndex: Int
+    @Binding var restaurantsSwipedLeft: [Business]
+    @Binding var restaurantsSwipedRight: [Business]
     
     @Environment(\.managedObjectContext) private var moc
     
     var body: some View {
         ZStack(alignment: .topLeading) {
             if apiError {
-                Text("😕 Error loading business photos")
+                Text("😕 Error loading restaurant photos")
                     .font(Font.system(.body, design: .rounded))
                     .foregroundColor(.gray)
                     .padding(.leading)
@@ -42,13 +42,13 @@ struct CardView: View {
             if userTappedToShowMorePhotos {
                 ImageSliderView(selectedTab: $selectedTab, imageUrls: imageUrls)
             } else {
-                ImageSliderView(selectedTab: $selectedTab, imageUrls: [business.image_url])
+                ImageSliderView(selectedTab: $selectedTab, imageUrls: [restaurant.image_url])
             }
             
             LinearGradient(gradient: cardGradient, startPoint: .top, endPoint: .bottom)
             
             VStack {
-                if currentBusinessIndex == 0 {
+                if currentRestaurantIndex == 0 {
                     Text("Swipe ← to skip, swipe → for details")
                         .foregroundColor(.white)
                         .font(Font.system(.caption, design: .rounded))
@@ -59,27 +59,27 @@ struct CardView: View {
                 }
                 Spacer()
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(business.name)
+                    Text(restaurant.name)
                         .font(Font.system(.largeTitle, design: .rounded))
                         .bold()
                     
                     HStack {
-                        StarRatingView(rating: business.rating)
+                        StarRatingView(rating: restaurant.rating)
                         Spacer()
                         Button(action: {
                             undo()
                         }) {
                             Image(systemName: "arrow.uturn.backward.circle.fill")
                                 .font(Font.system(size: 40, design: .rounded))
-                                .foregroundColor(totalBusinesses != remainingBusinessesInList ? .yellow : .gray)
+                                .foregroundColor(totalRestaurants != remainingRestaurantsInList ? .yellow : .gray)
                         }
                         .accessibilityLabel("Undo")
                     }
                     
-                    DollarView(price: business.price ?? "", label: "")
+                    DollarView(price: restaurant.price ?? "", label: "")
                     
                     HStack {
-                        Text(business.categories[0].title)
+                        Text(restaurant.categories[0].title)
                         Spacer()
                         Image("yelp_burst")
                             .resizable()
@@ -107,7 +107,7 @@ struct CardView: View {
                             .stroke(Color(UIColor(named: "fuchsia")!), lineWidth: 4)
                     )
                     .rotationEffect(Angle(degrees: -25))
-                    .opacity(Double(business.x/10 - 1))
+                    .opacity(Double(restaurant.x/10 - 1))
                 
                 Spacer()
                 
@@ -123,20 +123,20 @@ struct CardView: View {
                             .stroke(Color.black, lineWidth: 4)
                     )
                     .rotationEffect(Angle(degrees: 25))
-                    .opacity(Double(business.x/10 * -1 - 1))
+                    .opacity(Double(restaurant.x/10 * -1 - 1))
             }
             .padding(.top, 35)
             .padding(.leading, 10)
             .padding(.trailing, 10)
         }
         .cornerRadius(8)
-        .offset(x: business.x, y: business.y)
-        .rotationEffect(.init(degrees: business.degree))
+        .offset(x: restaurant.x, y: restaurant.y)
+        .rotationEffect(.init(degrees: restaurant.degree))
         
         .onTapGesture {
             if userTappedToShowMorePhotos == false {
                 Task {
-                    await getBusinessPhotos(id: business.id)
+                    await getBusinessPhotos(id: restaurant.id)
                 }
             } else {
                 if selectedTab == imageUrls.count {
@@ -151,9 +151,9 @@ struct CardView: View {
             DragGesture()
                 .onChanged { value in
                     withAnimation(.default) {
-                        business.x = value.translation.width
-                        business.y = value.translation.height
-                        business.degree = 7 * (value.translation.width > 0 ? 1 : -1)
+                        restaurant.x = value.translation.width
+                        restaurant.y = value.translation.height
+                        restaurant.degree = 7 * (value.translation.width > 0 ? 1 : -1)
                     }
                 }
             
@@ -169,24 +169,24 @@ struct CardView: View {
                         case let x where x < -100:
                             swipedLeft()
                         default:
-                            business.x = 0
-                            business.y = 0
+                            restaurant.x = 0
+                            restaurant.y = 0
                         }
                     }
                 }
         )
         
-        .sheet(isPresented: $showingBusinessDetails) {
-            BusinessView(business: business)
+        .sheet(isPresented: $showingRestaurantDetails) {
+            RestaurantDetailsView(restaurant: restaurant)
         }
     }
     
     func getBusinessPhotos(id: String) async {
         Task {
             do {
-                let businessDetails = try await BusinessFetcher.getBusiness(id: id)
-                print("businessDetails: \(businessDetails)")
-                imageUrls = businessDetails.photos ?? [business.image_url]
+                let restaurantDetails = try await BusinessFetcher.getBusiness(id: id)
+                print("restaurantDetails: \(restaurantDetails)")
+                imageUrls = restaurantDetails.photos ?? [restaurant.image_url]
                 print("imageUrls: \(imageUrls)")
                 apiError = false
                 selectedTab = 2
@@ -199,78 +199,78 @@ struct CardView: View {
     }
     
     func undo() {
-        if totalBusinesses != remainingBusinessesInList {
+        if totalRestaurants != remainingRestaurantsInList {
             withAnimation(.interpolatingSpring(mass: 1.0, stiffness: 50, damping: 100, initialVelocity: 7)) {
-                nearbyBusinesses[currentBusinessIndex-1].x = 0
-                nearbyBusinesses[currentBusinessIndex-1].y = 0
-                nearbyBusinesses[currentBusinessIndex-1].degree = 0.0
+                nearbyRestaurants[currentRestaurantIndex-1].x = 0
+                nearbyRestaurants[currentRestaurantIndex-1].y = 0
+                nearbyRestaurants[currentRestaurantIndex-1].degree = 0.0
             }
             
-            remainingBusinessesInList += 1
-            currentBusinessIndex -= 1
+            remainingRestaurantsInList += 1
+            currentRestaurantIndex -= 1
         } else {
             print("nothing to undo")
         }
     }
     
     func almostSwipedLeft() {
-        business.x = 0
-        business.degree = 0
-        business.y = 0
+        restaurant.x = 0
+        restaurant.degree = 0
+        restaurant.y = 0
         
         print("almost swiped left")
     }
     
     func swipedLeft() {
-        business.x = -500
-        business.y = -12
+        restaurant.x = -500
+        restaurant.y = -12
         
-        remainingBusinessesInList -= 1
-        if remainingBusinessesInList != 0 {
-            currentBusinessIndex += 1
+        remainingRestaurantsInList -= 1
+        if remainingRestaurantsInList != 0 {
+            currentRestaurantIndex += 1
         }
         
-        businessesSwipedLeft.append(business)
+        restaurantsSwipedLeft.append(restaurant)
         
         addSwipeToCoreData(direction: "left")
         
         print("swiped left")
-        print("businessesSwipedLeft: \(businessesSwipedLeft)")
-        print("remaining businesses: \(remainingBusinessesInList)")
+        print("restaurantsSwipedLeft: \(restaurantsSwipedLeft)")
+        print("remaining restaurants: \(remainingRestaurantsInList)")
     }
     
     func almostSwipedRight() {
-        business.x = 0
-        business.degree = 0
-        business.y = 0
+        restaurant.x = 0
+        restaurant.degree = 0
+        restaurant.y = 0
         
         print("almost swiped right")
     }
     
     func swipedRight() {
-        business.x = 0
-        business.y = 0
-        business.degree = 0
+        restaurant.x = 0
+        restaurant.y = 0
+        restaurant.degree = 0
         
-        businessesSwipedRight.append(business)
+        restaurantsSwipedRight.append(restaurant)
         
         addSwipeToCoreData(direction: "right")
         
         print("swiped right")
         
-        showingBusinessDetails.toggle()
+        showingRestaurantDetails.toggle()
     }
     
     func addSwipeToCoreData(direction: String) {
         if direction == "right" {
             let rightSwipe = RightSwipe(context: moc)
-            rightSwipe.name = business.name
+            rightSwipe.name = restaurant.name
             rightSwipe.uuid = UUID()
             
             try? moc.save()
         } else if direction == "left" {
             let leftSwipe = LeftSwipe(context: moc)
-            leftSwipe.name = business.name
+            leftSwipe.name = restaurant.name
             leftSwipe.uuid = UUID()
             
             try? moc.save()
@@ -282,6 +282,6 @@ struct CardView: View {
 
 struct CardView_Previews: PreviewProvider {
     static var previews: some View {
-        CardView(totalBusinesses: 50, business: .constant(Business.data[0]), nearbyBusinesses: .constant(Business.data), remainingBusinessesInList: .constant(45), currentBusinessIndex: .constant(5), businessesSwipedLeft: .constant([Business.data[0]]), businessesSwipedRight: .constant([Business.data[1]]))
+        CardView(totalRestaurants: 50, restaurant: .constant(Business.data[0]), nearbyRestaurants: .constant(Business.data), remainingRestaurantsInList: .constant(45), currentRestaurantIndex: .constant(5), restaurantsSwipedLeft: .constant([Business.data[0]]), restaurantsSwipedRight: .constant([Business.data[1]]))
     }
 }

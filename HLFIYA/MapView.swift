@@ -14,10 +14,11 @@ struct MapView: View {
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
     @State private var isShowingRadiusTooLargeAlert = false
     
-    @Binding var nearbyBusinesses: [Business]
-    @Binding var remainingBusinessesInList: Int
-    @Binding var currentBusinessIndex: Int
+    @Binding var nearbyRestaurants: [Business]
+    @Binding var remainingRestaurantsInList: Int
+    @Binding var currentRestaurantIndex: Int
     @Binding var showRefreshButton: Bool
+    @Binding var noResultsFound: Bool
     @Binding var apiError: Bool
     
     @ObservedObject var filters: FiltersState
@@ -150,11 +151,16 @@ struct MapView: View {
     }
 
     func setState(fetchedBusinesses: [Business]) {
-        nearbyBusinesses = fetchedBusinesses
-        remainingBusinessesInList = fetchedBusinesses.count
-        currentBusinessIndex = 0
+        nearbyRestaurants = fetchedBusinesses
+        remainingRestaurantsInList = fetchedBusinesses.count
+        currentRestaurantIndex = 0
         showRefreshButton = true
         apiError = false
+        if fetchedBusinesses.isEmpty {
+            noResultsFound = true
+        } else {
+            noResultsFound = false
+        }
     }
 }
 

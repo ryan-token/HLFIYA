@@ -1,5 +1,5 @@
 //
-//  Business.swift
+//  Businesses.swift
 //  HLFIYA
 //
 //  Created by Ryan Token on 1/18/22.

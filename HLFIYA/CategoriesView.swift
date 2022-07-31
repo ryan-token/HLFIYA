@@ -10,10 +10,11 @@ import SwiftUI
 struct CategoriesView: View {
     let yelpCategories = AllCategories().getYelpCategories()
     
-    @Binding var nearbyBusinesses: [Business]
-    @Binding var remainingBusinessesInList: Int
-    @Binding var currentBusinessIndex: Int
+    @Binding var nearbyRestaurants: [Business]
+    @Binding var remainingRestaurantsInList: Int
+    @Binding var currentRestaurantIndex: Int
     @Binding var showRefreshButton: Bool
+    @Binding var noResultsFound: Bool
     @Binding var apiError: Bool
     
     @EnvironmentObject var locationViewModel: LocationViewModel
@@ -35,10 +36,10 @@ struct CategoriesView: View {
                             }
                             
                             // Only allow 'All Food' to be selected if nothing else is selected
-                            if filters.categories.count > 0 {
-                                filters.categories.remove("food")
+                            if filters.categories.count == yelpCategories.count-1 {
+                                filters.categories = ["food"]
                             } else {
-                                filters.categories.insert("food")
+                                filters.categories.remove("food")
                             }
                             
                             // If user specifically selects 'All Food', deselect everything else
@@ -88,11 +89,16 @@ struct CategoriesView: View {
     }
     
     func setState(fetchedBusinesses: [Business]) {
-        nearbyBusinesses = fetchedBusinesses
-        remainingBusinessesInList = fetchedBusinesses.count
-        currentBusinessIndex = 0
+        nearbyRestaurants = fetchedBusinesses
+        remainingRestaurantsInList = fetchedBusinesses.count
+        currentRestaurantIndex = 0
         showRefreshButton = true
         apiError = false
+        if fetchedBusinesses.isEmpty {
+            noResultsFound = true
+        } else {
+            noResultsFound = false
+        }
     }
 }
 
