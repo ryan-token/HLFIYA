@@ -26,8 +26,11 @@ struct LocationRequestView: View {
             VStack {
                 Spacer()
                 
-                Text("🍑")
-                    .font(Font.system(size: 150))
+                Image("HLF-1024")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 100, height: 100)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
                     .padding(.bottom, 32)
                 
                 if showGetReady {
@@ -84,7 +87,7 @@ struct LocationRequestView: View {
                     
                     if showMaybeLater {
                         Button {
-                            locationViewModel.location = CLLocation(latitude: 36.14203247996243, longitude: -95.97570631738338)
+                            locationViewModel.location = CLLocation(latitude: 37.334633, longitude: -122.012682)
                         } label: {
                             Text("Maybe Later")
                                 .padding()

@@ -150,7 +150,7 @@ struct CardView: View {
         .gesture (
             DragGesture()
                 .onChanged { value in
-                    withAnimation(.default) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
                         restaurant.x = value.translation.width
                         restaurant.y = value.translation.height
                         restaurant.degree = 7 * (value.translation.width > 0 ? 1 : -1)

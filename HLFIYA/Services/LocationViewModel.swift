@@ -33,6 +33,7 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        // print("new location: \(locations.first)")
         location = locations.first
         fetchCountryAndCity(for: locations.first)
     }

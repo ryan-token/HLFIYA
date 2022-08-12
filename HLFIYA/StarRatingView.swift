@@ -22,6 +22,7 @@ struct StarRatingView: View {
             if let label = label {
                 Text(label)
                     .foregroundColor(.gray)
+                    .font(Font.system(.body, design: .rounded))
             }
             
             ForEach(1..<maximumRating + 1, id: \.self) { number in

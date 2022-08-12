@@ -172,7 +172,7 @@ struct SettingsView: View {
     
     func sendFeatureRequestEmail() {
         let email = "hotlocalfood@gmail.com"
-        let subject = "Feature Request - HLFIYA"
+        let subject = "Feature Request - Hot Local Food"
                     
         let coded = "mailto:\(email)?subject=\(subject)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
             

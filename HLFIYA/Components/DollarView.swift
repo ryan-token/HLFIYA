@@ -20,6 +20,10 @@ struct DollarView: View {
             if label.isEmpty == false {
                 Text(label)
                     .foregroundColor(.gray)
+                    .font(Font.system(.body, design: .rounded))
+                
+                Spacer()
+                    .frame(width: 20)
             }
             
             ForEach(1..<maximumPrice + 1, id: \.self) { possiblePrice in

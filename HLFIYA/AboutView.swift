@@ -13,13 +13,13 @@ struct AboutView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 7) {
-                Image("HLFIYA")
+                Image("HLF-1024")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 100, height: 100)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                 
-                Text("HLFIYA")
+                Text("Hot Local Food")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .foregroundColor(.primary)
@@ -33,7 +33,7 @@ struct AboutView: View {
                 
                 Form {
                     Section {
-                        Text("Hot Local Food In Your Area was built by two friends who just needed a better way to find some good food nearby.")
+                        Text("Hot Local Food was built by two friends who just needed a better way to find some good food nearby.")
                         
                         Text("Thank you for using the app. Please leave a review if you find it valuable.")
                         

@@ -51,10 +51,15 @@ struct RestaurantDetailsView: View {
             
             List {
                 Section(header: Text(currentRestaurant.name ?? "")) {
-                    StarRatingView(rating: currentRestaurant.rating ?? 0.0, label: "Rating:", reviewCount: currentRestaurant.review_count)
-                    DollarView(price: currentRestaurant.price ?? "", label: "Price:")
+                    VStack(alignment: .leading, spacing: 10) {
+                        StarRatingView(rating: currentRestaurant.rating ?? 0.0, label: "Rating:", reviewCount: currentRestaurant.review_count)
+                        DollarView(price: currentRestaurant.price ?? "", label: "Price:")
+                    }
                 }
                 .headerProminence(.increased)
+                .accessibilityLabel("Rating and price for \(currentRestaurant.name ?? "restaurant")")
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
                 
                 Section(header: Text("Photos")) {
                     ImageSliderView(selectedTab: $selectedTab, imageUrls: checkForPhotos(imageUrls: currentRestaurant.photos ?? [""]))
