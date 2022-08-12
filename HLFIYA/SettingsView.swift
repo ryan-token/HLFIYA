@@ -12,6 +12,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var storeManager: StoreManager
     
+    @State private var isShowingIntroScreen = false
     @State private var isShowingAboutScreen = false
     @State private var isShowingPrivacyActionSheet = false
     @State private var isShowingError = false
@@ -20,23 +21,6 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             Form {
-                if storeManager.purchasedIds.isEmpty {
-                    if let removeAdsProduct = storeManager.products.first {
-                        AsyncButton(action: {
-                            await purchaseRemoveAds(product: removeAdsProduct)
-                        }) {
-                            HStack {
-                                Image(systemName: "star.square.fill")
-                                    .font(Font.system(.title, design: .rounded))
-                                    .foregroundColor(.green)
-                                Text("Remove Ads for \(removeAdsProduct.displayPrice)")
-                                    .font(Font.system(.body, design: .rounded))
-                                    .foregroundColor(.primary)
-                            }
-                        }
-                    }
-                }
-                
                 Section(header: Text("Support")) {
                     Button(action: {
                         requestReviewManually()
@@ -44,15 +28,46 @@ struct SettingsView: View {
                         HStack {
                             Image(systemName: "heart.square.fill")
                                 .font(.title)
-                                .foregroundColor(.red)
+                                .foregroundColor(Color(UIColor(named: "fuchsia")!))
                             Text("Rate on the App Store")
                                 .font(Font.system(.body, design: .rounded))
                                 .foregroundColor(.primary)
                         }
                     }
+                    
+                    if storeManager.purchasedIds.isEmpty {
+                        if let removeAdsProduct = storeManager.products.first {
+                            AsyncButton(action: {
+                                await purchaseRemoveAds(product: removeAdsProduct)
+                            }) {
+                                HStack {
+                                    Image(systemName: "star.square.fill")
+                                        .font(Font.system(.title, design: .rounded))
+                                        .foregroundColor(.green)
+                                    Text("Remove Ads for \(removeAdsProduct.displayPrice)")
+                                        .font(Font.system(.body, design: .rounded))
+                                        .foregroundColor(.primary)
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 Section(header: Text("General")) {
+                    Button(action: {
+                        isShowingIntroScreen.toggle()
+                    }) {
+                        HStack {
+                            Image(systemName: "location.square.fill")
+                                .font(.title)
+                                .foregroundColor(.orange)
+                            Text("Location Permissions")
+                                .font(Font.system(.body, design: .rounded))
+                                .foregroundColor(.primary)
+                        }
+                    }
+                    .accessibilityLabel("Open Intro Screen")
+                    
                     Button(action: {
                         sendFeatureRequestEmail()
                     }) {
@@ -115,7 +130,7 @@ struct SettingsView: View {
                         HStack {
                             Image(systemName: "arrow.left.arrow.right.square.fill")
                                 .font(.title)
-                                .foregroundColor(.purple)
+                                .foregroundColor(.yellow)
                             Text("Swipes")
                                 .font(Font.system(.body, design: .rounded))
                         }
@@ -131,6 +146,10 @@ struct SettingsView: View {
             
             .sheet(isPresented: $isShowingAboutScreen) {
                 AboutView()
+            }
+            
+            .sheet(isPresented: $isShowingIntroScreen) {
+                LocationRequestView()
             }
             
             .alert(isPresented: $isShowingError, content: {

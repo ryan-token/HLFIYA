@@ -49,7 +49,7 @@ struct BottomBarView: View {
                 VStack(spacing: 5) {
                     Image(systemName: "line.3.horizontal.decrease.circle.fill")
                         .font(Font.system(size: 50, design: .rounded))
-                        .foregroundColor(.orange)
+                        .foregroundColor(.pink)
                     Text("Categories")
                         .font(Font.system(.body, design: .rounded))
                         .foregroundColor(.gray)
@@ -65,7 +65,7 @@ struct BottomBarView: View {
                 VStack(spacing: 5) {
                     Image(systemName: "dollarsign.circle.fill")
                         .font(Font.system(size: 50, design: .rounded))
-                        .foregroundColor(.green)
+                        .foregroundColor(.orange)
                     Text("Prices")
                         .font(Font.system(.body, design: .rounded))
                         .foregroundColor(.gray)
@@ -81,7 +81,7 @@ struct BottomBarView: View {
                 VStack(spacing: 5) {
                     Image(systemName: "map.circle.fill")
                         .font(Font.system(size: 50, design: .rounded))
-                        .foregroundColor(.pink)
+                        .foregroundColor(.green)
                     Text("Location")
                         .font(Font.system(.body, design: .rounded))
                         .foregroundColor(.gray)

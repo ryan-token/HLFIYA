@@ -9,6 +9,7 @@ import SwiftUI
 import CoreLocation
 
 struct LocationRequestView: View {
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var locationViewModel: LocationViewModel
     @AppStorage("userHasOpenedAppBefore") var userHasOpenedAppBefore = false
     
@@ -31,6 +32,7 @@ struct LocationRequestView: View {
                     .scaledToFit()
                     .frame(width: 100, height: 100)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .shadow(radius: 10)
                     .padding(.bottom, 32)
                 
                 if showGetReady {
@@ -64,7 +66,7 @@ struct LocationRequestView: View {
                 Spacer()
                 
                 VStack {
-                    if showAllowLocation {
+                    if showAllowLocation && (locationViewModel.authorizationStatus.rawValue != 2 && locationViewModel.authorizationStatus.rawValue != 4) {
                         Button {
                             locationViewModel.requestPermission()
                         } label: {
@@ -75,9 +77,9 @@ struct LocationRequestView: View {
                         }
                         .frame(width: UIScreen.main.bounds.width)
                         .padding(.horizontal, -32)
-                        .if(locationViewModel.authorizationStatus.rawValue == 2) { view in
-                            view.background(Color.gray)
-                        }
+//                        .if(locationViewModel.authorizationStatus.rawValue == 2) { view in
+//                            view.background(Color.gray)
+//                        }
                         .background(colorScheme == .dark ? Color.white : Color.black)
                         .clipShape(Capsule())
                         .padding()
@@ -85,9 +87,10 @@ struct LocationRequestView: View {
                         .disabled(locationViewModel.authorizationStatus.rawValue == 2 ? true : false)
                     }
                     
-                    if showMaybeLater {
+                    if showMaybeLater && (locationViewModel.authorizationStatus.rawValue != 2 && locationViewModel.authorizationStatus.rawValue != 4) {
                         Button {
                             locationViewModel.location = CLLocation(latitude: 37.334633, longitude: -122.012682)
+                            dismiss()
                         } label: {
                             Text("Maybe Later")
                                 .padding()
@@ -98,37 +101,60 @@ struct LocationRequestView: View {
                     }
                     
                     switch locationViewModel.authorizationStatus {
-                    case .notDetermined:
-                        Text("")
-                    case .restricted, .denied:
-                        VStack(spacing: 0) {
-                            Text("Location services are disabled")
-                                .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                                .font(Font.system(.body, design: .rounded))
-                                .fixedSize(horizontal: false, vertical: true)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal)
-                            
-                            Button(action: {
-                                UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
-                            }) {
-                                Text("Allow Location in Settings")
-                                    .padding()
-                                    .font(Font.system(.headline, design: .rounded))
-                                    .foregroundColor(.white)
+                        case .notDetermined:
+                            Text("")
+                        case .restricted, .denied:
+                            VStack(spacing: 0) {
+                                Text("Location services are disabled")
+                                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                                    .font(Font.system(.body, design: .rounded))
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal)
+                                
+                                Button(action: {
+                                    UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                                }) {
+                                    Text("Allow Location in Settings")
+                                        .padding()
+                                        .font(Font.system(.headline, design: .rounded))
+                                        .foregroundColor(.white)
+                                }
+                                .frame(width: UIScreen.main.bounds.width)
+                                .padding(.horizontal, -32)
+                                .background(Color(UIColor(named: "fuchsia")!))
+                                .clipShape(Capsule())
+                                .padding()
                             }
-                            .frame(width: UIScreen.main.bounds.width)
-                            .padding(.horizontal, -32)
-                            .background(Color(UIColor(named: "fuchsia")!))
-                            .clipShape(Capsule())
-                            .padding()
-                        }
-                        .padding(.top, 30)
+                            .padding(.top, 30)
+                            
+                        case .authorizedWhenInUse, .authorizedAlways:
+                            VStack(spacing: 0) {
+                                Text("Location services are enabled 🚀")
+                                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                                    .font(Font.system(.body, design: .rounded))
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal)
+                                
+                                Button(action: {
+                                    UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                                }) {
+                                    Text("Change Location Permissions in Settings")
+                                        .padding()
+                                        .font(Font.system(.headline, design: .rounded))
+                                        .foregroundColor(.white)
+                                }
+                                .frame(width: UIScreen.main.bounds.width)
+                                .padding(.horizontal, -32)
+                                .background(Color(UIColor(named: "fuchsia")!))
+                                .clipShape(Capsule())
+                                .padding()
+                            }
+                            .padding(.top, 30)
                         
-                    case .authorizedAlways, .authorizedWhenInUse:
-                        Text("")
-                    @unknown default:
-                        Text("")
+                        @unknown default:
+                            Text("")
                     }
                 }
                 .padding(.bottom, 32)

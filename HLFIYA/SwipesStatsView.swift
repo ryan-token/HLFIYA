@@ -15,7 +15,7 @@ struct SwipesStatsView: View {
     var leftSwipes: FetchedResults<LeftSwipe>
     
     var body: some View {
-        List() {
+        List {
             Section(header: Text("Top 5 Right Swipes").font(.callout).foregroundColor(.gray)) {
                 ForEach(formattedRightSwipes().prefix(5), id: \.key) { business, count in
                     Text("\(business.trimmingCharacters(in: .whitespacesAndNewlines)): \(count)")
@@ -29,7 +29,7 @@ struct SwipesStatsView: View {
             }
         }
         .font(Font.system(.body, design: .rounded))
-        .listStyle(.sidebar)
+        // .listStyle(.sidebar)
         
         .navigationTitle("Swipe Stats")
     }

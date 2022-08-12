@@ -18,13 +18,16 @@ struct AboutView: View {
                     .scaledToFit()
                     .frame(width: 100, height: 100)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .shadow(radius: 10)
+                    .padding(.bottom, 7)
                 
                 Text("Hot Local Food")
-                    .font(.largeTitle)
+                    .font(.title)
                     .fontWeight(.bold)
                     .foregroundColor(.primary)
+                    .padding(.bottom, 7)
                 
-                Text("Made with ❤️ by an independent developer")
+                Text("Made with 💜 by an independent developer")
                     .foregroundColor(.gray)
                     .padding(.horizontal)
                     .padding(.bottom, 5)
@@ -43,7 +46,7 @@ struct AboutView: View {
                             HStack {
                                 Image(systemName: "heart.square.fill")
                                     .font(.title)
-                                    .foregroundColor(.red)
+                                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
                                 Text("Rate on the App Store")
                                     .font(Font.system(.headline, design: .rounded))
                                     .foregroundColor(Color(UIColor(named: "fuchsia")!))

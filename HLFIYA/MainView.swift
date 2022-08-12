@@ -155,7 +155,7 @@ struct MainView: View {
         
         .onAppear() {
             if locationViewModel.location == nil {
-                locationViewModel.location = CLLocation(latitude: 36.14203247996243, longitude: -95.97570631738338)
+                locationViewModel.location = CLLocation(latitude: 37.334633, longitude: -122.012682)
             }
             
             if !userHasOpenedAppBefore && !itemExists("Favorites") {
@@ -192,8 +192,8 @@ struct MainView: View {
                 latitude = currentLocation.coordinate.latitude
                 longitude = currentLocation.coordinate.longitude
             } else {
-                latitude = 36.14203247996243
-                longitude = -95.97570631738338
+                latitude = 37.334633
+                longitude = -122.012682
             }
         }
         
