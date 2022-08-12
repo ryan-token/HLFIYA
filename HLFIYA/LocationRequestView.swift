@@ -140,7 +140,7 @@ struct LocationRequestView: View {
                                 Button(action: {
                                     UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
                                 }) {
-                                    Text("Change Location Permissions in Settings")
+                                    Text("Change Location Permissions")
                                         .padding()
                                         .font(Font.system(.headline, design: .rounded))
                                         .foregroundColor(.white)
