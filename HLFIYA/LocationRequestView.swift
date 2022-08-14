@@ -63,6 +63,35 @@ struct LocationRequestView: View {
                     }
                 }
                 
+//                VStack(spacing: -30) {
+//                    if showHot {
+//                        Image("hot")
+//                            .resizable()
+//                            .scaledToFit()
+//                            .frame(width: 250, height: 100)
+//                            .padding(.trailing, 15)
+//                    }
+//
+//                    if showLocal {
+//                        Image("local")
+//                            .resizable()
+//                            .scaledToFit()
+//                            .frame(width: 250, height: 100)
+//                            //.padding(.leading, 15)
+//                    }
+//
+//                    Spacer()
+//                        .frame(height: 25)
+//
+//                    if showFood {
+//                        Image("food")
+//                            .resizable()
+//                            .scaledToFit()
+//                            .frame(width: 250, height: 100)
+//                            .padding(.leading, 15)
+//                    }
+//                }
+                
                 Spacer()
                 
                 VStack {
@@ -77,9 +106,6 @@ struct LocationRequestView: View {
                         }
                         .frame(width: UIScreen.main.bounds.width)
                         .padding(.horizontal, -32)
-//                        .if(locationViewModel.authorizationStatus.rawValue == 2) { view in
-//                            view.background(Color.gray)
-//                        }
                         .background(colorScheme == .dark ? Color.white : Color.black)
                         .clipShape(Capsule())
                         .padding()
@@ -218,5 +244,6 @@ struct LocationRequestView_Previews: PreviewProvider {
     static var previews: some View {
         LocationRequestView()
             .preferredColorScheme(.light)
+            .environmentObject(LocationViewModel())
     }
 }

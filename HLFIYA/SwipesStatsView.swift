@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CloudKit
 
 struct SwipesStatsView: View {
     @FetchRequest(fetchRequest: RightSwipe.allRightSwipesFetchRequest, animation: .default)
@@ -13,6 +14,14 @@ struct SwipesStatsView: View {
     
     @FetchRequest(fetchRequest: LeftSwipe.allLeftSwipesFetchRequest, animation: .default)
     var leftSwipes: FetchedResults<LeftSwipe>
+    
+    @Environment(\.managedObjectContext) var moc
+    @Environment(\.colorScheme) var colorScheme
+    
+    let containers: [CKContainer] = [
+        CKContainer.default(),
+        .init(identifier: "iCloud.com.ryantoken.HLFIYA")
+    ]
     
     var body: some View {
         List {
@@ -27,9 +36,32 @@ struct SwipesStatsView: View {
                     Text("\(business.trimmingCharacters(in: .whitespacesAndNewlines)): \(count)")
                 }
             }
+            
+            if !leftSwipes.isEmpty || !rightSwipes.isEmpty {
+                Section(header: Text("Clear Data").font(.callout).foregroundColor(.gray)) {
+                    Text("Your swipes data is stored in CloudKit, so it syncs across your devices. I do not store this data (or any other data) on my servers. If you'd like to clear this data from CloudKit, you can do so by tapping the button below.")
+                        .foregroundColor(.primary)
+                    
+                    Button {
+                        deleteCloudKitData()
+                    } label: {
+                        Text("Clear Swipes Data")
+                            .padding()
+                            .font(Font.system(.headline, design: .rounded))
+                            .foregroundColor(colorScheme == .dark ? Color(UIColor(named: "fuchsia")!.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light))) : Color.white)
+                    }
+                    .frame(width: UIScreen.main.bounds.width)
+                    .padding(.horizontal, -32)
+                    .background(colorScheme == .dark ? Color.white : Color.black)
+                    .clipShape(Capsule())
+                    .padding()
+                }
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .font(Font.system(.body, design: .rounded))
+            }
         }
         .font(Font.system(.body, design: .rounded))
-        // .listStyle(.sidebar)
         
         .navigationTitle("Swipe Stats")
     }
@@ -72,6 +104,36 @@ struct SwipesStatsView: View {
         }
         
         return sortedDictionary
+    }
+    
+    func deleteCloudKitData() {
+        for leftSwipe in leftSwipes {
+            moc.delete(leftSwipe)
+        }
+        
+        for rightSwipe in rightSwipes {
+            moc.delete(rightSwipe)
+        }
+        
+        try? moc.save()
+        
+        for container in containers {
+            container.privateCloudDatabase.fetchAllRecordZones { zones, error in
+                guard let zones = zones, error == nil else {
+                    print("Error fetching zones.")
+                    return
+                }
+                
+                let zoneIDs = zones.map { $0.zoneID }
+                let deletionOperation = CKModifyRecordZonesOperation(recordZonesToSave: nil, recordZoneIDsToDelete: zoneIDs)
+                
+                deletionOperation.modifyRecordZonesResultBlock = { result in
+                    print("deletion result: \(result)")
+                }
+                
+                container.privateCloudDatabase.add(deletionOperation)
+            }
+        }
     }
 }
 
