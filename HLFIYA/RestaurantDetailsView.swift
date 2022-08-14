@@ -23,6 +23,8 @@ struct RestaurantDetailsView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.openURL) var openURL
     @Environment(\.managedObjectContext) var moc
+    
+    @EnvironmentObject var locationViewModel: LocationViewModel
     @FetchRequest(sortDescriptors: [SortDescriptor(\.name)]) var savedLists: FetchedResults<SavedList>
     
     var body: some View {
@@ -51,9 +53,35 @@ struct RestaurantDetailsView: View {
             
             List {
                 Section(header: Text(currentRestaurant.name ?? "")) {
-                    VStack(alignment: .leading, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 5) {
                         StarRatingView(rating: currentRestaurant.rating ?? 0.0, label: "Rating:", reviewCount: currentRestaurant.review_count)
                         DollarView(price: currentRestaurant.price ?? "", label: "Price:")
+                        
+                        if currentRestaurant.categories?.count == 1 {
+                            HStack {
+                                Text("Category:")
+                                ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
+                                    Text(category.title ?? "")
+                                        .accessibilityLabel("\(currentRestaurant.name ?? "restaurant") is a \(category.title ?? "") place")
+                                }
+                            }
+                            .foregroundColor(.gray)
+                            
+                        } else {
+                            VStack(alignment: .leading) {
+                                Text("Categories:")
+                                
+                                Spacer()
+                                    .frame(height: 5)
+                                
+                                ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
+                                    Text("– \(category.title ?? "")")
+                                        .padding(.leading, 25)
+                                        .accessibilityLabel("\(currentRestaurant.name ?? "restaurant") is a \(category.title ?? "") place")
+                                }
+                            }
+                            .foregroundColor(.gray)
+                        }
                     }
                 }
                 .headerProminence(.increased)
@@ -83,7 +111,7 @@ struct RestaurantDetailsView: View {
                         isShowingCreateListSheet.toggle()
                     }) {
                         HStack {
-                            Image(systemName: "plus.square")
+                            Image(systemName: "plus.square.fill")
                             Text("Create List")
                         }
                         .font(Font.system(.headline, design: .rounded))
@@ -91,31 +119,46 @@ struct RestaurantDetailsView: View {
                     }
                 }
                 
-                Section(header: Text("Categories")) {
-                    ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
-                        Text(category.title ?? "")
+                Section(header: Text("Order").foregroundColor(.gray)) {
+                    HStack {
+                        Button("Search DoorDash") {
+                            openAppOrSafari(appToTry: "DoorDash")
+                        }
+                        Spacer()
+                        Image(systemName: "arrow.up.forward")
+                            .foregroundColor(Color(uiColor: .lightGray))
+                            .font(.callout)
+                    }
+                    
+                    HStack {
+                        Button("Search UberEats") {
+                            openAppOrSafari(appToTry: "Uber Eats")
+                        }
+                        Spacer()
+                        Image(systemName: "arrow.up.forward")
+                            .foregroundColor(Color(uiColor: .lightGray))
+                            .font(.callout)
+                    }
+                    
+                    HStack {
+                        Button("Search OpenTable") {
+                            openAppOrSafari(appToTry: "OpenTable")
+                        }
+                        Spacer()
+                        Image(systemName: "arrow.up.forward")
+                            .foregroundColor(Color(uiColor: .lightGray))
+                            .font(.callout)
+                    }
+                    
+                    HStack {
+                        Link("See More on Yelp", destination: URL(string: currentRestaurant.url ?? "#")!)
+                        Spacer()
+                        Image(systemName: "arrow.up.forward")
+                            .foregroundColor(Color(uiColor: .lightGray))
+                            .font(.callout)
                     }
                 }
-                
-                Section(header: Text("Order")) {
-                    Button("Open DoorDash") {
-                        openAppOrSafari(appToTry: "DoorDash")
-                    }
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                    
-                    Button("Open Uber Eats") {
-                        openAppOrSafari(appToTry: "Uber Eats")
-                    }
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                    
-                    Button("Open OpenTable") {
-                        openAppOrSafari(appToTry: "OpenTable")
-                    }
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                    
-                    Link("See More on Yelp", destination: URL(string: currentRestaurant.url ?? "#")!)
-                        .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                }
+                .foregroundColor(Color(UIColor(named: "fuchsia")!))
                 
                 Section(header: Text("Information")) {
                     HStack {
@@ -143,24 +186,35 @@ struct RestaurantDetailsView: View {
                     VStack(alignment: .leading) {
                         Text("Address:")
                             .foregroundColor(.gray)
+                            .padding(.top, 2)
                             .padding(.bottom, 2)
                         
                         Button {
                             openAddressInAppleMaps(latitude: currentRestaurant.coordinates?.latitude ?? 0.0, longitude: currentRestaurant.coordinates?.longitude ?? 0.0)
                         } label: {
-                            ForEach(currentRestaurant.location?.display_address ?? [""], id: \.self) { addressPortion in
-                                HStack {
-                                    Text(addressPortion)
-                                    Spacer()
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    ForEach(currentRestaurant.location?.display_address ?? [""], id: \.self) { addressPortion in
+                                        HStack {
+                                            Text(addressPortion)
+                                            Spacer()
+                                        }
+                                    }
                                 }
+                                Spacer()
+                                Image(systemName: "arrow.up.forward")
+                                    .foregroundColor(Color(uiColor: .lightGray))
+                                    .font(.callout)
                             }
                         }
                         .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                        .padding(.bottom, 5)
                     }
                     
                     VStack(alignment: .leading) {
                         Text("Full Hours:")
                             .foregroundColor(.gray)
+                            .padding(.top, 5)
                             .padding(.bottom, 2)
                         
                         VStack(alignment: .leading) {
@@ -322,29 +376,57 @@ struct RestaurantDetailsView: View {
         
         switch appToTry {
         case "DoorDash":
-            urlScheme = "doordash://"
-            let url = "https://www.doordash.com/search/store/\(currentRestaurant.name!)"
-            safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            let doordashUrl = "search/store/\(currentRestaurant.name!)/?event_type=search"
+            let cleanUrl = doordashUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            urlScheme = "doordash:///\(cleanUrl)"
+            safariUrl = "https://www.doordash.com/\(cleanUrl)"
+            
         case "Uber Eats":
-            urlScheme = "ubereats://"
-            let url = "https://www.ubereats.com/search?diningMode=DELIVERY&q=\(currentRestaurant.name!)"
-            safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            let uberEatsUrl = "search?diningMode=DELIVERY&q=\(currentRestaurant.name!)&sc=SEARCH_SUGGESTION&vertical=ALL"
+            let cleanUrl = uberEatsUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            urlScheme = "ubereats://\(cleanUrl)"
+            safariUrl = "https://www.ubereats.com/\(cleanUrl)"
+            
         case "OpenTable":
-            urlScheme = "opentable://"
-            let url = "https://www.opentable.com/s?term=\(currentRestaurant.name!)"
-            safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            let date = Date.now
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+            let now = formatter.string(from: date)
+            
+            if let location = locationViewModel.location {
+                let latitude = location.coordinate.latitude
+                let longitude = location.coordinate.longitude
+                
+                let openTableUrl = "s?dateTime=\(now)&covers=2&latitude=\(latitude)&longitude=\(longitude)&term=\(currentRestaurant.name!)&shouldUseLatLongSearch=true&sortBy=web_conversion&originalTerm=\(currentRestaurant.name!)&intentModifiedTerm=\(currentRestaurant.name!)&queryUnderstandingType=default"
+                let cleanUrl = openTableUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+                urlScheme = "opentable"
+                safariUrl = "https://www.opentable.com/\(cleanUrl)"
+            } else {
+                let openTableUrl = "s?dateTime=\(now)&covers=2&term=\(currentRestaurant.name!)&shouldUseLatLongSearch=true&sortBy=web_conversion&originalTerm=\(currentRestaurant.name!)&intentModifiedTerm=\(currentRestaurant.name!)&queryUnderstandingType=default"
+                let cleanUrl = openTableUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+                urlScheme = "opentable"
+                safariUrl = "https://www.opentable.com/\(cleanUrl)"
+            }
         default:
             urlScheme = "#"
             safariUrl = "#"
         }
         
-        if let customScheme = URL(string: urlScheme) {
-            openURL(customScheme) { accepted in
-                if !accepted {
-                    print("failed to open app")
-                    print("safariUrl: \(safariUrl)")
-                    if let webUrl = URL(string: safariUrl) {
-                        openURL(webUrl)
+        // couldn't figure out the URL scheme to search within the OpenTable app, so I try to just open Safari every time for OpenTable
+        // even the standard https:// url is opening the OpenTable app though, unfortunately
+        if urlScheme == "opentable" {
+            if let webUrl = URL(string: safariUrl) {
+                openURL(webUrl)
+            }
+        } else {
+            if let customScheme = URL(string: urlScheme) {
+                openURL(customScheme) { accepted in
+                    if !accepted {
+                        print("failed to open app")
+                        print("using safariUrl: \(safariUrl)")
+                        if let webUrl = URL(string: safariUrl) {
+                            openURL(webUrl)
+                        }
                     }
                 }
             }
@@ -354,6 +436,6 @@ struct RestaurantDetailsView: View {
 
 struct BusinessView_Previews: PreviewProvider {
     static var previews: some View {
-        RestaurantDetailsView(restaurant: Business.data[0])
+        RestaurantDetailsView(restaurant: Business.data[1])
     }
 }

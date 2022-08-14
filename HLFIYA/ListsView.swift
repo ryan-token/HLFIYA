@@ -38,7 +38,7 @@ struct ListsView: View {
                     isShowingCreateListSheet.toggle()
                 }) {
                     HStack {
-                        Image(systemName: "plus.square")
+                        Image(systemName: "plus.square.fill")
                             .foregroundColor(Color(UIColor(named: "fuchsia")!))
                         Text("Create List")
                             .foregroundColor(Color(UIColor(named: "fuchsia")!))

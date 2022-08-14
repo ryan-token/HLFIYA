@@ -29,6 +29,9 @@ struct DollarView: View {
             ForEach(1..<maximumPrice + 1, id: \.self) { possiblePrice in
                 dollarImage
                     .foregroundColor(possiblePrice > countDollarSigns(from: price) ? offColor : onColor)
+                
+                Spacer()
+                    .frame(width: 10.3)
             }
         }
         .accessibilityLabel("Price: \(price.count) dollar signs")

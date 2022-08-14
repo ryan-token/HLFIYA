@@ -39,7 +39,7 @@ struct CreateListSheet: View {
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button("Save") {
                         if (!listName.isEmpty) {
                             let newList = SavedList(context: moc)
                             newList.name = listName
