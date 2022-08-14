@@ -12,7 +12,6 @@ struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var storeManager: StoreManager
     
-    @State private var isShowingIntroScreen = false
     @State private var isShowingAboutScreen = false
     @State private var isShowingPrivacyActionSheet = false
     @State private var isShowingError = false
@@ -32,6 +31,10 @@ struct SettingsView: View {
                             Text("Rate on the App Store")
                                 .font(Font.system(.body, design: .rounded))
                                 .foregroundColor(.primary)
+                            Spacer()
+                            Image(systemName: "arrow.up.forward")
+                                .foregroundColor(Color(uiColor: .lightGray))
+                                .font(.callout)
                         }
                     }
                     
@@ -54,19 +57,17 @@ struct SettingsView: View {
                 }
                 
                 Section(header: Text("General")) {
-                    Button(action: {
-                        isShowingIntroScreen.toggle()
-                    }) {
+                    NavigationLink(destination: LocationRequestView()) {
                         HStack {
                             Image(systemName: "location.square.fill")
                                 .font(.title)
-                                .foregroundColor(.orange)
+                                .foregroundColor(.blue)
                             Text("Location Permissions")
                                 .font(Font.system(.body, design: .rounded))
                                 .foregroundColor(.primary)
                         }
                     }
-                    .accessibilityLabel("Open Intro Screen")
+                    .accessibilityLabel("Open Location Permissions Screen")
                     
                     Button(action: {
                         sendFeatureRequestEmail()
@@ -78,6 +79,10 @@ struct SettingsView: View {
                             Text("Feature Request")
                                 .font(Font.system(.body, design: .rounded))
                                 .foregroundColor(.primary)
+                            Spacer()
+                            Image(systemName: "arrow.up.forward")
+                                .foregroundColor(Color(uiColor: .lightGray))
+                                .font(.callout)
                         }
                     }
                     .accessibilityLabel("Send an email with a feature request")
@@ -88,7 +93,7 @@ struct SettingsView: View {
                         HStack {
                             Image(systemName: "person.crop.square.fill")
                                 .font(.title)
-                                .foregroundColor(.blue)
+                                .foregroundColor(Color(UIColor(named: "fuchsia")!))
                             Text("About")
                                 .font(Font.system(.body, design: .rounded))
                                 .foregroundColor(.primary)
@@ -130,7 +135,7 @@ struct SettingsView: View {
                         HStack {
                             Image(systemName: "arrow.left.arrow.right.square.fill")
                                 .font(.title)
-                                .foregroundColor(.yellow)
+                                .foregroundColor(.orange)
                             Text("Swipes")
                                 .font(Font.system(.body, design: .rounded))
                         }
@@ -146,10 +151,6 @@ struct SettingsView: View {
             
             .sheet(isPresented: $isShowingAboutScreen) {
                 AboutView()
-            }
-            
-            .sheet(isPresented: $isShowingIntroScreen) {
-                LocationRequestView()
             }
             
             .alert(isPresented: $isShowingError, content: {

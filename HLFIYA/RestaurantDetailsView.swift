@@ -97,6 +97,26 @@ struct RestaurantDetailsView: View {
                     }
                 }
                 
+                Section(header: Text("Order")) {
+                    Button("Open DoorDash") {
+                        openAppOrSafari(appToTry: "DoorDash")
+                    }
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                    
+                    Button("Open Uber Eats") {
+                        openAppOrSafari(appToTry: "Uber Eats")
+                    }
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                    
+                    Button("Open OpenTable") {
+                        openAppOrSafari(appToTry: "OpenTable")
+                    }
+                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                    
+                    Link("See More on Yelp", destination: URL(string: currentRestaurant.url ?? "#")!)
+                        .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                }
+                
                 Section(header: Text("Information")) {
                     HStack {
                         Text("Currently Open:")
@@ -164,26 +184,6 @@ struct RestaurantDetailsView: View {
                         }
                         .foregroundColor(.primary)
                     }
-                }
-                
-                Section(header: Text("Links")) {
-                    Button("Open DoorDash") {
-                        openAppOrSafari(appToTry: "DoorDash")
-                    }
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                    
-                    Button("Open Uber Eats") {
-                        openAppOrSafari(appToTry: "Uber Eats")
-                    }
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                    
-                    Button("Open OpenTable") {
-                        openAppOrSafari(appToTry: "OpenTable")
-                    }
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                    
-                    Link("See More on Yelp", destination: URL(string: currentRestaurant.url ?? "#")!)
-                        .foregroundColor(Color(UIColor(named: "fuchsia")!))
                 }
                 
                 HStack {

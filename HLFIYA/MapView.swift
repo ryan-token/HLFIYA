@@ -48,23 +48,15 @@ struct MapView: View {
             
             .onAppear {
                 if let location = locationViewModel.location {
-                    print("got location")
                     var latitude = location.coordinate.latitude
                     var longitude = location.coordinate.longitude
                     
-                    print("initial latitude: \(latitude)")
-                    print("initial longitude: \(longitude)")
-                    
                     if ((filters.customLatitude != 0.000000 && filters.customLongitude != 0.000000) && (filters.customLatitude != latitude || filters.customLongitude != longitude)) {
-                        print("filters latitude: \(filters.customLatitude)")
-                        print("filters longitude: \(filters.customLongitude)")
                         latitude = filters.customLatitude
                         longitude = filters.customLongitude
                     }
                     
                     let degrees = convertRadiusToDegrees(radius: filters.customRadius)
-                    print("final latitude: \(latitude)")
-                    print("final longitude: \(longitude)")
                     region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: MKCoordinateSpan(latitudeDelta: degrees, longitudeDelta: degrees))
                 } else {
                     print("no location")
@@ -72,7 +64,6 @@ struct MapView: View {
             }
         
             .onChange(of: region.center.latitude) { newLatitude in
-                print("latitude changed")
                 filters.customLatitude = newLatitude
             }
             
