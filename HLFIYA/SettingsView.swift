@@ -185,7 +185,7 @@ struct SettingsView: View {
     }
     
     func requestReviewManually() {
-        guard let writeReviewURL = URL(string: "https://apps.apple.com/us/app/outrank/id1621818779?action=write-review") else {
+        guard let writeReviewURL = URL(string: "https://apps.apple.com/us/app/hot-local-food/id1621818779?action=write-review") else {
             fatalError("Expected a valid URL")
         }
         UIApplication.shared.open(writeReviewURL, options: [:], completionHandler: nil)

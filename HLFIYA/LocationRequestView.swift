@@ -27,70 +27,60 @@ struct LocationRequestView: View {
             VStack {
                 Spacer()
                 
-                Image("HLF-1024")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 100, height: 100)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .shadow(radius: 10)
-                    .padding(.bottom, 32)
-                
                 if showGetReady {
                     Text("Get ready for some")
                         .font(.system(size: 28, weight: .bold, design: .rounded))
                         .multilineTextAlignment(.center)
                         .foregroundColor(colorScheme == .dark ? .white : .black)
-                        .padding()
                 }
                 
-                VStack (spacing: 5) {
+                Spacer()
+                
+                VStack(spacing: -50) {
                     if showHot {
-                        Text("HOT 🥵")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .multilineTextAlignment(.center)
+                        Image("hot")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 250, height: 100)
+                            .padding(.trailing, 26)
+                            .transition(
+                                .asymmetric(
+                                    insertion: .move(edge: .leading),
+                                    removal: .move(edge: .trailing)
+                                )
+                            )
                     }
-                    
+
                     if showLocal {
-                        Text("LOCAL 📍")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .multilineTextAlignment(.center)
+                        Image("local")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 250, height: 100)
+                            .transition(
+                                .asymmetric(
+                                    insertion: .move(edge: .trailing),
+                                    removal: .move(edge: .leading)
+                                )
+                            )
                     }
-                    
+
+                    Spacer()
+                        .frame(height: 53)
+
                     if showFood {
-                        Text("FOOD 🍔")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .multilineTextAlignment(.center)
+                        Image("food")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 250, height: 100)
+                            .padding(.leading, 15)
+                            .transition(
+                                .asymmetric(
+                                    insertion: .move(edge: .bottom),
+                                    removal: .move(edge: .top)
+                                )
+                            )
                     }
                 }
-                
-//                VStack(spacing: -30) {
-//                    if showHot {
-//                        Image("hot")
-//                            .resizable()
-//                            .scaledToFit()
-//                            .frame(width: 250, height: 100)
-//                            .padding(.trailing, 15)
-//                    }
-//
-//                    if showLocal {
-//                        Image("local")
-//                            .resizable()
-//                            .scaledToFit()
-//                            .frame(width: 250, height: 100)
-//                            //.padding(.leading, 15)
-//                    }
-//
-//                    Spacer()
-//                        .frame(height: 25)
-//
-//                    if showFood {
-//                        Image("food")
-//                            .resizable()
-//                            .scaledToFit()
-//                            .frame(width: 250, height: 100)
-//                            .padding(.leading, 15)
-//                    }
-//                }
                 
                 Spacer()
                 
@@ -183,7 +173,6 @@ struct LocationRequestView: View {
                             Text("")
                     }
                 }
-                .padding(.bottom, 32)
             }
             .font(Font.system(.body, design: .rounded))
             
@@ -245,5 +234,11 @@ struct LocationRequestView_Previews: PreviewProvider {
         LocationRequestView()
             .preferredColorScheme(.light)
             .environmentObject(LocationViewModel())
+            .previewDevice(PreviewDevice(rawValue: "iPhone 13 Pro Max"))
+        
+        LocationRequestView()
+            .preferredColorScheme(.light)
+            .environmentObject(LocationViewModel())
+            .previewDevice(PreviewDevice(rawValue: "iPhone 13 mini"))
     }
 }

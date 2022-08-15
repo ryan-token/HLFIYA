@@ -39,7 +39,7 @@ struct SwipesStatsView: View {
             
             if !leftSwipes.isEmpty || !rightSwipes.isEmpty {
                 Section(header: Text("Clear Data").font(.callout).foregroundColor(.gray)) {
-                    Text("Your swipes data is stored in CloudKit, so it syncs across your devices. I do not store this data (or any other data) on my servers. If you'd like to clear this data from CloudKit, you can do so by tapping the button below.")
+                    Text("Your swipes data is stored in iCloud so it can sync across your devices. I do not store this data (or any other data) on my servers. If you'd like to clear this data from iCloud, you can do so by tapping the button below.")
                         .foregroundColor(.primary)
                     
                     Button {

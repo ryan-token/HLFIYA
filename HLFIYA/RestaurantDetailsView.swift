@@ -57,7 +57,7 @@ struct RestaurantDetailsView: View {
                         StarRatingView(rating: currentRestaurant.rating ?? 0.0, label: "Rating:", reviewCount: currentRestaurant.review_count)
                         DollarView(price: currentRestaurant.price ?? "", label: "Price:")
                         
-                        if currentRestaurant.categories?.count == 1 {
+                        if currentRestaurant.categories?.count ?? 0 < 2 {
                             HStack {
                                 Text("Category:")
                                 ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
