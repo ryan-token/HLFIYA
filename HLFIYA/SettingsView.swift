@@ -146,6 +146,7 @@ struct SettingsView: View {
                     Text("You paid to remove ads. Thank you!")
                         .font(Font.system(.body, design: .rounded))
                         .foregroundColor(.gray)
+                        .listRowBackground(Color.clear)
                 }
             }
             
