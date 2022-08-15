@@ -85,7 +85,7 @@ struct RestaurantDetailsView: View {
                     }
                 }
                 .headerProminence(.increased)
-                .accessibilityLabel("Rating and price for \(currentRestaurant.name ?? "restaurant")")
+                .accessibilityLabel("Rating, price, and categories for \(currentRestaurant.name ?? "restaurant")")
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
                 
@@ -131,7 +131,7 @@ struct RestaurantDetailsView: View {
                     }
                     
                     HStack {
-                        Button("Search UberEats") {
+                        Button("Search Uber Eats") {
                             openAppOrSafari(appToTry: "Uber Eats")
                         }
                         Spacer()

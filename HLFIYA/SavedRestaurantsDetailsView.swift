@@ -22,22 +22,48 @@ struct SavedRestaurantsDetailsView: View {
     @Environment(\.managedObjectContext) var moc
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.openURL) var openURL
+    
+    @EnvironmentObject var locationViewModel: LocationViewModel
     @FetchRequest(sortDescriptors: [SortDescriptor(\.name)]) var savedLists: FetchedResults<SavedList>
     
     var body: some View {
         List {
-            if apiError {
-                Text("😕 Error loading business details")
-                    .font(Font.system(.body, design: .rounded))
-                    .foregroundColor(.gray)
-                    .padding(.leading)
-            }
-            
             Section(header: Text(currentRestaurant.name ?? "")) {
-                StarRatingView(rating: currentRestaurant.rating ?? 0.0, label: "Rating:", reviewCount: currentRestaurant.review_count)
-                DollarView(price: currentRestaurant.price ?? "", label: "Price:")
+                VStack(alignment: .leading, spacing: 5) {
+                    StarRatingView(rating: currentRestaurant.rating ?? 0.0, label: "Rating:", reviewCount: currentRestaurant.review_count)
+                    DollarView(price: currentRestaurant.price ?? "", label: "Price:")
+                    
+                    if currentRestaurant.categories?.count == 1 {
+                        HStack {
+                            Text("Category:")
+                            ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
+                                Text(category.title ?? "")
+                                    .accessibilityLabel("\(currentRestaurant.name ?? "restaurant") is a \(category.title ?? "") place")
+                            }
+                        }
+                        .foregroundColor(.gray)
+                        
+                    } else {
+                        VStack(alignment: .leading) {
+                            Text("Categories:")
+                            
+                            Spacer()
+                                .frame(height: 5)
+                            
+                            ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
+                                Text("– \(category.title ?? "")")
+                                    .padding(.leading, 25)
+                                    .accessibilityLabel("\(currentRestaurant.name ?? "restaurant") is a \(category.title ?? "") place")
+                            }
+                        }
+                        .foregroundColor(.gray)
+                    }
+                }
             }
             .headerProminence(.increased)
+            .accessibilityLabel("Rating, price, and categories for \(currentRestaurant.name ?? "restaurant")")
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
             
             Section(header: Text("Photos")) {
                 ImageSliderView(selectedTab: $selectedTab, imageUrls: checkForPhotos(imageUrls: currentRestaurant.photos ?? [""]))
@@ -61,7 +87,7 @@ struct SavedRestaurantsDetailsView: View {
                     isShowingCreateListSheet.toggle()
                 }) {
                     HStack {
-                        Image(systemName: "plus.square")
+                        Image(systemName: "plus.square.fill")
                         Text("Create List")
                     }
                     .font(Font.system(.headline, design: .rounded))
@@ -69,11 +95,46 @@ struct SavedRestaurantsDetailsView: View {
                 }
             }
             
-            Section(header: Text("Categories")) {
-                ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
-                    Text(category.title ?? "")
+            Section(header: Text("Order").foregroundColor(.gray)) {
+                HStack {
+                    Button("Search DoorDash") {
+                        openAppOrSafari(appToTry: "DoorDash")
+                    }
+                    Spacer()
+                    Image(systemName: "arrow.up.forward")
+                        .foregroundColor(Color(uiColor: .lightGray))
+                        .font(.callout)
+                }
+                
+                HStack {
+                    Button("Search Uber Eats") {
+                        openAppOrSafari(appToTry: "Uber Eats")
+                    }
+                    Spacer()
+                    Image(systemName: "arrow.up.forward")
+                        .foregroundColor(Color(uiColor: .lightGray))
+                        .font(.callout)
+                }
+                
+                HStack {
+                    Button("Search OpenTable") {
+                        openAppOrSafari(appToTry: "OpenTable")
+                    }
+                    Spacer()
+                    Image(systemName: "arrow.up.forward")
+                        .foregroundColor(Color(uiColor: .lightGray))
+                        .font(.callout)
+                }
+                
+                HStack {
+                    Link("See More on Yelp", destination: URL(string: currentRestaurant.url ?? "#")!)
+                    Spacer()
+                    Image(systemName: "arrow.up.forward")
+                        .foregroundColor(Color(uiColor: .lightGray))
+                        .font(.callout)
                 }
             }
+            .foregroundColor(Color(UIColor(named: "fuchsia")!))
             
             Section(header: Text("Information")) {
                 HStack {
@@ -101,24 +162,35 @@ struct SavedRestaurantsDetailsView: View {
                 VStack(alignment: .leading) {
                     Text("Address:")
                         .foregroundColor(.gray)
+                        .padding(.top, 2)
                         .padding(.bottom, 2)
                     
                     Button {
                         openAddressInAppleMaps(latitude: currentRestaurant.coordinates?.latitude ?? 0.0, longitude: currentRestaurant.coordinates?.longitude ?? 0.0)
                     } label: {
-                        ForEach(currentRestaurant.location?.display_address ?? [""], id: \.self) { addressPortion in
-                            HStack {
-                                Text(addressPortion)
-                                Spacer()
+                        HStack {
+                            VStack(alignment: .leading) {
+                                ForEach(currentRestaurant.location?.display_address ?? [""], id: \.self) { addressPortion in
+                                    HStack {
+                                        Text(addressPortion)
+                                        Spacer()
+                                    }
+                                }
                             }
+                            Spacer()
+                            Image(systemName: "arrow.up.forward")
+                                .foregroundColor(Color(uiColor: .lightGray))
+                                .font(.callout)
                         }
                     }
                     .foregroundColor(Color(UIColor(named: "fuchsia")!))
+                    .padding(.bottom, 5)
                 }
                 
                 VStack(alignment: .leading) {
                     Text("Full Hours:")
                         .foregroundColor(.gray)
+                        .padding(.top, 5)
                         .padding(.bottom, 2)
                     
                     VStack(alignment: .leading) {
@@ -142,26 +214,6 @@ struct SavedRestaurantsDetailsView: View {
                     }
                     .foregroundColor(.primary)
                 }
-            }
-            
-            Section(header: Text("Links")) {
-                Button("Open DoorDash") {
-                    openAppOrSafari(appToTry: "DoorDash")
-                }
-                .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                
-                Button("Open Uber Eats") {
-                    openAppOrSafari(appToTry: "Uber Eats")
-                }
-                .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                
-                Button("Open OpenTable") {
-                    openAppOrSafari(appToTry: "OpenTable")
-                }
-                .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                
-                Link("See More on Yelp", destination: URL(string: currentRestaurant.url ?? "#")!)
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
             }
             
             HStack {
@@ -209,11 +261,31 @@ struct SavedRestaurantsDetailsView: View {
         }
     }
     
+    func addToList(list: SavedList, id: String, name: String) {
+        let restaurant = SavedRestaurant(context: moc)
+        print("list restaurants: \(list.restaurantsArray)")
+        if !list.restaurantsArray.contains(where: { $0.name == name }) {
+            restaurant.addToLists(list)
+            restaurant.id = id
+            restaurant.name = name
+
+            do {
+                try moc.save()
+                isShowingAddedToListAlert.toggle()
+            } catch {
+                isShowingAddedToListErrorAlert.toggle()
+            }
+        } else {
+            isShowingDuplicateAlert.toggle()
+        }
+    }
+    
     func getBusiness(id: String) async {
         Task {
             do {
                 let businessDetails = try await BusinessFetcher.getBusiness(id: id)
                 currentRestaurant = businessDetails
+                print(businessDetails)
                 apiError = false
             } catch {
                 print("Request failed with error: \(error)")
@@ -276,54 +348,63 @@ struct SavedRestaurantsDetailsView: View {
         UIApplication.shared.open(url)
     }
     
-    func addToList(list: SavedList, id: String, name: String) {
-        let restaurant = SavedRestaurant(context: moc)
-        print("list restaurants: \(list.restaurantsArray)")
-        if !list.restaurantsArray.contains(where: { $0.name == name }) {
-            restaurant.addToLists(list)
-            restaurant.id = id
-            restaurant.name = name
-
-            do {
-                try moc.save()
-                isShowingAddedToListAlert.toggle()
-            } catch {
-                isShowingAddedToListErrorAlert.toggle()
-            }
-        } else {
-            isShowingDuplicateAlert.toggle()
-        }
-    }
-    
     func openAppOrSafari(appToTry: String) {
         var urlScheme: String
         var safariUrl: String
         
         switch appToTry {
         case "DoorDash":
-            urlScheme = "doordash://"
-            let url = "https://www.doordash.com/search/store/\(currentRestaurant.name!)"
-            safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            let doordashUrl = "search/store/\(currentRestaurant.name!)/?event_type=search"
+            let cleanUrl = doordashUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            urlScheme = "doordash:///\(cleanUrl)"
+            safariUrl = "https://www.doordash.com/\(cleanUrl)"
+            
         case "Uber Eats":
-            urlScheme = "ubereats://"
-            let url = "https://www.ubereats.com/search?diningMode=DELIVERY&q=\(currentRestaurant.name!)"
-            safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            let uberEatsUrl = "search?diningMode=DELIVERY&q=\(currentRestaurant.name!)&sc=SEARCH_SUGGESTION&vertical=ALL"
+            let cleanUrl = uberEatsUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            urlScheme = "ubereats://\(cleanUrl)"
+            safariUrl = "https://www.ubereats.com/\(cleanUrl)"
+            
         case "OpenTable":
-            urlScheme = "opentable://"
-            let url = "https://www.opentable.com/s?term=\(currentRestaurant.name!)"
-            safariUrl = url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            let date = Date.now
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+            let now = formatter.string(from: date)
+            
+            if let location = locationViewModel.location {
+                let latitude = location.coordinate.latitude
+                let longitude = location.coordinate.longitude
+                
+                let openTableUrl = "s?dateTime=\(now)&covers=2&latitude=\(latitude)&longitude=\(longitude)&term=\(currentRestaurant.name!)&shouldUseLatLongSearch=true&sortBy=web_conversion&originalTerm=\(currentRestaurant.name!)&intentModifiedTerm=\(currentRestaurant.name!)&queryUnderstandingType=default"
+                let cleanUrl = openTableUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+                urlScheme = "opentable"
+                safariUrl = "https://www.opentable.com/\(cleanUrl)"
+            } else {
+                let openTableUrl = "s?dateTime=\(now)&covers=2&term=\(currentRestaurant.name!)&shouldUseLatLongSearch=true&sortBy=web_conversion&originalTerm=\(currentRestaurant.name!)&intentModifiedTerm=\(currentRestaurant.name!)&queryUnderstandingType=default"
+                let cleanUrl = openTableUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+                urlScheme = "opentable"
+                safariUrl = "https://www.opentable.com/\(cleanUrl)"
+            }
         default:
             urlScheme = "#"
             safariUrl = "#"
         }
         
-        if let customScheme = URL(string: urlScheme) {
-            openURL(customScheme) { accepted in
-                if !accepted {
-                    print("failed to open app")
-                    print("safariUrl: \(safariUrl)")
-                    if let webUrl = URL(string: safariUrl) {
-                        openURL(webUrl)
+        // couldn't figure out the URL scheme to search within the OpenTable app, so I try to just open Safari every time for OpenTable
+        // even the standard https:// url is opening the OpenTable app though, unfortunately
+        if urlScheme == "opentable" {
+            if let webUrl = URL(string: safariUrl) {
+                openURL(webUrl)
+            }
+        } else {
+            if let customScheme = URL(string: urlScheme) {
+                openURL(customScheme) { accepted in
+                    if !accepted {
+                        print("failed to open app")
+                        print("using safariUrl: \(safariUrl)")
+                        if let webUrl = URL(string: safariUrl) {
+                            openURL(webUrl)
+                        }
                     }
                 }
             }
