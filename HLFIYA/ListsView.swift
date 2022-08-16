@@ -28,7 +28,7 @@ struct ListsView: View {
                     .onDelete(perform: removeList)
                     
                     if (savedLists.isEmpty) {
-                        Text("Create lists to easily save places for later")
+                        Text("Create lists to easily save places for later.")
                             .foregroundColor(.gray)
                     }
                 }

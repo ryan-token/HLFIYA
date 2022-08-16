@@ -130,13 +130,23 @@ struct SettingsView: View {
                     .font(Font.system(.body, design: .rounded))
                 }
                 
-                Section(header: Text("Stats")) {
+                Section(header: Text("Data")) {
                     NavigationLink(destination: SwipesStatsView()) {
                         HStack {
                             Image(systemName: "arrow.left.arrow.right.square.fill")
                                 .font(.title)
                                 .foregroundColor(.orange)
                             Text("Swipes")
+                                .font(Font.system(.body, design: .rounded))
+                        }
+                    }
+                    
+                    NavigationLink(destination: DeleteDataView()) {
+                        HStack {
+                            Image(systemName: "trash.square.fill")
+                                .font(.title)
+                                .foregroundColor(.red)
+                            Text("Delete Data")
                                 .font(Font.system(.body, design: .rounded))
                         }
                     }

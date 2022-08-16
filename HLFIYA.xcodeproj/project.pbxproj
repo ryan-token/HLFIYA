@@ -60,6 +60,7 @@
 		F4D4073E2824B45D009805CB /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D4073D2824B45D009805CB /* CategoriesView.swift */; };
 		F4D407402824B9E7009805CB /* AllCategories.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D4073F2824B9E7009805CB /* AllCategories.swift */; };
 		F4D407422824C599009805CB /* MultiPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D407412824C599009805CB /* MultiPicker.swift */; };
+		F4FE0F3628AB2A0500F19388 /* DeleteDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FE0F3528AB2A0500F19388 /* DeleteDataView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -119,6 +120,7 @@
 		F4D4073D2824B45D009805CB /* CategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesView.swift; sourceTree = "<group>"; };
 		F4D4073F2824B9E7009805CB /* AllCategories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllCategories.swift; sourceTree = "<group>"; };
 		F4D407412824C599009805CB /* MultiPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiPicker.swift; sourceTree = "<group>"; };
+		F4FE0F3528AB2A0500F19388 /* DeleteDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteDataView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,9 +174,10 @@
 				F48497302826226300C2DB89 /* SettingsView.swift */,
 				F4BC0C3128564F3C00D76EE5 /* AboutView.swift */,
 				F4BC0C1D2854FB2700D76EE5 /* ListsView.swift */,
+				F484973228262F2C00C2DB89 /* SwipesStatsView.swift */,
+				F4FE0F3528AB2A0500F19388 /* DeleteDataView.swift */,
 				F4BC0C1F2854FEE300D76EE5 /* SavedRestaurantsView.swift */,
 				F4BC0C2328550FF000D76EE5 /* SavedRestaurantsDetailsView.swift */,
-				F484973228262F2C00C2DB89 /* SwipesStatsView.swift */,
 				F4BC0C2F2856468100D76EE5 /* HapticGenerator.swift */,
 				F42D615F281D837B00DBA5C0 /* Utils.swift */,
 				F45B3F1827963D97003DCC31 /* Persistence.swift */,
@@ -396,6 +399,7 @@
 				F45B3F2B279700FC003DCC31 /* TopBarView.swift in Sources */,
 				F49820E928160B4600035D1C /* RestaurantDetailsView.swift in Sources */,
 				F4130FA5285419ED0007D7E0 /* RightSwipe+CoreDataClass.swift in Sources */,
+				F4FE0F3628AB2A0500F19388 /* DeleteDataView.swift in Sources */,
 				F47A9D0728441BCB00161653 /* PriceView.swift in Sources */,
 				F45B3F1027963D96003DCC31 /* HLFIYAApp.swift in Sources */,
 				F45B3F242796FEDE003DCC31 /* CardView.swift in Sources */,
@@ -538,7 +542,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = HLFIYA/HLFIYA.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_ASSET_PATHS = "\"HLFIYA/Preview Content\"";
 				DEVELOPMENT_TEAM = DJAHJZFYK7;
 				ENABLE_PREVIEWS = YES;
@@ -572,7 +576,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = HLFIYA/HLFIYA.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_ASSET_PATHS = "\"HLFIYA/Preview Content\"";
 				DEVELOPMENT_TEAM = DJAHJZFYK7;
 				ENABLE_PREVIEWS = YES;
