@@ -66,14 +66,14 @@
 /* Begin PBXFileReference section */
 		F404FD662818DA96006D9C5A /* LocationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationViewModel.swift; sourceTree = "<group>"; };
 		F404FD682818E2D2006D9C5A /* LocationRequestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRequestView.swift; sourceTree = "<group>"; };
-		F4130F99285419ED0007D7E0 /* LeftSwipe+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LeftSwipe+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
-		F4130F9A285419ED0007D7E0 /* LeftSwipe+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LeftSwipe+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
-		F4130F9B285419ED0007D7E0 /* SavedRestaurant+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedRestaurant+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
-		F4130F9C285419ED0007D7E0 /* SavedRestaurant+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedRestaurant+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
-		F4130F9D285419ED0007D7E0 /* RightSwipe+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RightSwipe+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
-		F4130F9E285419ED0007D7E0 /* RightSwipe+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RightSwipe+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
-		F4130F9F285419ED0007D7E0 /* SavedList+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedList+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
-		F4130FA0285419ED0007D7E0 /* SavedList+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedList+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		F4130F99285419ED0007D7E0 /* LeftSwipe+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "LeftSwipe+CoreDataClass.swift"; path = "HLFIYA/Core Data/LeftSwipe+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		F4130F9A285419ED0007D7E0 /* LeftSwipe+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "LeftSwipe+CoreDataProperties.swift"; path = "HLFIYA/Core Data/LeftSwipe+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		F4130F9B285419ED0007D7E0 /* SavedRestaurant+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SavedRestaurant+CoreDataClass.swift"; path = "HLFIYA/Core Data/SavedRestaurant+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		F4130F9C285419ED0007D7E0 /* SavedRestaurant+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SavedRestaurant+CoreDataProperties.swift"; path = "HLFIYA/Core Data/SavedRestaurant+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		F4130F9D285419ED0007D7E0 /* RightSwipe+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "RightSwipe+CoreDataClass.swift"; path = "HLFIYA/Core Data/RightSwipe+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		F4130F9E285419ED0007D7E0 /* RightSwipe+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "RightSwipe+CoreDataProperties.swift"; path = "HLFIYA/Core Data/RightSwipe+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		F4130F9F285419ED0007D7E0 /* SavedList+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SavedList+CoreDataClass.swift"; path = "HLFIYA/Core Data/SavedList+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		F4130FA0285419ED0007D7E0 /* SavedList+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SavedList+CoreDataProperties.swift"; path = "HLFIYA/Core Data/SavedList+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		F4130FA928541A3D0007D7E0 /* SavedList+FetchRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedList+FetchRequest.swift"; sourceTree = "<group>"; };
 		F4130FAB28541A870007D7E0 /* SavedRestaurant+FetchRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedRestaurant+FetchRequest.swift"; sourceTree = "<group>"; };
 		F4253B832895C5F800DE59CB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -156,48 +156,21 @@
 		F45B3F0E27963D96003DCC31 /* HLFIYA */ = {
 			isa = PBXGroup;
 			children = (
-				F484972C28261D8E00C2DB89 /* HLFIYA.entitlements */,
+				F45B3F0F27963D96003DCC31 /* HLFIYAApp.swift */,
+				F4253B832895C5F800DE59CB /* ContentView.swift */,
 				F484972B28261D8000C2DB89 /* Info.plist */,
+				F484972C28261D8E00C2DB89 /* HLFIYA.entitlements */,
+				F45B3F1327963D97003DCC31 /* Assets.xcassets */,
+				F45B3F1A27963D97003DCC31 /* HLFIYA.xcdatamodeld */,
+				F48456F228960E4E0037A1B7 /* Views */,
+				F45B3F222796FED1003DCC31 /* Components */,
+				F45B3F252796FEEF003DCC31 /* Models */,
+				F486A3C527C5C94600298DAF /* Services */,
 				F4BC0C2B28555F0100D76EE5 /* StoreKit */,
 				F4BC0C282855306C00D76EE5 /* Ads */,
 				F47A9D0828441C6100161653 /* Utils */,
-				F48456F228960E4E0037A1B7 /* Views */,
-				F45B3F0F27963D96003DCC31 /* HLFIYAApp.swift */,
-				F4253B832895C5F800DE59CB /* ContentView.swift */,
-				F45B3F1127963D96003DCC31 /* MainView.swift */,
-				F404FD682818E2D2006D9C5A /* LocationRequestView.swift */,
-				F45B3F232796FEDE003DCC31 /* CardView.swift */,
-				F49820E828160B4600035D1C /* RestaurantDetailsView.swift */,
-				F4D4073D2824B45D009805CB /* CategoriesView.swift */,
-				F47A9D0628441BCB00161653 /* PriceView.swift */,
-				F47A9D00284074A000161653 /* MapView.swift */,
-				F48497302826226300C2DB89 /* SettingsView.swift */,
-				F4BC0C3128564F3C00D76EE5 /* AboutView.swift */,
-				F4BC0C1D2854FB2700D76EE5 /* ListsView.swift */,
-				F484973228262F2C00C2DB89 /* SwipesStatsView.swift */,
-				F4FE0F3528AB2A0500F19388 /* DeleteDataView.swift */,
-				F4BC0C1F2854FEE300D76EE5 /* SavedRestaurantsView.swift */,
-				F4BC0C2328550FF000D76EE5 /* SavedRestaurantsDetailsView.swift */,
-				F4BC0C2F2856468100D76EE5 /* HapticGenerator.swift */,
-				F42D615F281D837B00DBA5C0 /* Utils.swift */,
-				F45B3F1827963D97003DCC31 /* Persistence.swift */,
-				F486A3C527C5C94600298DAF /* Services */,
-				F45B3F252796FEEF003DCC31 /* Models */,
-				F45B3F222796FED1003DCC31 /* Components */,
-				F45B3F1327963D97003DCC31 /* Assets.xcassets */,
-				F45B3F1A27963D97003DCC31 /* HLFIYA.xcdatamodeld */,
-				F484972928261CC500C2DB89 /* Swipe+FetchRequest.swift */,
-				F4130FA928541A3D0007D7E0 /* SavedList+FetchRequest.swift */,
-				F4130FAB28541A870007D7E0 /* SavedRestaurant+FetchRequest.swift */,
-				F4130F99285419ED0007D7E0 /* LeftSwipe+CoreDataClass.swift */,
-				F4130F9A285419ED0007D7E0 /* LeftSwipe+CoreDataProperties.swift */,
-				F4130F9B285419ED0007D7E0 /* SavedRestaurant+CoreDataClass.swift */,
-				F4130F9C285419ED0007D7E0 /* SavedRestaurant+CoreDataProperties.swift */,
-				F4130F9D285419ED0007D7E0 /* RightSwipe+CoreDataClass.swift */,
-				F4130F9E285419ED0007D7E0 /* RightSwipe+CoreDataProperties.swift */,
-				F4130F9F285419ED0007D7E0 /* SavedList+CoreDataClass.swift */,
-				F4130FA0285419ED0007D7E0 /* SavedList+CoreDataProperties.swift */,
-				F48456F02895DA910037A1B7 /* View+If.swift */,
+				F4FE0F3728AB39F000F19388 /* Extensions */,
+				F4FE0F3828AB3A1400F19388 /* Core Data */,
 				F45B3F1527963D97003DCC31 /* Preview Content */,
 			);
 			path = HLFIYA;
@@ -240,8 +213,10 @@
 		F47A9D0828441C6100161653 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				F4BC0C2F2856468100D76EE5 /* HapticGenerator.swift */,
 				F4D4073F2824B9E7009805CB /* AllCategories.swift */,
 				F47A9D0928441C7600161653 /* AllPrices.swift */,
+				F42D615F281D837B00DBA5C0 /* Utils.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -249,6 +224,20 @@
 		F48456F228960E4E0037A1B7 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F45B3F1127963D96003DCC31 /* MainView.swift */,
+				F404FD682818E2D2006D9C5A /* LocationRequestView.swift */,
+				F45B3F232796FEDE003DCC31 /* CardView.swift */,
+				F49820E828160B4600035D1C /* RestaurantDetailsView.swift */,
+				F4D4073D2824B45D009805CB /* CategoriesView.swift */,
+				F47A9D0628441BCB00161653 /* PriceView.swift */,
+				F47A9D00284074A000161653 /* MapView.swift */,
+				F4BC0C1D2854FB2700D76EE5 /* ListsView.swift */,
+				F4BC0C1F2854FEE300D76EE5 /* SavedRestaurantsView.swift */,
+				F4BC0C2328550FF000D76EE5 /* SavedRestaurantsDetailsView.swift */,
+				F48497302826226300C2DB89 /* SettingsView.swift */,
+				F4BC0C3128564F3C00D76EE5 /* AboutView.swift */,
+				F484973228262F2C00C2DB89 /* SwipesStatsView.swift */,
+				F4FE0F3528AB2A0500F19388 /* DeleteDataView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -285,6 +274,33 @@
 				F4BC0C2E285563EE00D76EE5 /* Products.storekit */,
 			);
 			path = StoreKit;
+			sourceTree = "<group>";
+		};
+		F4FE0F3728AB39F000F19388 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				F484972928261CC500C2DB89 /* Swipe+FetchRequest.swift */,
+				F4130FA928541A3D0007D7E0 /* SavedList+FetchRequest.swift */,
+				F4130FAB28541A870007D7E0 /* SavedRestaurant+FetchRequest.swift */,
+				F48456F02895DA910037A1B7 /* View+If.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		F4FE0F3828AB3A1400F19388 /* Core Data */ = {
+			isa = PBXGroup;
+			children = (
+				F45B3F1827963D97003DCC31 /* Persistence.swift */,
+				F4130F99285419ED0007D7E0 /* LeftSwipe+CoreDataClass.swift */,
+				F4130F9A285419ED0007D7E0 /* LeftSwipe+CoreDataProperties.swift */,
+				F4130F9B285419ED0007D7E0 /* SavedRestaurant+CoreDataClass.swift */,
+				F4130F9C285419ED0007D7E0 /* SavedRestaurant+CoreDataProperties.swift */,
+				F4130F9D285419ED0007D7E0 /* RightSwipe+CoreDataClass.swift */,
+				F4130F9E285419ED0007D7E0 /* RightSwipe+CoreDataProperties.swift */,
+				F4130F9F285419ED0007D7E0 /* SavedList+CoreDataClass.swift */,
+				F4130FA0285419ED0007D7E0 /* SavedList+CoreDataProperties.swift */,
+			);
+			path = "Core Data";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

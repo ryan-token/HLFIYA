@@ -145,7 +145,7 @@ struct SettingsView: View {
                         HStack {
                             Image(systemName: "trash.square.fill")
                                 .font(.title)
-                                .foregroundColor(.red)
+                                .foregroundColor(.pink)
                             Text("Delete Data")
                                 .font(Font.system(.body, design: .rounded))
                         }
