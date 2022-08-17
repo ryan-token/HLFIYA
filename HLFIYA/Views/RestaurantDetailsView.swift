@@ -99,7 +99,7 @@ struct RestaurantDetailsView: View {
                     ForEach(savedLists) { list in
                         Button(action:  {
                             listTappedName = list.wrappedName
-                            addToList(list: list, id: restaurant.id, name: restaurant.name)
+                            addToList(list: list, id: restaurant.id ?? "", name: restaurant.name ?? "")
                         }) {
                             Text(list.wrappedName)
                         }
@@ -263,18 +263,18 @@ struct RestaurantDetailsView: View {
         }
         
         .task {
-            await getBusiness(id: restaurant.id)
+            await getBusiness(id: restaurant.id ?? "")
         }
         
-        .alert("Added \(restaurant.name) to your \(listTappedName) list", isPresented: $isShowingAddedToListAlert) {
+        .alert("Added \(restaurant.name ?? "") to your \(listTappedName) list", isPresented: $isShowingAddedToListAlert) {
             Button("OK", role: .cancel) { }
         }
         
-        .alert("Error adding \(restaurant.name) to your \(listTappedName) list", isPresented: $isShowingAddedToListErrorAlert) {
+        .alert("Error adding \(restaurant.name ?? "") to your \(listTappedName) list", isPresented: $isShowingAddedToListErrorAlert) {
             Button("OK", role: .cancel) { }
         }
         
-        .alert("\(restaurant.name) is already in your \(listTappedName) list!", isPresented: $isShowingDuplicateAlert) {
+        .alert("\(restaurant.name ?? "") is already in your \(listTappedName) list!", isPresented: $isShowingDuplicateAlert) {
             Button("OK", role: .cancel) { }
         }
         

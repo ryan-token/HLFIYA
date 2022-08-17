@@ -42,7 +42,7 @@ struct CardView: View {
             if userTappedToShowMorePhotos {
                 ImageSliderView(selectedTab: $selectedTab, imageUrls: imageUrls)
             } else {
-                ImageSliderView(selectedTab: $selectedTab, imageUrls: [restaurant.image_url])
+                ImageSliderView(selectedTab: $selectedTab, imageUrls: [restaurant.image_url ?? ""])
             }
             
             LinearGradient(gradient: cardGradient, startPoint: .top, endPoint: .bottom)
@@ -59,12 +59,12 @@ struct CardView: View {
                 }
                 Spacer()
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(restaurant.name)
+                    Text(restaurant.name ?? "")
                         .font(Font.system(.largeTitle, design: .rounded))
                         .bold()
                     
                     HStack {
-                        StarRatingView(rating: restaurant.rating)
+                        StarRatingView(rating: restaurant.rating ?? 0.0)
                         Spacer()
                         Button(action: {
                             undo()
@@ -79,7 +79,7 @@ struct CardView: View {
                     DollarView(price: restaurant.price ?? "", label: "")
                     
                     HStack {
-                        Text(restaurant.categories[0].title)
+                        Text(restaurant.categories?.first?.title ?? "")
                         Spacer()
                         Image("yelp_burst")
                             .resizable()
@@ -136,7 +136,7 @@ struct CardView: View {
         .onTapGesture {
             if userTappedToShowMorePhotos == false {
                 Task {
-                    await getBusinessPhotos(id: restaurant.id)
+                    await getBusinessPhotos(id: restaurant.id ?? "")
                 }
             } else {
                 if selectedTab == imageUrls.count {
@@ -186,7 +186,7 @@ struct CardView: View {
             do {
                 let restaurantDetails = try await BusinessFetcher.getBusiness(id: id)
                 print("restaurantDetails: \(restaurantDetails)")
-                imageUrls = restaurantDetails.photos ?? [restaurant.image_url]
+                imageUrls = restaurantDetails.photos ?? [restaurant.image_url ?? ""]
                 print("imageUrls: \(imageUrls)")
                 apiError = false
                 selectedTab = 2
@@ -264,13 +264,13 @@ struct CardView: View {
     func addSwipeToCoreData(direction: String) {
         if direction == "right" {
             let rightSwipe = RightSwipe(context: moc)
-            rightSwipe.name = restaurant.name
+            rightSwipe.name = restaurant.name ?? ""
             rightSwipe.uuid = UUID()
             
             try? moc.save()
         } else if direction == "left" {
             let leftSwipe = LeftSwipe(context: moc)
-            leftSwipe.name = restaurant.name
+            leftSwipe.name = restaurant.name ?? ""
             leftSwipe.uuid = UUID()
             
             try? moc.save()

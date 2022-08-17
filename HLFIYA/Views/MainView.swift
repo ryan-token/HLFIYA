@@ -51,7 +51,7 @@ struct MainView: View {
             }
             
             if !nearbyRestaurants.isEmpty {
-                Text(nearbyRestaurants[currentRestaurantIndex].location.city)
+                Text(nearbyRestaurants[currentRestaurantIndex].location?.city ?? "")
                     .font(Font.system(.title, design: .rounded))
                     .bold()
                     .padding(5)
@@ -102,7 +102,7 @@ struct MainView: View {
                             CardView(totalRestaurants: nearbyRestaurants.count, restaurant: restaurant, nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, restaurantsSwipedLeft: $restaurantsSwipedLeft, restaurantsSwipedRight: $restaurantsSwipedRight)
                                 .padding(8)
                         }
-                        .accessibilityLabel("\(nearbyRestaurants[currentRestaurantIndex].name), \(nearbyRestaurants[currentRestaurantIndex].rating, specifier: "%.1f") stars, \(nearbyRestaurants[currentRestaurantIndex].price?.count ?? -1) dollar signs, \(nearbyRestaurants[currentRestaurantIndex].categories.first?.title ?? ""). Swipe left to skip, swipe right for details.")
+                        .accessibilityLabel("\(nearbyRestaurants[currentRestaurantIndex].name ?? ""), \(nearbyRestaurants[currentRestaurantIndex].rating ?? 0.0, specifier: "%.1f") stars, \(nearbyRestaurants[currentRestaurantIndex].price?.count ?? -1) dollar signs, \(nearbyRestaurants[currentRestaurantIndex].categories?.first?.title ?? ""). Swipe left to skip, swipe right for details.")
                     }
                 }
                 

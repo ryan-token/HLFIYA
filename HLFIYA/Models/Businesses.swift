@@ -14,20 +14,20 @@ struct Businesses: Codable {
 }
 
 struct Business: Identifiable, Codable {
-    let id: String
-    let rating: Double
+    let id: String?
+    let rating: Double?
     let price: String?
-    let phone: String
+    let phone: String?
     let display_phone: String?
     let alias: String?
-    let is_closed: Bool
-    let categories: [Category]
-    let review_count: Int
-    let name: String
-    let url: String
-    let coordinates: Coordinates
-    let image_url: String
-    let location: Location
+    let is_closed: Bool?
+    let categories: [Category]?
+    let review_count: Int?
+    let name: String?
+    let url: String?
+    let coordinates: Coordinates?
+    let image_url: String?
+    let location: Location?
     let distance: Double?
     let transactions: [String]?
     
