@@ -16,8 +16,10 @@ struct ImageSliderView: View {
     init(selectedTab: Binding<Int>, imageUrls: [String]) {
         _selectedTab = selectedTab
         self.imageUrls = imageUrls
-        for number in 1...imageUrls.count {
-            tabOptions.append(number)
+        if imageUrls.count > 0 {
+            for number in 1...imageUrls.count {
+                tabOptions.append(number)
+            }
         }
     }
     

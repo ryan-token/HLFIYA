@@ -18,6 +18,7 @@ struct CardView: View {
     @State private var imageUrls = [String]()
     @State private var apiError = false
     @State private var undoTapped = false
+    @State private var thereAreImages = true
     
     @Binding var restaurant: Business
     @Binding var nearbyRestaurants: [Business]
@@ -182,18 +183,25 @@ struct CardView: View {
     }
     
     func getBusinessPhotos(id: String) async {
-        Task {
-            do {
-                let restaurantDetails = try await BusinessFetcher.getBusiness(id: id)
-                print("restaurantDetails: \(restaurantDetails)")
-                imageUrls = restaurantDetails.photos ?? [restaurant.image_url ?? ""]
-                print("imageUrls: \(imageUrls)")
-                apiError = false
-                selectedTab = 2
-                userTappedToShowMorePhotos = true
-            } catch {
-                print("Request failed with error: \(error)")
-                apiError = true
+        if thereAreImages {
+            Task {
+                do {
+                    let restaurantDetails = try await BusinessFetcher.getBusiness(id: id)
+                    print("restaurantDetails: \(restaurantDetails)")
+                    imageUrls = restaurantDetails.photos ?? [restaurant.image_url ?? ""]
+                    print("imageUrls: \(imageUrls)")
+                    apiError = false
+                    
+                    if imageUrls.isEmpty {
+                        thereAreImages = false
+                    } else {
+                        selectedTab = 2
+                        userTappedToShowMorePhotos = true
+                    }
+                } catch {
+                    print("Request failed with error: \(error)")
+                    apiError = true
+                }
             }
         }
     }
