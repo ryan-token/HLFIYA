@@ -13,6 +13,7 @@ import StoreKit
 
 struct MainView: View {
     @State private var currentLocationSet = false
+    @State private var yelpCache = [Business]()
     @State private var nearbyRestaurants = [Business]()
     @State private var remainingRestaurantsInList = Int()
     @State private var currentRestaurantIndex = 0
@@ -143,11 +144,20 @@ struct MainView: View {
             }
         }
         
+        // First, check if we have cached data to use. Use that if we do
+        // If we don't have a local cache, run the network request (which saves results to the cache)
         .task {
-            if nearbyRestaurants.isEmpty {
+            let localYelpCache = Utils.getLocalYelpCache()
+            
+            if !localYelpCache.isEmpty {
+                yelpCache = localYelpCache
+                setState(fetchedBusinesses: localYelpCache)
+                print("set state based on cached data")
+            } else if nearbyRestaurants.isEmpty {
                 print("refreshing restaurants")
                 let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                 setState(fetchedBusinesses: fetchedBusinesses)
+                print("set state based on network data")
             } else {
                 print("We already have restaurants, not fetching onAppear")
             }

@@ -47,6 +47,18 @@ struct BusinessFetcher {
         let businesses = response.businesses
         let shuffledBusinesses = businesses?.shuffled()
         
+        // Write JSON data to local document as cache
+        let encodedData = try JSONEncoder().encode(response)
+        let jsonString = String(data: encodedData,
+                                encoding: .utf8)
+        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("localYelpCache.json")
+
+        do {
+            try jsonString?.write(to: localCacheUrl, atomically: true, encoding: .utf8)
+        } catch {
+            print(error.localizedDescription)
+        }
+        
         HapticGenerator.playSuccessHaptic()
         return shuffledBusinesses ?? Business.emptyBusinesses
     }
