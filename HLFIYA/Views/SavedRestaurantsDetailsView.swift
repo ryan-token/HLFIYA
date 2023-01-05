@@ -28,39 +28,42 @@ struct SavedRestaurantsDetailsView: View {
     
     var body: some View {
         List {
-            Section(header: Text(currentRestaurant.name ?? "")) {
-                VStack(alignment: .leading, spacing: 5) {
-                    StarRatingView(rating: currentRestaurant.rating ?? 0.0, label: "Rating:", reviewCount: currentRestaurant.review_count)
-                    DollarView(price: currentRestaurant.price ?? "", label: "Price:")
-                    
-                    if currentRestaurant.categories?.count ?? 0 < 2 {
-                        HStack {
-                            Text("Category:")
-                            ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
-                                Text(category.title ?? "")
-                                    .accessibilityLabel("\(currentRestaurant.name ?? "restaurant") is a \(category.title ?? "") place")
-                            }
+            Text(currentRestaurant.name ?? "")
+                .font(Font.system(.title2, design: .rounded))
+                .bold()
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets())
+            VStack(alignment: .leading, spacing: 5) {
+                StarRatingView(rating: currentRestaurant.rating ?? 0.0, label: "Rating:", reviewCount: currentRestaurant.review_count)
+                DollarView(price: currentRestaurant.price ?? "", label: "Price:")
+                
+                if currentRestaurant.categories?.count ?? 0 < 2 {
+                    HStack {
+                        Text("Category:")
+                        ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
+                            Text(category.title ?? "")
+                                .accessibilityLabel("\(currentRestaurant.name ?? "restaurant") is a \(category.title ?? "") place")
                         }
-                        .foregroundColor(.gray)
-                        
-                    } else {
-                        VStack(alignment: .leading) {
-                            Text("Categories:")
-                            
-                            Spacer()
-                                .frame(height: 5)
-                            
-                            ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
-                                Text("– \(category.title ?? "")")
-                                    .padding(.leading, 25)
-                                    .accessibilityLabel("\(currentRestaurant.name ?? "restaurant") is a \(category.title ?? "") place")
-                            }
-                        }
-                        .foregroundColor(.gray)
                     }
+                    .foregroundColor(.gray)
+                    
+                } else {
+                    VStack(alignment: .leading) {
+                        Text("Categories:")
+                        
+                        Spacer()
+                            .frame(height: 5)
+                        
+                        ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
+                            Text("– \(category.title ?? "")")
+                                .padding(.leading, 25)
+                                .accessibilityLabel("\(currentRestaurant.name ?? "restaurant") is a \(category.title ?? "") place")
+                        }
+                    }
+                    .foregroundColor(.gray)
                 }
             }
-            .headerProminence(.increased)
             .accessibilityLabel("Rating, price, and categories for \(currentRestaurant.name ?? "restaurant")")
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
