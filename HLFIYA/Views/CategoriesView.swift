@@ -10,6 +10,8 @@ import SwiftUI
 struct CategoriesView: View {
     let yelpCategories = AllCategories().getYelpCategories()
     
+    @State private var initialCategories = Set([""])
+    @State private var saveTapped = false
     @Binding var nearbyRestaurants: [Business]
     @Binding var remainingRestaurantsInList: Int
     @Binding var currentRestaurantIndex: Int
@@ -77,6 +79,7 @@ struct CategoriesView: View {
                     
                     ToolbarItem(placement: .navigationBarTrailing) {
                         AsyncButton(action: {
+                            saveTapped = true
                             dismiss()
                             let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                             setState(fetchedBusinesses: fetchedBusinesses)
@@ -90,6 +93,21 @@ struct CategoriesView: View {
         }
         .navigationViewStyle(.stack)
         .accentColor(Color(UIColor(named: "fuchsia")!))
+        
+        .onAppear {
+            initialCategories = filters.categories
+        }
+        
+        .onDisappear {
+            if !saveTapped {
+                filters.categories = initialCategories
+                if filters.categories.count == 1 {
+                    filters.categoriesNames = AllCategories().getFormattedCategory(from: filters.categories.first!)
+                } else {
+                    filters.categoriesNames = "\(AllCategories().getFormattedCategory(from: filters.categories.first!)) and \(filters.categories.count-1) More"
+                }
+            }
+        }
     }
     
     func setState(fetchedBusinesses: [Business]) {

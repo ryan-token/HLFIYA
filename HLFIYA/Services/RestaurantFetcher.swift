@@ -87,6 +87,18 @@ struct BusinessFetcher {
         // Parse the JSON data
         let businessDetails = try JSONDecoder().decode(BusinessDetails.self, from: data)
         
+        // Write JSON data to local document as cache
+        let encodedData = try JSONEncoder().encode(businessDetails)
+        let jsonString = String(data: encodedData,
+                                encoding: .utf8)
+        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("localYelpCacheForBusId-\(businessDetails.id ?? "unknown").json")
+
+        do {
+            try jsonString?.write(to: localCacheUrl, atomically: true, encoding: .utf8)
+        } catch {
+            print(error.localizedDescription)
+        }
+        
         return businessDetails
     }
 }

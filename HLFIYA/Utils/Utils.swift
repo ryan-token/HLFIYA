@@ -42,10 +42,32 @@ class Utils {
             print("Local cache as businesses object:")
             print(localCacheAsBusinesses)
             
-            return localCacheAsBusinesses.businesses ?? []
+            return localCacheAsBusinesses.businesses?.shuffled() ?? []
         } catch {
             print(error.localizedDescription)
             return []
+        }
+    }
+    
+    static func getLocalYelpCacheForBusiness(id: String) -> BusinessDetails {
+        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("localYelpCacheForBusId-\(id).json")
+        
+        do {
+            let localYelpCacheForBusiness = try String(contentsOf: localCacheUrl)
+            print("Local Yelp Cache for Business with id \(id):")
+            print(localYelpCacheForBusiness)
+            
+            let localCacheAsData = Data(localYelpCacheForBusiness.utf8)
+            print("Local cache as data:")
+            print(localCacheAsData)
+            let localCacheAsBusiness = try! JSONDecoder().decode(BusinessDetails.self, from: localCacheAsData)
+            print("Local cache as businesses object:")
+            print(localCacheAsBusiness)
+            
+            return localCacheAsBusiness
+        } catch {
+            print(error.localizedDescription)
+            return BusinessDetails.emptyBusiness
         }
     }
 }

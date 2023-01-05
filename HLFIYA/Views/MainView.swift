@@ -13,7 +13,6 @@ import StoreKit
 
 struct MainView: View {
     @State private var currentLocationSet = false
-    @State private var yelpCache = [Business]()
     @State private var nearbyRestaurants = [Business]()
     @State private var remainingRestaurantsInList = Int()
     @State private var currentRestaurantIndex = 0
@@ -150,7 +149,6 @@ struct MainView: View {
             let localYelpCache = Utils.getLocalYelpCache()
             
             if !localYelpCache.isEmpty {
-                yelpCache = localYelpCache
                 setState(fetchedBusinesses: localYelpCache)
                 print("set state based on cached data")
             } else if nearbyRestaurants.isEmpty {
@@ -216,7 +214,7 @@ struct MainView: View {
         
         do {
             fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: customRadius), categories: categories, prices: stringPrices)
-            print("fetched Businesses: \(fetchedBusinesses)")
+            print("fetched businesses from API: \(fetchedBusinesses)")
         } catch {
             print("Request failed with error: \(error)")
             fetchedBusinesses = []

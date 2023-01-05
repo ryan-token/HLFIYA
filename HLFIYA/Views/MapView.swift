@@ -13,6 +13,10 @@ struct MapView: View {
     @State var tracking:MapUserTrackingMode = .follow
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
     @State private var isShowingRadiusTooLargeAlert = false
+    @State private var initialLatitude: CLLocationDegrees = 0.000000
+    @State private var initialLongitude: CLLocationDegrees = 0.000000
+    @State private var initialRadius = 5.0
+    @State private var saveTapped = false
     
     @Binding var nearbyRestaurants: [Business]
     @Binding var remainingRestaurantsInList: Int
@@ -123,6 +127,7 @@ struct MapView: View {
                         if (filters.customRadius > 24.854847) {
                             isShowingRadiusTooLargeAlert.toggle()
                         } else {
+                            saveTapped = true
                             dismiss()
                             let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                             setState(fetchedBusinesses: fetchedBusinesses)
@@ -140,6 +145,20 @@ struct MapView: View {
         }
         .navigationViewStyle(.stack)
         .accentColor(Color(UIColor(named: "fuchsia")!))
+        
+        .onAppear {
+            initialLatitude = filters.customLatitude
+            initialLongitude = filters.customLongitude
+            initialRadius = filters.customRadius
+        }
+        
+        .onDisappear {
+            if !saveTapped {
+                filters.customLatitude = initialLatitude
+                filters.customLongitude = initialLongitude
+                filters.customRadius = initialRadius
+            }
+        }
     }
     
     // latitudeDelta is the amount of degrees that are visible on the screen. 1 degree is equal to ~69 miles

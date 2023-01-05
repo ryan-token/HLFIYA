@@ -10,6 +10,8 @@ import SwiftUI
 struct PriceView: View {
     let priceOptions = AllPrices().getPriceOptions()
     
+    @State private var initialPrices = Set([""])
+    @State private var saveTapped = false
     @Binding var nearbyRestaurants: [Business]
     @Binding var remainingRestaurantsInList: Int
     @Binding var currentRestaurantIndex: Int
@@ -52,7 +54,7 @@ struct PriceView: View {
                                 filters.prices = ["All Prices"]
                             }
                             
-                            // Set the categoriesNames option
+                            // Set the priceNames option
                             if filters.prices.count == 1 {
                                 filters.priceName = AllPrices().getFormattedPrice(from: filters.prices.first!)
                             } else {
@@ -78,6 +80,7 @@ struct PriceView: View {
                     
                     ToolbarItem(placement: .navigationBarTrailing) {
                         AsyncButton(action: {
+                            saveTapped = true
                             dismiss()
                             let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                             setState(fetchedBusinesses: fetchedBusinesses)
@@ -91,6 +94,21 @@ struct PriceView: View {
         }
         .navigationViewStyle(.stack)
         .accentColor(Color(UIColor(named: "fuchsia")!))
+        
+        .onAppear {
+            initialPrices = filters.prices
+        }
+        
+        .onDisappear {
+            if !saveTapped {
+                filters.prices = initialPrices
+                if filters.prices.count == 1 {
+                    filters.priceName = AllPrices().getFormattedPrice(from: filters.prices.first!)
+                } else {
+                    filters.priceName = AllPrices().getPriceNames(from: filters.prices)
+                }
+            }
+        }
     }
     
     func setState(fetchedBusinesses: [Business]) {

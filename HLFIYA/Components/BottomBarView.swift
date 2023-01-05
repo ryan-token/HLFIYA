@@ -26,23 +26,6 @@ struct BottomBarView: View {
         HStack {
             Spacer()
             
-            AsyncButton(action: {
-                let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
-                setState(fetchedBusinesses: fetchedBusinesses)
-            }) {
-                VStack(spacing: 5) {
-                    Image(systemName: "arrow.clockwise.circle.fill")
-                        .font(Font.system(size: 50, design: .rounded))
-                        .foregroundColor(.cyan)
-                    Text("Reload")
-                        .font(Font.system(.body, design: .rounded))
-                        .foregroundColor(.gray)
-                }
-            }
-            .accessibilityLabel("Reload Restaurants")
-            
-            Spacer()
-            
             Button(action: {
                 isShowingCategoriesView.toggle()
             }) {

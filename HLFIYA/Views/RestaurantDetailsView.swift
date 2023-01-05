@@ -263,7 +263,15 @@ struct RestaurantDetailsView: View {
         }
         
         .task {
-            await getBusiness(id: restaurant.id ?? "")
+            let localYelpCacheForBusiness = Utils.getLocalYelpCacheForBusiness(id: restaurant.id ?? "")
+            
+            if localYelpCacheForBusiness.name != "" {
+                currentRestaurant = localYelpCacheForBusiness
+                print("got business data from cache")
+            } else {
+                await getBusiness(id: restaurant.id ?? "")
+                print("got business data from API")
+            }
         }
         
         .alert("Added \(restaurant.name ?? "") to your \(listTappedName) list", isPresented: $isShowingAddedToListAlert) {
