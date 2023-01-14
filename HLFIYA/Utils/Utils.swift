@@ -71,6 +71,44 @@ class Utils {
         }
     }
     
+    static func clearAnyCacheFilesOverAMonthOld() {
+        let documentsDir = getDocumentsDirectory()
+        let todaysDate = Date.now
+        let calendar = Calendar(identifier: .gregorian)
+        
+        // loop over every local cache file
+        // if any modificationDates are over a month old, return  true
+        // otherwise return false
+        do {
+            let fileURLs = try FileManager.default.contentsOfDirectory(at: documentsDir, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+            
+            for fileURL in fileURLs where fileURL.pathExtension == "json" {
+                let fileName = fileURL.lastPathComponent
+                print("file name: \(fileName)")
+                let filePath = fileURL.relativePath
+                do {
+                    let fileAttributes = try FileManager.default.attributesOfItem(atPath: filePath)
+                    
+                    for attribute in fileAttributes {
+                        if attribute.key == FileAttributeKey("NSFileModificationDate") {
+                            let modificationDate = attribute.value as! Date
+                            let daysSinceCacheModification = calendar.numberOfDaysBetween(modificationDate, and: todaysDate)
+                            print("days since cache modification: \(daysSinceCacheModification)")
+                            if daysSinceCacheModification > 30 {
+                                print("clearing cache for \(fileName)")
+                                try FileManager.default.removeItem(at: fileURL)
+                            }
+                        }
+                    }
+                } catch {
+                    print("error checking for old cache files: \(error)")
+                }
+            }
+        } catch  {
+            print("error getting files from documents dir: \(error)")
+        }
+    }
+    
     static func clearAllCacheFilesInDocumentsDir() {
         let documentsDir = getDocumentsDirectory()
         
@@ -80,19 +118,7 @@ class Utils {
                 try FileManager.default.removeItem(at: fileURL)
             }
         } catch  {
-            print(error)
-        }
-    }
-    
-    static func isTodayThe15thOfTheMonth() -> Bool {
-        let components = Calendar.current.dateComponents([.day], from: Date.now)
-        let day = components.day ?? 0
-        print("current day of month: \(day)")
-        
-        if day == 15 {
-            return true
-        } else {
-            return false
+            print("error clearing files from cache: \(error)")
         }
     }
 }

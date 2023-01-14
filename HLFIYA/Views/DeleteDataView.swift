@@ -9,6 +9,7 @@ import SwiftUI
 import CloudKit
 
 struct DeleteDataView: View {
+    @State private var isShowingClearCachesAlert = false
     @State private var isShowingDeleteAlert = false
     
     @FetchRequest(fetchRequest: RightSwipe.allRightSwipesFetchRequest, animation: .default)
@@ -35,7 +36,42 @@ struct DeleteDataView: View {
                 Text("Number of Lists: \(savedLists.count)")
                 
                 Section {
-                    Text("Your swipes data and all of your saved Lists are stored in iCloud so it can sync across your devices. I do not store this data (or any other data) on my servers. If you'd like to delete this data from both your device and from iCloud, tap the button below.")
+                    Text("We cache Yelp data to improve the app. Cached data is intermittently refreshed, but you can manually clear the cached data here.")
+                        .foregroundColor(.gray)
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                    Button {
+                        print("IsShowingClearCachesAlert: \(isShowingClearCachesAlert)")
+                        print("tapped clear caches")
+                        isShowingClearCachesAlert = true
+                        print("IsShowingClearCachesAlert: \(isShowingClearCachesAlert)")
+                    } label: {
+                        Text("Clear Cached Yelp Data")
+                            .padding()
+                            .font(Font.system(.headline, design: .rounded))
+                            .foregroundColor(.white)
+                    }
+                    .frame(width: UIScreen.main.bounds.width)
+                    .padding(.horizontal, -32)
+                    .background(Color.orange)
+                    .clipShape(Capsule())
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    
+                    .alert(isPresented: $isShowingClearCachesAlert) {
+                        Alert(
+                            title: Text("This will clear all cached data received from the Yelp API."),
+                            message: Text("Proceed if you're seeing stale Yelp data."),
+                            primaryButton: .destructive(Text("Clear Caches")) {
+                                Utils.clearAllCacheFilesInDocumentsDir()
+                            },
+                            secondaryButton: .cancel()
+                        )
+                    }
+                }
+                
+                Section {
+                    Text("Your swipes data and all of your saved Lists are stored in iCloud so they can sync across your devices. You can delete all saved data from your device and from iCloud by tapping below.")
                         .foregroundColor(.gray)
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
@@ -55,6 +91,17 @@ struct DeleteDataView: View {
                     .padding()
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
+                    
+                    .alert(isPresented: $isShowingDeleteAlert) {
+                        Alert(
+                            title: Text("This will permanently delete all of your swipes data and all of your Lists."),
+                            message: Text("Are you sure you want to do this?"),
+                            primaryButton: .destructive(Text("Delete All Saved Data")) {
+                                deleteAllLocalAndCloudKitData()
+                            },
+                            secondaryButton: .cancel()
+                        )
+                    }
                 }
             } else {
                 Text("No data to delete! Use the app for a bit, then come back 🙂")
@@ -63,21 +110,11 @@ struct DeleteDataView: View {
         }
         .font(Font.system(.body, design: .rounded))
         
-        .alert(isPresented: $isShowingDeleteAlert) {
-            Alert(
-                title: Text("This will permanently delete all of your swipes data and all of your Lists."),
-                message: Text("Are you sure you want to do this?"),
-                primaryButton: .destructive(Text("Delete")) {
-                    deleteAllLocalAndCloudKitData()
-                },
-                secondaryButton: .cancel()
-            )
-        }
-        
         .navigationTitle("Delete Data")
     }
     
     func deleteAllLocalAndCloudKitData() {
+        Utils.clearAllCacheFilesInDocumentsDir()
         for leftSwipe in leftSwipes {
             moc.delete(leftSwipe)
         }
