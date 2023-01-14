@@ -70,4 +70,29 @@ class Utils {
             return BusinessDetails.emptyBusiness
         }
     }
+    
+    static func clearAllCacheFilesInDocumentsDir() {
+        let documentsDir = getDocumentsDirectory()
+        
+        do {
+            let fileURLs = try FileManager.default.contentsOfDirectory(at: documentsDir, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+            for fileURL in fileURLs where fileURL.pathExtension == "json" {
+                try FileManager.default.removeItem(at: fileURL)
+            }
+        } catch  {
+            print(error)
+        }
+    }
+    
+    static func isTodayThe15thOfTheMonth() -> Bool {
+        let components = Calendar.current.dateComponents([.day], from: Date.now)
+        let day = components.day ?? 0
+        print("current day of month: \(day)")
+        
+        if day == 15 {
+            return true
+        } else {
+            return false
+        }
+    }
 }

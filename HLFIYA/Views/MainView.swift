@@ -12,6 +12,7 @@ import GoogleMobileAds
 import StoreKit
 
 struct MainView: View {
+    @AppStorage("cacheWasClearedToday") private var cacheWasClearedToday = false
     @State private var currentLocationSet = false
     @State private var nearbyRestaurants = [Business]()
     @State private var remainingRestaurantsInList = Int()
@@ -144,8 +145,19 @@ struct MainView: View {
         }
         
         // First, check if we have cached data to use. Use that if we do
+        // Clear the caches on the 15th of every month
         // If we don't have a local cache, run the network request (which saves results to the cache)
         .task {
+            let todayIsThe15th = Utils.isTodayThe15thOfTheMonth()
+            if todayIsThe15th && !cacheWasClearedToday {
+                print("clearing cache")
+                Utils.clearAllCacheFilesInDocumentsDir()
+                cacheWasClearedToday = true
+            }
+            if !todayIsThe15th {
+                cacheWasClearedToday = false
+            }
+            
             let localYelpCache = Utils.getLocalYelpCache()
             
             if !localYelpCache.isEmpty {
