@@ -11,7 +11,7 @@ import CoreLocation
 
 struct MapView: View {
     @State var tracking:MapUserTrackingMode = .follow
-    @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 51.507222, longitude: -0.1275), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
+    @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 37.334633, longitude: -122.012682), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
     @State private var isShowingRadiusTooLargeAlert = false
     @State private var initialLatitude: CLLocationDegrees = 0.000000
     @State private var initialLongitude: CLLocationDegrees = 0.000000
@@ -49,23 +49,6 @@ struct MapView: View {
                     .clipShape(Circle())
                     .padding(.horizontal)
             }
-            
-            .onAppear {
-                if let location = locationViewModel.location {
-                    var latitude = location.coordinate.latitude
-                    var longitude = location.coordinate.longitude
-                    
-                    if ((filters.customLatitude != 0.000000 && filters.customLongitude != 0.000000) && (filters.customLatitude != latitude || filters.customLongitude != longitude)) {
-                        latitude = filters.customLatitude
-                        longitude = filters.customLongitude
-                    }
-                    
-                    let degrees = convertRadiusToDegrees(radius: filters.customRadius)
-                    region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: MKCoordinateSpan(latitudeDelta: degrees, longitudeDelta: degrees))
-                } else {
-                    print("no location")
-                }
-            }
         
             .onChange(of: region.center.latitude) { newLatitude in
                 filters.customLatitude = newLatitude
@@ -77,12 +60,6 @@ struct MapView: View {
             
             .onChange(of: region.span.longitudeDelta) { newLongitudeDelta in
                 filters.customRadius = convertDegreesToRadius(degrees: newLongitudeDelta)
-            }
-            
-            .onDisappear {
-                if filters.customRadius > 24.854847 {
-                    filters.customRadius = 24.854847
-                }
             }
         
             .toolbar {
@@ -150,6 +127,23 @@ struct MapView: View {
             initialLatitude = filters.customLatitude
             initialLongitude = filters.customLongitude
             initialRadius = filters.customRadius
+            
+            if let location = locationViewModel.location {
+                var latitude = location.coordinate.latitude
+                var longitude = location.coordinate.longitude
+                
+                // the customLatitude & customLongitude filters aren't set to 0.000000, and they aren't set to your current location, then use that custom location
+                // otherwise, use your current location
+                if ((filters.customLatitude != 0.000000 && filters.customLongitude != 0.000000) && (filters.customLatitude != latitude || filters.customLongitude != longitude)) {
+                    latitude = filters.customLatitude
+                    longitude = filters.customLongitude
+                }
+                
+                let degrees = convertRadiusToDegrees(radius: filters.customRadius)
+                region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: MKCoordinateSpan(latitudeDelta: degrees, longitudeDelta: degrees))
+            } else {
+                print("no location")
+            }
         }
         
         .onDisappear {
@@ -157,6 +151,10 @@ struct MapView: View {
                 filters.customLatitude = initialLatitude
                 filters.customLongitude = initialLongitude
                 filters.customRadius = initialRadius
+            }
+            
+            if filters.customRadius > 24.854847 {
+                filters.customRadius = 24.854847
             }
         }
     }
