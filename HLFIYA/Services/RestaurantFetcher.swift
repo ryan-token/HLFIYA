@@ -45,7 +45,23 @@ struct BusinessFetcher {
         // Parse the JSON data
         let response = try JSONDecoder().decode(Businesses.self, from: data)
         let businesses = response.businesses
-        let shuffledBusinesses = businesses?.shuffled()
+        
+        // Filter out grocery and convenience stores
+        var filteredBusinesses = [Business]()
+        for business in businesses ?? [] {
+            var containsGroceryCategory = false
+            for category in business.categories ?? [] {
+                if category.alias == "grocery" || category.alias == "healthmarkets" || category.alias == "organic_stores" || category.alias == "convenience" {
+                    containsGroceryCategory = true
+                }
+            }
+            
+            if !containsGroceryCategory {
+                filteredBusinesses.append(business)
+            }
+        }
+        
+        let shuffledBusinesses = filteredBusinesses.shuffled()
         
         // Write JSON data to local document as cache
         let encodedData = try JSONEncoder().encode(response)
@@ -60,7 +76,7 @@ struct BusinessFetcher {
         }
         
         HapticGenerator.playSuccessHaptic()
-        return shuffledBusinesses ?? Business.emptyBusinesses
+        return shuffledBusinesses
     }
     
     static func getBusiness(id: String) async throws -> BusinessDetails {
