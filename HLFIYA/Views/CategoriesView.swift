@@ -83,6 +83,7 @@ struct CategoriesView: View {
                             dismiss()
                             let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                             setState(fetchedBusinesses: fetchedBusinesses)
+                            Utils.writeCategoriesFilterToCache(categories: filters.categories, categoriesNames: filters.categoriesNames)
                         }) {
                             Text("Save")
                                 .font(Font.system(.headline, design: .rounded))

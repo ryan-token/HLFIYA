@@ -53,7 +53,7 @@ struct SavedRestaurantsView: View {
         .font(Font.system(.headline, design: .rounded))
         
         .alert("Change List Name", isPresented: $isShowingUpdateListNameAlertForiOS16) {
-            TextField("New list name", text: $newListName)
+            TextField("New List Name", text: $newListName)
                 .textInputAutocapitalization(.words)
             Button(action: { updateListNameViaAlert(list: list) }) {
                 Text("Change List Name")

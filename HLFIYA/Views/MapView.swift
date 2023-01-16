@@ -108,6 +108,7 @@ struct MapView: View {
                             dismiss()
                             let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
                             setState(fetchedBusinesses: fetchedBusinesses)
+                            Utils.writeLocationFilterToCache(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, customRadius: filters.customRadius)
                         }
                     }) {
                         Text("Save")

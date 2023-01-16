@@ -55,7 +55,7 @@ struct MainView: View {
                     .font(Font.system(.title, design: .rounded))
                     .bold()
                     .padding(5)
-                    .animation(.none, value: currentRestaurantIndex)
+                    .animation(.default, value: currentRestaurantIndex)
             }
             
             VStack(spacing: 10) {
@@ -155,6 +155,9 @@ struct MainView: View {
             if !localYelpCache.isEmpty {
                 setState(fetchedBusinesses: localYelpCache)
                 print("set state based on cached data")
+                useCachedCategoriesFilter()
+                useCachedPricesFilter()
+                useCachedLocationFilter()
             } else if nearbyRestaurants.isEmpty {
                 print("refreshing restaurants")
                 let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
@@ -259,6 +262,25 @@ struct MainView: View {
             HapticGenerator.playErrorHaptic()
             print("Failed purchase for \(product.id): \(error)")
         }
+    }
+    
+    func useCachedCategoriesFilter() {
+        let localCategoriesFilter = Utils.getCategoriesFilterCache()
+        filters.categories = localCategoriesFilter.categories
+        filters.categoriesNames = localCategoriesFilter.categoriesNames
+    }
+    
+    func useCachedPricesFilter() {
+        let localPricesFilter = Utils.getPricesFilterCache()
+        filters.prices = localPricesFilter.prices
+        filters.priceName = localPricesFilter.priceName
+    }
+    
+    func useCachedLocationFilter() {
+        let localLocationFilter = Utils.getLocationFilterCache()
+        filters.customLatitude = localLocationFilter.customLatitude
+        filters.customLongitude = localLocationFilter.customLongitude
+        filters.customRadius = localLocationFilter.customRadius
     }
     
     private func itemExists(_ item: String) -> Bool {

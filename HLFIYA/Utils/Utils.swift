@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import CoreLocation
 
 class Utils {
     static func convertMilesToMeters(miles: Double) -> Int {
@@ -32,15 +32,8 @@ class Utils {
         
         do {
             let localYelpCache = try String(contentsOf: localCacheUrl)
-            print("Local Yelp Cache:")
-            print(localYelpCache)
-            
             let localCacheAsData = Data(localYelpCache.utf8)
-            print("Local cache as data:")
-            print(localCacheAsData)
             let localCacheAsBusinesses = try! JSONDecoder().decode(Businesses.self, from: localCacheAsData)
-            print("Local cache as businesses object:")
-            print(localCacheAsBusinesses)
             
             return localCacheAsBusinesses.businesses?.shuffled() ?? []
         } catch {
@@ -68,6 +61,111 @@ class Utils {
         } catch {
             print(error.localizedDescription)
             return BusinessDetails.emptyBusiness
+        }
+    }
+    
+    static func writeCategoriesFilterToCache(categories: Set<String>, categoriesNames: String) {
+        let categoriesStruct = CategoriesFilter(categories: categories, categoriesNames: categoriesNames)
+
+        let encoder = JSONEncoder()
+        let cacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("categoriesFilterCache.json")
+        do {
+            let result = try encoder.encode(categoriesStruct)
+            if let jsonString = String(data: result, encoding: .utf8){
+                print("Categories JSON: \(jsonString)")
+                do {
+                    try jsonString.write(to: cacheUrl, atomically: true, encoding: .utf8)
+                } catch {
+                    print(error.localizedDescription)
+                }
+            }
+        } catch {
+            print("Error writing categories filter to cache: \(error)")
+        }
+    }
+    
+    static func getCategoriesFilterCache() -> CategoriesFilter {
+        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("categoriesFilterCache.json")
+        
+        do {
+            let localYelpCache = try String(contentsOf: localCacheUrl)
+            let localCacheAsData = Data(localYelpCache.utf8)
+            let localCacheAsCategories = try! JSONDecoder().decode(CategoriesFilter.self, from: localCacheAsData)
+            
+            return localCacheAsCategories
+        } catch {
+            print(error.localizedDescription)
+            return CategoriesFilter(categories: ["food"], categoriesNames: "All Food")
+        }
+    }
+    
+    static func writePricesFilterToCache(prices: Set<String>, priceName: String) {
+        let pricesStruct = PricesFilter(prices: prices, priceName: priceName)
+
+        let encoder = JSONEncoder()
+        let cacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("pricesFilterCache.json")
+        do {
+            let result = try encoder.encode(pricesStruct)
+            if let jsonString = String(data: result, encoding: .utf8){
+                print("Prices JSON: \(jsonString)")
+                do {
+                    try jsonString.write(to: cacheUrl, atomically: true, encoding: .utf8)
+                } catch {
+                    print(error.localizedDescription)
+                }
+            }
+        } catch {
+            print("Error writing prices filter to cache: \(error)")
+        }
+    }
+    
+    static func getPricesFilterCache() -> PricesFilter {
+        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("pricesFilterCache.json")
+        
+        do {
+            let localYelpCache = try String(contentsOf: localCacheUrl)
+            let localCacheAsData = Data(localYelpCache.utf8)
+            let localCacheAsPrices = try! JSONDecoder().decode(PricesFilter.self, from: localCacheAsData)
+            
+            return localCacheAsPrices
+        } catch {
+            print(error.localizedDescription)
+            return PricesFilter(prices: ["All Prices"], priceName: "All Prices")
+        }
+    }
+    
+    static func writeLocationFilterToCache(customLatitude: CLLocationDegrees, customLongitude: CLLocationDegrees, customRadius: Double) {
+        let locationStruct = LocationFilter(customLatitude: customLatitude, customLongitude: customLongitude, customRadius: customRadius)
+
+        let encoder = JSONEncoder()
+        let cacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("locationFilterCache.json")
+        do {
+            let result = try encoder.encode(locationStruct)
+            if let jsonString = String(data: result, encoding: .utf8){
+                print("Location JSON: \(jsonString)")
+                do {
+                    try jsonString.write(to: cacheUrl, atomically: true, encoding: .utf8)
+                } catch {
+                    print(error.localizedDescription)
+                }
+            }
+        } catch {
+            print("Error writing location filter to cache: \(error)")
+        }
+    }
+    
+    static func getLocationFilterCache() -> LocationFilter {
+        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("locationFilterCache.json")
+        
+        do {
+            let localYelpCache = try String(contentsOf: localCacheUrl)
+            let localCacheAsData = Data(localYelpCache.utf8)
+            let localCacheAsLocation = try! JSONDecoder().decode(LocationFilter.self, from: localCacheAsData)
+            
+            return localCacheAsLocation
+        } catch {
+            print(error.localizedDescription)
+            return LocationFilter(customLatitude: CLLocationDegrees(), customLongitude: CLLocationDegrees(), customRadius: 5.0)
         }
     }
     
@@ -119,6 +217,38 @@ class Utils {
             }
         } catch  {
             print("error clearing files from cache: \(error)")
+        }
+    }
+    
+    struct CategoriesFilter: Codable {
+        var categories: Set<String>
+        var categoriesNames: String
+        
+        init(categories: Set<String>, categoriesNames: String) {
+            self.categories = categories
+            self.categoriesNames = categoriesNames
+        }
+    }
+    
+    struct PricesFilter: Codable {
+        var prices: Set<String>
+        var priceName: String
+        
+        init(prices: Set<String>, priceName: String) {
+            self.prices = prices
+            self.priceName = priceName
+        }
+    }
+    
+    struct LocationFilter: Codable {
+        var customLatitude: CLLocationDegrees
+        var customLongitude: CLLocationDegrees
+        var customRadius: Double
+        
+        init(customLatitude: CLLocationDegrees, customLongitude: CLLocationDegrees, customRadius: Double) {
+            self.customLatitude = customLatitude
+            self.customLongitude = customLongitude
+            self.customRadius = customRadius
         }
     }
 }
