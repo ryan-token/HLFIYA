@@ -22,11 +22,13 @@ struct AllCategories {
             "cocktailbars",
             "coffee",
             "comfortfood",
+            "desserts",
             "hotdogs",
             "foodtrucks",
             "french",
             "german",
             "greek",
+            "icecream",
             "indpak",
             "italian",
             "japanese",
@@ -70,6 +72,8 @@ struct AllCategories {
             return "Coffee & Tea"
         case "comfortfood":
             return "Comfort Food"
+        case "desserts":
+            return "Desserts"
         case "hotdogs":
             return "Fast Food"
         case "foodtrucks":
@@ -80,6 +84,8 @@ struct AllCategories {
             return "German"
         case "greek":
             return "Greek"
+        case "icecream":
+            return "Ice Cream"
         case "indpak":
             return "Indian"
         case "italian":

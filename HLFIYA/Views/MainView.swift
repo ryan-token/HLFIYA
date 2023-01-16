@@ -64,6 +64,7 @@ struct MainView: View {
                         .foregroundColor(.gray)
                     Text(filters.categoriesNames)
                         .bold()
+                        .lineLimit(1)
                 }
                 .animation(.interactiveSpring(), value: filters.categories)
                 
