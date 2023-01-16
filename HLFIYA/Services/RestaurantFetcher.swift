@@ -51,7 +51,7 @@ struct BusinessFetcher {
         for business in businesses ?? [] {
             var containsGroceryCategory = false
             for category in business.categories ?? [] {
-                if category.alias == "grocery" || category.alias == "healthmarkets" || category.alias == "organic_stores" || category.alias == "convenience" || category.alias == "giftshops" {
+                if category.alias == "grocery" || category.alias == "intlgrocery" || category.alias == "ethicgrocery" || category.alias == "healthmarkets" || category.alias == "organic_stores" || category.alias == "convenience" || category.alias == "giftshops" {
                     containsGroceryCategory = true
                 }
             }

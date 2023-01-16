@@ -37,6 +37,7 @@ struct AllCategories {
             "mideastern",
             "pizza",
             "seafood",
+            "sportsbars",
             "steak",
             "sushi",
             "thai",
@@ -102,6 +103,8 @@ struct AllCategories {
             return "Pizza"
         case "seafood":
             return "Seafood"
+        case "sportsbars":
+            return "Sports Bars"
         case "steak":
             return "Steakhouses"
         case "sushi":
