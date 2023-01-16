@@ -46,12 +46,12 @@ struct BusinessFetcher {
         let response = try JSONDecoder().decode(Businesses.self, from: data)
         let businesses = response.businesses
         
-        // Filter out grocery and convenience stores
+        // Filter out grocery stores, convenience stores, and gift shops
         var filteredBusinesses = [Business]()
         for business in businesses ?? [] {
             var containsGroceryCategory = false
             for category in business.categories ?? [] {
-                if category.alias == "grocery" || category.alias == "healthmarkets" || category.alias == "organic_stores" || category.alias == "convenience" {
+                if category.alias == "grocery" || category.alias == "healthmarkets" || category.alias == "organic_stores" || category.alias == "convenience" || category.alias == "giftshops" {
                     containsGroceryCategory = true
                 }
             }
