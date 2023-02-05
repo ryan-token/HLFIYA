@@ -74,7 +74,7 @@ struct AboutView: View {
                                         .font(.headline)
                                         .foregroundColor(.primary)
                                     
-                                    Text("College Football Stat Rankings.")
+                                    Text("College football stat rankings")
                                         .multilineTextAlignment(.leading)
                                         .foregroundColor(.gray)
                                 }
@@ -100,7 +100,7 @@ struct AboutView: View {
                                         .font(.headline)
                                         .foregroundColor(.primary)
                                     
-                                    Text("Stay in touch with those who matter most.")
+                                    Text("Stay in touch with those who matter most")
                                         .multilineTextAlignment(.leading)
                                         .foregroundColor(.gray)
                                 }
