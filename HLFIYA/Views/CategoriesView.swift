@@ -110,7 +110,6 @@ struct CategoriesView: View {
         .accentColor(Color(UIColor(named: "fuchsia")!))
         
         .onAppear {
-            print("filters.openNow:", filters.openNow)
             onlyShowOpenNow = filters.openNow
             initialOpenNowValue = filters.openNow
             initialCategories = filters.categories

@@ -41,10 +41,7 @@ struct DeleteDataView: View {
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
                     Button {
-                        print("IsShowingClearCachesAlert: \(isShowingClearCachesAlert)")
-                        print("tapped clear caches")
                         isShowingClearCachesAlert = true
-                        print("IsShowingClearCachesAlert: \(isShowingClearCachesAlert)")
                     } label: {
                         Text("Clear Cached Yelp Data")
                             .padding()

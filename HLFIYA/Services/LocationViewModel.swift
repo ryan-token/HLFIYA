@@ -47,27 +47,3 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 
 }
-
-//extension LocationManager: CLLocationManagerDelegate {
-//    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-//        switch status{
-//        case .notDetermined:
-//            print("DEBUG: not determined")
-//        case .restricted:
-//            print("DEBUG: restricted")
-//        case .denied:
-//            print("DEBUG: denied")
-//        case .authorizedAlways:
-//            print("DEBUG: authorizedAlways")
-//        case .authorizedWhenInUse:
-//            print("DEBUG: authorizedWhenInUse")
-//        @unknown default:
-//            break
-//        }
-//    }
-//
-//    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-//        guard let location = locations.last else { return }
-//        self.location = location
-//    }
-//}

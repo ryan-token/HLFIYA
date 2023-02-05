@@ -55,7 +55,10 @@ struct MainView: View {
                     .font(Font.system(.title, design: .rounded))
                     .bold()
                     .padding(5)
-                    .animation(.default, value: currentRestaurantIndex)
+            } else {
+                ProgressView()
+                    .font(.largeTitle)
+                    .padding(5)
             }
             
             VStack(spacing: 10) {
@@ -66,7 +69,6 @@ struct MainView: View {
                         .bold()
                         .lineLimit(1)
                 }
-                .animation(.interactiveSpring(), value: filters.categories)
                 
                 HStack {
                     Text("Prices:")
@@ -74,7 +76,6 @@ struct MainView: View {
                     Text(filters.priceName)
                         .bold()
                 }
-                .animation(.interactiveSpring(), value: filters.priceName)
                 
                 HStack {
                     Text("Location:")
@@ -82,7 +83,6 @@ struct MainView: View {
                     Text("Within \(String(format:"%.1f", filters.customRadius)) Miles")
                         .bold()
                 }
-                .animation(.interactiveSpring(), value: filters.customRadius)
             }
             .font(Font.system(.body, design: .rounded))
             
@@ -107,7 +107,7 @@ struct MainView: View {
                     }
                 }
                 
-                if remainingRestaurantsInList == 0 && showRefreshButton && !noResultsFound {
+                if remainingRestaurantsInList <= 0 && showRefreshButton && !noResultsFound {
                     AsyncButton(action: {
                         let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices, onlyGetOpenNow: filters.openNow)
                         setState(fetchedBusinesses: fetchedBusinesses)
@@ -222,7 +222,6 @@ struct MainView: View {
         
         do {
             fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: customRadius), categories: categories, prices: stringPrices, onlyGetOpenNow: onlyGetOpenNow)
-            print("fetched businesses from API: \(fetchedBusinesses)")
         } catch {
             print("Request failed with error: \(error)")
             fetchedBusinesses = []
@@ -267,7 +266,6 @@ struct MainView: View {
     
     func useCachedIsOpenNowFilter() {
         let localIsOpenNowFilter = Utils.getIsOpenNowFilterCache()
-        print("localIsOpenNowFilter:", localIsOpenNowFilter)
         filters.openNow = localIsOpenNowFilter
     }
     

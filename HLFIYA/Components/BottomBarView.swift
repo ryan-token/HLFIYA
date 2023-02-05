@@ -84,26 +84,6 @@ struct BottomBarView: View {
             Spacer()
         }
     }
-    
-    func setPriceFilter(prices: Set<String>, name: String) async {
-        filters.prices = prices
-        filters.priceName = name
-        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices, onlyGetOpenNow: filters.openNow)
-        setState(fetchedBusinesses: fetchedBusinesses)
-    }
-    
-    func setState(fetchedBusinesses: [Business]) {
-        nearbyRestaurants = fetchedBusinesses
-        remainingRestaurantsInList = fetchedBusinesses.count
-        currentRestaurantIndex = 0
-        showRefreshButton = true
-        apiError = false
-        if fetchedBusinesses.isEmpty {
-            noResultsFound = true
-        } else {
-            noResultsFound = false
-        }
-    }
 }
 
 //struct BottomBarView_Previews: PreviewProvider {

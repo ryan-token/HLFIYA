@@ -47,15 +47,9 @@ class Utils {
         
         do {
             let localYelpCacheForBusiness = try String(contentsOf: localCacheUrl)
-            print("Local Yelp Cache for Business with id \(id):")
-            print(localYelpCacheForBusiness)
             
             let localCacheAsData = Data(localYelpCacheForBusiness.utf8)
-            print("Local cache as data:")
-            print(localCacheAsData)
             let localCacheAsBusiness = try! JSONDecoder().decode(BusinessDetails.self, from: localCacheAsData)
-            print("Local cache as businesses object:")
-            print(localCacheAsBusiness)
             
             return localCacheAsBusiness
         } catch {
@@ -82,7 +76,6 @@ class Utils {
         
         do {
             let isOpenNowCache = try String(contentsOf: localCacheUrl)
-            print("isOpenNowCache: \(isOpenNowCache)")
             if (isOpenNowCache == "true") {
                 return true
             } else {
@@ -102,7 +95,6 @@ class Utils {
         do {
             let result = try encoder.encode(categoriesStruct)
             if let jsonString = String(data: result, encoding: .utf8){
-                print("Categories JSON: \(jsonString)")
                 do {
                     try jsonString.write(to: cacheUrl, atomically: true, encoding: .utf8)
                 } catch {
@@ -137,7 +129,6 @@ class Utils {
         do {
             let result = try encoder.encode(pricesStruct)
             if let jsonString = String(data: result, encoding: .utf8){
-                print("Prices JSON: \(jsonString)")
                 do {
                     try jsonString.write(to: cacheUrl, atomically: true, encoding: .utf8)
                 } catch {
@@ -197,7 +188,6 @@ class Utils {
         do {
             let result = try encoder.encode(locationStruct)
             if let jsonString = String(data: result, encoding: .utf8){
-                print("Location JSON: \(jsonString)")
                 do {
                     try jsonString.write(to: cacheUrl, atomically: true, encoding: .utf8)
                 } catch {

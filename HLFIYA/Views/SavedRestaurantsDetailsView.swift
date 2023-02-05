@@ -266,7 +266,6 @@ struct SavedRestaurantsDetailsView: View {
     
     func addToList(list: SavedList, id: String, name: String) {
         let restaurant = SavedRestaurant(context: moc)
-        print("list restaurants: \(list.restaurantsArray)")
         if !list.restaurantsArray.contains(where: { $0.name == name }) {
             restaurant.addToLists(list)
             restaurant.id = id
@@ -288,7 +287,6 @@ struct SavedRestaurantsDetailsView: View {
             do {
                 let businessDetails = try await BusinessFetcher.getBusiness(id: id)
                 currentRestaurant = businessDetails
-                print(businessDetails)
                 apiError = false
             } catch {
                 print("Request failed with error: \(error)")

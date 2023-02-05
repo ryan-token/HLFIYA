@@ -89,7 +89,7 @@ struct BusinessFetcher {
         print("getting business with ID \(id)")
         let endpoint = "https://api.yelp.com/v3/businesses/\(id)"
         let cleanEndpoint = endpoint.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        print(cleanEndpoint)
+        print("getBusiness endpoint: \(cleanEndpoint)")
         
         guard let url = URL(string: cleanEndpoint) else {
             throw BusinessFetcherError.invalidURL

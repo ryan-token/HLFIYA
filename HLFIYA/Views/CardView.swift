@@ -187,9 +187,7 @@ struct CardView: View {
             Task {
                 do {
                     let restaurantDetails = try await BusinessFetcher.getBusiness(id: id)
-                    print("restaurantDetails: \(restaurantDetails)")
                     imageUrls = restaurantDetails.photos ?? [restaurant.image_url ?? ""]
-                    print("imageUrls: \(imageUrls)")
                     apiError = false
                     
                     if imageUrls.isEmpty {
@@ -225,8 +223,6 @@ struct CardView: View {
         restaurant.x = 0
         restaurant.degree = 0
         restaurant.y = 0
-        
-        print("almost swiped left")
     }
     
     func swipedLeft() {
@@ -234,7 +230,8 @@ struct CardView: View {
         restaurant.y = -12
         
         remainingRestaurantsInList -= 1
-        if remainingRestaurantsInList != 0 {
+        
+        if remainingRestaurantsInList > 0 {
             currentRestaurantIndex += 1
         }
         
@@ -243,16 +240,12 @@ struct CardView: View {
         addSwipeToCoreData(direction: "left")
         
         print("swiped left")
-        print("restaurantsSwipedLeft: \(restaurantsSwipedLeft)")
-        print("remaining restaurants: \(remainingRestaurantsInList)")
     }
     
     func almostSwipedRight() {
         restaurant.x = 0
         restaurant.degree = 0
         restaurant.y = 0
-        
-        print("almost swiped right")
     }
     
     func swipedRight() {

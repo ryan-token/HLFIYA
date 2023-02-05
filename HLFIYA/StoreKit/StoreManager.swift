@@ -48,8 +48,6 @@ class StoreManager: ObservableObject {
                     await isPurchased(product: product)
                 }
             }
-            
-            print(products)
         } catch {
             print(error)
         }
