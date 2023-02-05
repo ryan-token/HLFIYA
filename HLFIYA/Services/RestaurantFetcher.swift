@@ -14,7 +14,7 @@ struct BusinessFetcher {
     }
     
     // radius is in meters
-    static func getBusinessesNear(latitude: Double, longitude: Double, radius: Int, categories: Set<String>, prices: String) async throws -> [Business] {
+    static func getBusinessesNear(latitude: Double, longitude: Double, radius: Int, categories: Set<String>, prices: String, onlyGetOpenNow: Bool) async throws -> [Business] {
         var userCategories: Set = ["food"]
         if categories == userCategories { userCategories = ["food"] } else { userCategories = categories }
         let formattedCategories = userCategories.joined(separator: ",")
@@ -23,9 +23,15 @@ struct BusinessFetcher {
         if prices == "" { userPrice = "1, 2, 3, 4" } else { userPrice = prices }
         
         print("getting businesses near \(latitude), \(longitude), within a radius of \(radius) meters")
-        let endpoint = "https://api.yelp.com/v3/businesses/search?latitude=\(latitude)&longitude=\(longitude)&radius=\(radius)&limit=50&categories=\(formattedCategories)&price=\(userPrice)"
+        var endpoint = ""
+        if onlyGetOpenNow {
+            endpoint = "https://api.yelp.com/v3/businesses/search?latitude=\(latitude)&longitude=\(longitude)&radius=\(radius)&limit=50&categories=\(formattedCategories)&price=\(userPrice)&open_now=true"
+        } else {
+            endpoint = "https://api.yelp.com/v3/businesses/search?latitude=\(latitude)&longitude=\(longitude)&radius=\(radius)&limit=50&categories=\(formattedCategories)&price=\(userPrice)"
+        }
+        
         let cleanEndpoint = endpoint.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        print(cleanEndpoint)
+        print("hit endpoint: \(cleanEndpoint)")
         
         guard let url = URL(string: cleanEndpoint) else {
             throw BusinessFetcherError.invalidURL

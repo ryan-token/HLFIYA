@@ -9,6 +9,7 @@ import SwiftUI
 import MapKit
 
 class FiltersState: ObservableObject {
+    @Published var openNow = false
     @Published var categories: Set = ["food"]
     @Published var categoriesNames = "All Food"
     @Published var prices: Set = ["All Prices"] // send to api as "1,2,3,4"

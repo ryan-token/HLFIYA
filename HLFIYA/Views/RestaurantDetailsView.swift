@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct RestaurantDetailsView: View {
     var restaurant: Business
@@ -36,6 +37,7 @@ struct RestaurantDetailsView: View {
                     Button("Close") {
                         dismiss()
                     }
+                    .font(Font.system(.headline, design: .rounded))
                     .foregroundColor(Color(UIColor(named: "fuchsia")!))
                 }
                 .padding(.top, 10)
@@ -165,14 +167,6 @@ struct RestaurantDetailsView: View {
                 
                 Section(header: Text("Information")) {
                     HStack {
-                        Text("Currently Open:")
-                            .foregroundColor(.gray)
-                        Text(isOpenNow(currentRestaurant.hours?[0].is_open_now ?? false))
-                            .bold()
-                            .foregroundColor(currentRestaurant.hours?[0].is_open_now ?? false ? .green : .red)
-                    }
-                    
-                    HStack {
                         Text("Phone:")
                             .foregroundColor(.gray)
                         Button(action: {
@@ -277,6 +271,20 @@ struct RestaurantDetailsView: View {
             }
         }
         
+        .onDisappear {
+            let lastReviewDateString = Utils.getLastReviewRequestFromDocumentsDir()
+            let lastReviewDate = convertStringToDate(dateString: lastReviewDateString)
+            let sevenDaysAgo = Date.now.addingTimeInterval(-604800)
+            
+            if lastReviewDateString == "Unknown" || lastReviewDate < sevenDaysAgo {
+                if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+                    SKStoreReviewController.requestReview(in: scene)
+                }
+                
+                Utils.writeReviewDateToDocumentsDir(date: Date.now)
+            }
+        }
+        
         .alert("Added \(restaurant.name ?? "") to your \(listTappedName) list", isPresented: $isShowingAddedToListAlert) {
             Button("OK", role: .cancel) { }
         }
@@ -292,6 +300,13 @@ struct RestaurantDetailsView: View {
         .popover(isPresented: $isShowingCreateListSheet) {
             CreateListSheet()
         }
+    }
+    
+    func convertStringToDate(dateString: String) -> Date {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let date = dateFormatter.date(from: dateString) ?? Date.now
+        return date
     }
     
     func addToList(list: SavedList, id: String, name: String) {

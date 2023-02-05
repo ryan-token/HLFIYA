@@ -109,7 +109,7 @@ struct MainView: View {
                 
                 if remainingRestaurantsInList == 0 && showRefreshButton && !noResultsFound {
                     AsyncButton(action: {
-                        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+                        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices, onlyGetOpenNow: filters.openNow)
                         setState(fetchedBusinesses: fetchedBusinesses)
                     }, label: {
                         HStack {
@@ -155,12 +155,13 @@ struct MainView: View {
             if !localYelpCache.isEmpty {
                 setState(fetchedBusinesses: localYelpCache)
                 print("set state based on cached data")
+                useCachedIsOpenNowFilter()
                 useCachedCategoriesFilter()
                 useCachedPricesFilter()
                 useCachedLocationFilter()
             } else if nearbyRestaurants.isEmpty {
                 print("refreshing restaurants")
-                let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+                let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices, onlyGetOpenNow: filters.openNow)
                 setState(fetchedBusinesses: fetchedBusinesses)
                 print("set state based on network data")
             } else {
@@ -194,7 +195,7 @@ struct MainView: View {
     }
     
     // radius is in meters
-    static func refreshBusinesses(customLatitude: CLLocationDegrees, customLongitude: CLLocationDegrees, locationViewModel: LocationViewModel, customRadius: Double, categories: Set<String>, prices: Set<String>) async -> [Business] {
+    static func refreshBusinesses(customLatitude: CLLocationDegrees, customLongitude: CLLocationDegrees, locationViewModel: LocationViewModel, customRadius: Double, categories: Set<String>, prices: Set<String>, onlyGetOpenNow: Bool) async -> [Business] {
         var latitude: CLLocationDegrees
         var longitude: CLLocationDegrees
         var fetchedBusinesses: [Business]
@@ -220,7 +221,7 @@ struct MainView: View {
         }
         
         do {
-            fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: customRadius), categories: categories, prices: stringPrices)
+            fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: customRadius), categories: categories, prices: stringPrices, onlyGetOpenNow: onlyGetOpenNow)
             print("fetched businesses from API: \(fetchedBusinesses)")
         } catch {
             print("Request failed with error: \(error)")
@@ -262,6 +263,12 @@ struct MainView: View {
             HapticGenerator.playErrorHaptic()
             print("Failed purchase for \(product.id): \(error)")
         }
+    }
+    
+    func useCachedIsOpenNowFilter() {
+        let localIsOpenNowFilter = Utils.getIsOpenNowFilterCache()
+        print("localIsOpenNowFilter:", localIsOpenNowFilter)
+        filters.openNow = localIsOpenNowFilter
     }
     
     func useCachedCategoriesFilter() {

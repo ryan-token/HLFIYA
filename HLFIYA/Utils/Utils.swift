@@ -64,6 +64,36 @@ class Utils {
         }
     }
     
+    static func writeIsOpenNowFilterToCache(onlyShowOpenNow: Bool) {
+        let cacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("isOpenNowFilterCache.txt")
+        var onlyShowOpenNowString = "false"
+        if onlyShowOpenNow {
+            onlyShowOpenNowString = "true"
+        }
+        do {
+            try onlyShowOpenNowString.write(to: cacheUrl, atomically: true, encoding: .utf8)
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    static func getIsOpenNowFilterCache() -> Bool {
+        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("isOpenNowFilterCache.txt")
+        
+        do {
+            let isOpenNowCache = try String(contentsOf: localCacheUrl)
+            print("isOpenNowCache: \(isOpenNowCache)")
+            if (isOpenNowCache == "true") {
+                return true
+            } else {
+                return false
+            }
+        } catch {
+            print(error.localizedDescription)
+            return false
+        }
+    }
+    
     static func writeCategoriesFilterToCache(categories: Set<String>, categoriesNames: String) {
         let categoriesStruct = CategoriesFilter(categories: categories, categoriesNames: categoriesNames)
 
@@ -131,6 +161,31 @@ class Utils {
         } catch {
             print(error.localizedDescription)
             return PricesFilter(prices: ["All Prices"], priceName: "All Prices")
+        }
+    }
+    
+    static func writeReviewDateToDocumentsDir(date: Date) {
+        let lastReviewDateDoc = Utils.getDocumentsDirectory().appendingPathComponent("lastReviewData.txt")
+        let today = Date.now
+        let formatter = DateFormatter()
+        formatter.dateStyle = .full
+        let dateString = formatter.string(from: today)
+        do {
+            try dateString.write(to: lastReviewDateDoc, atomically: true, encoding: .utf8)
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    static func getLastReviewRequestFromDocumentsDir() -> String {
+        let lastReviewDateDoc = Utils.getDocumentsDirectory().appendingPathComponent("lastReviewData.txt")
+        
+        do {
+            let lastReviewDateString = try String(contentsOf: lastReviewDateDoc)
+            return lastReviewDateString
+        } catch {
+            print(error.localizedDescription)
+            return "Unknown"
         }
     }
     

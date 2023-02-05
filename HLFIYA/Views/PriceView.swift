@@ -82,7 +82,7 @@ struct PriceView: View {
                         AsyncButton(action: {
                             saveTapped = true
                             dismiss()
-                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices, onlyGetOpenNow: filters.openNow)
                             setState(fetchedBusinesses: fetchedBusinesses)
                             Utils.writePricesFilterToCache(prices: filters.prices, priceName: filters.priceName)
                         }) {

@@ -10,6 +10,8 @@ import SwiftUI
 struct CategoriesView: View {
     let yelpCategories = AllCategories().getYelpCategories()
     
+    @State private var onlyShowOpenNow = false
+    @State private var initialOpenNowValue = false
     @State private var initialCategories = Set([""])
     @State private var saveTapped = false
     @Binding var nearbyRestaurants: [Business]
@@ -28,36 +30,45 @@ struct CategoriesView: View {
         NavigationView {
             VStack {
                 List {
-                    ForEach(yelpCategories, id: \.self) { yelpCategory in
-                        MultiPicker(title: AllCategories().getFormattedCategory(from: yelpCategory), isSelected: filters.categories.contains(yelpCategory)) {
-                            // add or remove the selected category
-                            if filters.categories.contains(yelpCategory) {
-                                filters.categories.remove(yelpCategory)
-                            } else {
-                                filters.categories.insert(yelpCategory)
-                            }
-                            
-                            // Only allow 'All Food' to be selected if nothing else is selected
-                            if filters.categories.count > 0 {
-                                filters.categories.remove("food")
-                            } else {
-                                filters.categories = ["food"]
-                            }
-                            
-                            if filters.categories.count == yelpCategories.count-1 {
-                                filters.categories = ["food"]
-                            }
-                            
-                            // If user specifically selects 'All Food', deselect everything else
-                            if yelpCategory == "food" {
-                                filters.categories = ["food"]
-                            }
-                            
-                            // Set the categoriesNames option
-                            if filters.categories.count == 1 {
-                                filters.categoriesNames = AllCategories().getFormattedCategory(from: filters.categories.first!)
-                            } else {
-                                filters.categoriesNames = "\(AllCategories().getFormattedCategory(from: filters.categories.first!)) and \(filters.categories.count-1) More"
+                    Section(header: Text("Hours").foregroundColor(.gray), footer: Text("Toggle on to only show places that are currently open. Toggle off to show all places.").font(Font.system(.caption, design: .rounded))
+                        .foregroundColor(.gray)
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)) {
+                        Toggle("Currently Open", isOn: $onlyShowOpenNow)
+                    }
+                    
+                    Section(header: Text("Types").foregroundColor(.gray)) {
+                        ForEach(yelpCategories, id: \.self) { yelpCategory in
+                            MultiPicker(title: AllCategories().getFormattedCategory(from: yelpCategory), isSelected: filters.categories.contains(yelpCategory)) {
+                                // add or remove the selected category
+                                if filters.categories.contains(yelpCategory) {
+                                    filters.categories.remove(yelpCategory)
+                                } else {
+                                    filters.categories.insert(yelpCategory)
+                                }
+                                
+                                // Only allow 'All Food' to be selected if nothing else is selected
+                                if filters.categories.count > 0 {
+                                    filters.categories.remove("food")
+                                } else {
+                                    filters.categories = ["food"]
+                                }
+                                
+                                if filters.categories.count == yelpCategories.count-1 {
+                                    filters.categories = ["food"]
+                                }
+                                
+                                // If user specifically selects 'All Food', deselect everything else
+                                if yelpCategory == "food" {
+                                    filters.categories = ["food"]
+                                }
+                                
+                                // Set the categoriesNames option
+                                if filters.categories.count == 1 {
+                                    filters.categoriesNames = AllCategories().getFormattedCategory(from: filters.categories.first!)
+                                } else {
+                                    filters.categoriesNames = "\(AllCategories().getFormattedCategory(from: filters.categories.first!)) and \(filters.categories.count-1) More"
+                                }
                             }
                         }
                     }
@@ -68,6 +79,7 @@ struct CategoriesView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {
+                            onlyShowOpenNow = false
                             filters.categories = ["food"]
                             filters.categoriesNames = "All Food"
                         }) {
@@ -81,9 +93,11 @@ struct CategoriesView: View {
                         AsyncButton(action: {
                             saveTapped = true
                             dismiss()
-                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+                            filters.openNow = onlyShowOpenNow
+                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices, onlyGetOpenNow: filters.openNow)
                             setState(fetchedBusinesses: fetchedBusinesses)
                             Utils.writeCategoriesFilterToCache(categories: filters.categories, categoriesNames: filters.categoriesNames)
+                            Utils.writeIsOpenNowFilterToCache(onlyShowOpenNow: filters.openNow)
                         }) {
                             Text("Save")
                                 .font(Font.system(.headline, design: .rounded))
@@ -96,11 +110,15 @@ struct CategoriesView: View {
         .accentColor(Color(UIColor(named: "fuchsia")!))
         
         .onAppear {
+            print("filters.openNow:", filters.openNow)
+            onlyShowOpenNow = filters.openNow
+            initialOpenNowValue = filters.openNow
             initialCategories = filters.categories
         }
         
         .onDisappear {
             if !saveTapped {
+                onlyShowOpenNow = initialOpenNowValue
                 filters.categories = initialCategories
                 if filters.categories.count == 1 {
                     filters.categoriesNames = AllCategories().getFormattedCategory(from: filters.categories.first!)

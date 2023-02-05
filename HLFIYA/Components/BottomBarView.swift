@@ -91,7 +91,7 @@ struct BottomBarView: View {
     func setPriceFilter(prices: Set<String>, name: String) async {
         filters.prices = prices
         filters.priceName = name
-        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices, onlyGetOpenNow: filters.openNow)
         setState(fetchedBusinesses: fetchedBusinesses)
     }
     

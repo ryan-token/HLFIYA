@@ -106,7 +106,7 @@ struct MapView: View {
                         } else {
                             saveTapped = true
                             dismiss()
-                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices)
+                            let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices, onlyGetOpenNow: filters.openNow)
                             setState(fetchedBusinesses: fetchedBusinesses)
                             Utils.writeLocationFilterToCache(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, customRadius: filters.customRadius)
                         }
@@ -162,11 +162,11 @@ struct MapView: View {
     
     // latitudeDelta is the amount of degrees that are visible on the screen. 1 degree is equal to ~69 miles
     func convertRadiusToDegrees(radius: Double) -> Double {
-        return radius/69
+        return (radius/69) * 2
     }
 
     func convertDegreesToRadius(degrees: CLLocationDegrees) -> Double {
-        return Double(degrees)*69
+        return (Double(degrees)*69) / 2
     }
 
     func setState(fetchedBusinesses: [Business]) {
