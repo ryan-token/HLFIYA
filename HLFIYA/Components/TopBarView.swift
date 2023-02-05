@@ -22,6 +22,9 @@ struct TopBarView: View {
                     .foregroundColor(Color(UIColor(named: "fuchsia")!))
             }
             .accessibilityLabel("Settings")
+            .popover(isPresented: $isShowingSettingsView) {
+                SettingsView()
+            }
             
             Spacer()
             
@@ -33,11 +36,6 @@ struct TopBarView: View {
                     .foregroundColor(Color(UIColor(named: "fuchsia")!))
             }
             .accessibilityLabel("Lists")
-            
-            .popover(isPresented: $isShowingSettingsView) {
-                SettingsView()
-            }
-            
             .popover(isPresented: $isShowingListsView) {
                 ListsView()
             }

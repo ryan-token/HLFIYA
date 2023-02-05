@@ -39,6 +39,9 @@ struct BottomBarView: View {
                 }
             }
             .accessibilityLabel("Select Categories")
+            .popover(isPresented: $isShowingCategoriesView) {
+                CategoriesView(nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, showRefreshButton: $showRefreshButton, noResultsFound: $noResultsFound, apiError: $apiError, filters: filters)
+            }
             
             Spacer()
             
@@ -55,6 +58,9 @@ struct BottomBarView: View {
                 }
             }
             .accessibilityLabel("Select Prices")
+            .popover(isPresented: $isShowingPriceView) {
+                PriceView(nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, showRefreshButton: $showRefreshButton, noResultsFound: $noResultsFound, apiError: $apiError, filters: filters)
+            }
             
             Spacer()
             
@@ -71,20 +77,11 @@ struct BottomBarView: View {
                 }
             }
             .accessibilityLabel("Select Location")
-            
-            Spacer()
-            
-            .popover(isPresented: $isShowingPriceView) {
-                PriceView(nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, showRefreshButton: $showRefreshButton, noResultsFound: $noResultsFound, apiError: $apiError, filters: filters)
-            }
-        
-            .popover(isPresented: $isShowingCategoriesView) {
-                CategoriesView(nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, showRefreshButton: $showRefreshButton, noResultsFound: $noResultsFound, apiError: $apiError, filters: filters)
-            }
-            
             .popover(isPresented: $isShowingMapView) {
                 MapView(nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, showRefreshButton: $showRefreshButton, noResultsFound: $noResultsFound, apiError: $apiError, filters: filters)
             }
+            
+            Spacer()
         }
     }
     

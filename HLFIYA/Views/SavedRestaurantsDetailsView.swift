@@ -141,14 +141,6 @@ struct SavedRestaurantsDetailsView: View {
             
             Section(header: Text("Information")) {
                 HStack {
-                    Text("Currently Open:")
-                        .foregroundColor(.gray)
-                    Text(isOpenNow(currentRestaurant.hours?[0].is_open_now ?? false))
-                        .bold()
-                        .foregroundColor(currentRestaurant.hours?[0].is_open_now ?? false ? .green : .red)
-                }
-                
-                HStack {
                     Text("Phone:")
                         .foregroundColor(.gray)
                     Button(action: {
