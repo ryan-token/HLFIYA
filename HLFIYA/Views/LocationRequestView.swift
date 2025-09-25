@@ -10,7 +10,7 @@ import CoreLocation
 
 struct LocationRequestView: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var locationViewModel: LocationViewModel
+    @Environment(LocationViewModel.self) private var locationViewModel
     @AppStorage("userHasOpenedAppBefore") var userHasOpenedAppBefore = false
     
     @State private var showGetReady = false
@@ -233,12 +233,12 @@ struct LocationRequestView_Previews: PreviewProvider {
     static var previews: some View {
         LocationRequestView()
             .preferredColorScheme(.light)
-            .environmentObject(LocationViewModel())
+            .environment(LocationViewModel())
             .previewDevice(PreviewDevice(rawValue: "iPhone 13 Pro Max"))
         
         LocationRequestView()
             .preferredColorScheme(.light)
-            .environmentObject(LocationViewModel())
+            .environment(LocationViewModel())
             .previewDevice(PreviewDevice(rawValue: "iPhone 13 mini"))
     }
 }

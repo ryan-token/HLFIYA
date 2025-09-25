@@ -25,9 +25,9 @@ struct MainView: View {
     @State private var restaurantsSwipedLeft = [Business]()
     @State private var restaurantsSwipedRight = [Business]()
     
-    @StateObject var filters = FiltersState()
-    @StateObject var storeManager = StoreManager()
-    @EnvironmentObject var locationViewModel: LocationViewModel
+    @State var filters = FiltersState()
+    @State var storeManager = StoreManager()
+    @Environment(LocationViewModel.self) private var locationViewModel
     
     @Environment(\.managedObjectContext) var moc
     @AppStorage("userHasOpenedAppBefore") var userHasOpenedAppBefore = false
@@ -139,7 +139,7 @@ struct MainView: View {
                         }
                     }
                     GADBannerViewController()
-                        .frame(width: GADAdSizeBanner.size.width, height: GADAdSizeBanner.size.height)
+                        .frame(width: AdSizeBanner.size.width, height: AdSizeBanner.size.height)
                 }
             }
         }
@@ -187,7 +187,7 @@ struct MainView: View {
             }
         }
         
-        .environmentObject(storeManager)
+        .environment(storeManager)
         
         .alert(isPresented: $isShowingError, content: {
             Alert(title: Text(errorTitle), message: nil, dismissButton: .default(Text("Okay")))
@@ -298,6 +298,6 @@ struct MainView: View {
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         MainView()
-            .environmentObject(LocationViewModel())
+            .environment(LocationViewModel())
     }
 }

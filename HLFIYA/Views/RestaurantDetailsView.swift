@@ -24,8 +24,8 @@ struct RestaurantDetailsView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.openURL) var openURL
     @Environment(\.managedObjectContext) var moc
-    
-    @EnvironmentObject var locationViewModel: LocationViewModel
+    @Environment(LocationViewModel.self) private var locationViewModel
+
     @FetchRequest(sortDescriptors: [SortDescriptor(\.name)]) var savedLists: FetchedResults<SavedList>
     
     var body: some View {

@@ -7,10 +7,11 @@
 
 import CoreLocation
 
-class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
-    @Published var authorizationStatus: CLAuthorizationStatus
-    @Published var location: CLLocation?
-    @Published var currentPlacemark: CLPlacemark?
+@Observable
+class LocationViewModel: NSObject, CLLocationManagerDelegate, @unchecked Sendable {
+    var authorizationStatus: CLAuthorizationStatus
+    var location: CLLocation?
+    var currentPlacemark: CLPlacemark?
     
     private let locationManager: CLLocationManager
 
@@ -33,17 +34,24 @@ class LocationViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        // print("new location: \(locations.first)")
         location = locations.first
-        fetchCountryAndCity(for: locations.first)
-    }
-    
-    func fetchCountryAndCity(for location: CLLocation?) {
-        guard let location = location else { return }
-        let geocoder = CLGeocoder()
-        geocoder.reverseGeocodeLocation(location) { (placemarks, error) in
-            self.currentPlacemark = placemarks?.first
+
+        Task { @MainActor in
+            await fetchCountryAndCity(for: locations.first)
         }
     }
 
+    @MainActor
+    func fetchCountryAndCity(for location: CLLocation?) async {
+        guard let location = location else { return }
+        let geocoder = CLGeocoder()
+
+        do {
+            let placemarks = try await geocoder.reverseGeocodeLocation(location)
+            currentPlacemark = placemarks.first
+        } catch {
+            print("Geocoding error: \(error)")
+            currentPlacemark = nil
+        }
+    }
 }

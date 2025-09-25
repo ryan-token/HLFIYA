@@ -19,8 +19,8 @@ struct BottomBarView: View {
     @Binding var noResultsFound: Bool
     @Binding var apiError: Bool
     
-    @EnvironmentObject var locationViewModel: LocationViewModel
-    @ObservedObject var filters: FiltersState
+    @Environment(LocationViewModel.self) private var locationViewModel
+    var filters: FiltersState
     
     var body: some View {
         HStack {

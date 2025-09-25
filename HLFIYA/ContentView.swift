@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var locationViewModel = LocationViewModel()
+    @State private var locationViewModel = LocationViewModel()
     @Environment(\.managedObjectContext) var moc
     
     var body: some View {
@@ -16,14 +16,14 @@ struct ContentView: View {
             case .notDetermined:
                 if (locationViewModel.location != nil) {
                     MainView()
-                        .environmentObject(locationViewModel)
+                        .environment(locationViewModel)
                 } else {
                     LocationRequestView()
-                        .environmentObject(locationViewModel)
+                        .environment(locationViewModel)
                 }
             default:
                 MainView()
-                    .environmentObject(locationViewModel)
+                    .environment(locationViewModel)
         }
     }
 }

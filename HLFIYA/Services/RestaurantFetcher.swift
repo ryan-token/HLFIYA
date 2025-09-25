@@ -81,7 +81,7 @@ struct BusinessFetcher {
             print(error.localizedDescription)
         }
         
-        HapticGenerator.playSuccessHaptic()
+        await HapticGenerator.playSuccessHaptic()
         return shuffledBusinesses
     }
     

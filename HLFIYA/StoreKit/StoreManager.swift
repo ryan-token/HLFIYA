@@ -5,7 +5,6 @@
 //  Created by Ryan Token on 6/11/22.
 //
 
-
 import StoreKit
 
 typealias Transaction = StoreKit.Transaction
@@ -14,35 +13,36 @@ public enum StoreError: Error {
     case failedVerification
 }
 
-class StoreManager: ObservableObject {
-    @Published private(set) var products: [Product]
-    @Published private(set) var purchasedIds = Set<String>()
-    
+@Observable
+class StoreManager: @unchecked Sendable {
+    private(set) var products: [Product]
+    private(set) var purchasedIds = Set<String>()
+
     var updateListenerTask: Task<Void, Error>? = nil
-    
+
     init() {
         products = []
         purchasedIds = []
-        
+
         //Start a transaction listener as close to app launch as possible so you don't miss any transactions.
         updateListenerTask = listenForTransactions()
-        
-        Task {
+
+        Task { @MainActor [weak self] in
             //Initialize the store by starting a product request.
-            await fetchProducts()
+            await self?.fetchProducts()
         }
     }
-    
+
     deinit {
         updateListenerTask?.cancel()
     }
-    
+
     @MainActor
     func fetchProducts() async {
         do {
             let products = try await Product.products(for: ["nonconsumable.removeAds"])
             self.products = products
-            
+
             for product in products {
                 if product.id == "nonconsumable.removeAds" {
                     await isPurchased(product: product)
@@ -52,33 +52,31 @@ class StoreManager: ObservableObject {
             print(error)
         }
     }
-    
+
     func isPurchased(product: Product) async {
         guard let state = await product.currentEntitlement else { return }
-        
+
         switch state {
         case .verified(let transaction):
-            DispatchQueue.main.async {
-                self.purchasedIds.insert(transaction.productID)
-            }
+            purchasedIds.insert(transaction.productID)
         case .unverified(_, _):
             print("Unverified transaction")
         }
     }
-    
+
     func purchase(_ product: Product) async throws -> Transaction? {
         let result = try await product.purchase()
-        
+
         switch result {
         case .success(let verification):
             let transaction = try checkVerified(verification)
-            
+
             // Deliver content to the user
             await updatePurchasedIdentifiers(transaction)
-            
+
             // Always finish a transaction
             await transaction.finish()
-            
+
             return transaction
         case .userCancelled, .pending:
             print("user cancelled transaction")
@@ -88,7 +86,7 @@ class StoreManager: ObservableObject {
             return nil
         }
     }
-    
+
     func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
         print("checking verified")
         //Check if the transaction passes StoreKit verification.
@@ -103,27 +101,24 @@ class StoreManager: ObservableObject {
             return safe
         }
     }
-    
+
     @MainActor
     func updatePurchasedIdentifiers(_ transaction: Transaction) async {
         print("updating purchased IDs")
         if transaction.revocationDate == nil {
             //If the App Store has not revoked the transaction, add it to the list of `purchasedIdentifiers`.
-            DispatchQueue.main.async {
-                self.purchasedIds.insert(transaction.productID)
-            }
+            self.purchasedIds.insert(transaction.productID)
         } else {
             //If the App Store has revoked this transaction, remove it from the list of `purchasedIdentifiers`.
-            DispatchQueue.main.async {
-                self.purchasedIds.remove(transaction.productID)
-            }
+            self.purchasedIds.remove(transaction.productID)
         }
     }
-    
+
     func listenForTransactions() -> Task<Void, Error> {
-        return Task.detached {
+        return Task.detached { @Sendable [weak self] in
             //Iterate through any transactions which didn't come from a direct call to `purchase()`.
             for await result in Transaction.updates {
+                guard let self = self else { return }
                 do {
                     let transaction = try self.checkVerified(result)
 

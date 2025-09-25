@@ -10,8 +10,8 @@ import StoreKit
 
 struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var storeManager: StoreManager
-    
+    @Environment(StoreManager.self) private var storeManager
+
     @State private var isShowingAboutScreen = false
     @State private var isShowingPrivacyActionSheet = false
     @State private var isShowingError = false
@@ -249,6 +249,6 @@ struct SettingsView: View {
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView()
-            .environmentObject(StoreManager())
+            .environment(StoreManager())
     }
 }
