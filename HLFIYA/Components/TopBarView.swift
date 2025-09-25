@@ -13,28 +13,35 @@ struct TopBarView: View {
     
     var body: some View {
         HStack {
-            
-            Button(action: {
-                isShowingSettingsView.toggle()
-            }) {
-                Image(systemName: "gear")
-                    .font(Font.system(size: 30, weight: .semibold, design: .rounded))
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
-            }
+            GlassButton(
+                action: {
+                    isShowingSettingsView.toggle()
+                },
+                label: {
+                    Image(systemName: "gear")
+                        .font(Font.system(size: 30, weight: .semibold, design: .rounded))
+                },
+                tintColor: Color(UIColor(named: "fuchsia")!),
+                style: .standard
+            )
             .accessibilityLabel("Settings")
             .popover(isPresented: $isShowingSettingsView) {
                 SettingsView()
             }
             
             Spacer()
-            
-            Button(action: {
-                isShowingListsView.toggle()
-            }) {
-                Image(systemName: "list.bullet")
-                    .font(Font.system(size: 30, weight: .semibold, design: .rounded))
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
-            }
+
+            GlassButton(
+                action: {
+                    isShowingListsView.toggle()
+                },
+                label: {
+                    Image(systemName: "list.bullet")
+                        .font(Font.system(size: 30, weight: .semibold, design: .rounded))
+                },
+                tintColor: Color(UIColor(named: "fuchsia")!),
+                style: .standard
+            )
             .accessibilityLabel("Lists")
             .popover(isPresented: $isShowingListsView) {
                 ListsView()

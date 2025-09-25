@@ -21,22 +21,29 @@ struct BottomBarView: View {
     
     @Environment(LocationViewModel.self) private var locationViewModel
     var filters: FiltersState
-    
+
+    let buttonSize: CGFloat = 30
+
     var body: some View {
         HStack {
             Spacer()
-            
-            Button(action: {
-                isShowingCategoriesView.toggle()
-            }) {
-                VStack(spacing: 5) {
-                    Image(systemName: "line.3.horizontal.decrease.circle.fill")
-                        .font(Font.system(size: 50, design: .rounded))
-                        .foregroundColor(.pink)
-                    Text("Categories")
-                        .font(Font.system(.body, design: .rounded))
-                        .foregroundColor(.gray)
-                }
+
+            VStack(spacing: 5) {
+                GlassButton(
+                    action: {
+                        isShowingCategoriesView.toggle()
+                    },
+                    label: {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                            .font(Font.system(size: buttonSize, design: .rounded))
+                    },
+                    tintColor: .pink,
+                    style: .prominent
+                )
+
+                Text("Categories")
+                    .font(Font.system(.body, design: .rounded))
+                    .foregroundColor(.gray)
             }
             .accessibilityLabel("Select Categories")
             .popover(isPresented: $isShowingCategoriesView) {
@@ -44,18 +51,23 @@ struct BottomBarView: View {
             }
             
             Spacer()
-            
-            Button(action: {
-                isShowingPriceView.toggle()
-            }) {
-                VStack(spacing: 5) {
-                    Image(systemName: "dollarsign.circle.fill")
-                        .font(Font.system(size: 50, design: .rounded))
-                        .foregroundColor(.green)
-                    Text("Prices")
-                        .font(Font.system(.body, design: .rounded))
-                        .foregroundColor(.gray)
-                }
+
+            VStack(spacing: 5) {
+                GlassButton(
+                    action: {
+                        isShowingPriceView.toggle()
+                    },
+                    label: {
+                        Image(systemName: "dollarsign.circle")
+                            .font(Font.system(size: buttonSize, design: .rounded))
+                    },
+                    tintColor: .green,
+                    style: .prominent
+                )
+
+                Text("Price")
+                    .font(Font.system(.body, design: .rounded))
+                    .foregroundColor(.gray)
             }
             .accessibilityLabel("Select Prices")
             .popover(isPresented: $isShowingPriceView) {
@@ -63,18 +75,23 @@ struct BottomBarView: View {
             }
             
             Spacer()
-            
-            Button(action: {
-                isShowingMapView.toggle()
-            }) {
-                VStack(spacing: 5) {
-                    Image(systemName: "map.circle.fill")
-                        .font(Font.system(size: 50, design: .rounded))
-                        .foregroundColor(.blue)
-                    Text("Location")
-                        .font(Font.system(.body, design: .rounded))
-                        .foregroundColor(.gray)
-                }
+
+            VStack(spacing: 5) {
+                GlassButton(
+                    action: {
+                        isShowingMapView.toggle()
+                    },
+                    label: {
+                        Image(systemName: "map.circle")
+                            .font(Font.system(size: buttonSize, design: .rounded))
+                    },
+                    tintColor: .blue,
+                    style: .prominent
+                )
+
+                Text("Location")
+                    .font(Font.system(.body, design: .rounded))
+                    .foregroundColor(.gray)
             }
             .accessibilityLabel("Select Location")
             .popover(isPresented: $isShowingMapView) {
