@@ -10,6 +10,9 @@ import MapKit
 import CoreLocation
 
 struct MapView: View {
+    @Environment(LocationViewModel.self) private var locationViewModel
+    @Environment(\.dismiss) var dismiss
+
     @State var position: MapCameraPosition = .userLocation(followsHeading: true, fallback: .automatic)
     @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 37.334633, longitude: -122.012682), span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
     @State private var isShowingRadiusTooLargeAlert = false
@@ -17,26 +20,23 @@ struct MapView: View {
     @State private var initialLongitude: CLLocationDegrees = 0.000000
     @State private var initialRadius = 5.0
     @State private var saveTapped = false
-    
+
     @Binding var nearbyRestaurants: [Business]
     @Binding var remainingRestaurantsInList: Int
     @Binding var currentRestaurantIndex: Int
     @Binding var showRefreshButton: Bool
     @Binding var noResultsFound: Bool
     @Binding var apiError: Bool
-    
-    var filters: FiltersState
-    @Environment(LocationViewModel.self) private var locationViewModel
 
-    @Environment(\.dismiss) var dismiss
-    
+    var filters: FiltersState
+
     var body: some View {
         NavigationView {
             VStack(spacing: 10) {
                 Text("Choose Location")
                     .font(Font.system(.largeTitle, design: .rounded))
                     .bold()
-                
+
                 HStack {
                     Text("Radius:")
                         .foregroundColor(.gray)
@@ -44,25 +44,37 @@ struct MapView: View {
                         .bold()
                 }
                 .font(Font.system(.body, design: .rounded))
-                
-                Map(position: $position)
-                    .mapControlVisibility(.automatic)
-                    .clipShape(Circle())
-                    .padding(.horizontal)
+
+                Map(position: $position) {
+                    UserAnnotation()
+                }
+                .mapControlVisibility(.automatic)
+                .clipShape(Circle())
+                .padding(.horizontal)
+                .onMapCameraChange(frequency: .continuous) { context in
+                    // Update the region state when the map camera changes
+                    region = MKCoordinateRegion(
+                        center: context.camera.centerCoordinate,
+                        span: MKCoordinateSpan(
+                            latitudeDelta: context.region.span.latitudeDelta,
+                            longitudeDelta: context.region.span.longitudeDelta
+                        )
+                    )
+                }
             }
-        
+
             .onChange(of: region.center.latitude) {
                 filters.customLatitude = region.center.latitude
             }
-            
+
             .onChange(of: region.center.longitude) {
                 filters.customLongitude = region.center.longitude
             }
-            
+
             .onChange(of: region.span.longitudeDelta) {
                 filters.customRadius = convertDegreesToRadius(degrees: region.span.longitudeDelta)
             }
-        
+
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     switch locationViewModel.authorizationStatus{
@@ -80,16 +92,19 @@ struct MapView: View {
                             Text("Allow Location in Settings")
                                 .font(Font.system(.headline, design: .rounded))
                         }
-                        
+
                     case .authorizedAlways, .authorizedWhenInUse:
                         Button(action: {
                             if let location = locationViewModel.location {
                                 let latitude = location.coordinate.latitude
                                 let longitude = location.coordinate.longitude
-                                
+
                                 let degrees = convertRadiusToDegrees(radius: 5.0)
-                                
+
                                 region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: MKCoordinateSpan(latitudeDelta: degrees, longitudeDelta: degrees))
+
+                                // Update the map position as well
+                                position = .region(region)
                             }
                         }) {
                             Text("Reset to Current Location")
@@ -99,7 +114,7 @@ struct MapView: View {
                         Text("")
                     }
                 }
-                
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     AsyncButton(action: {
                         if (filters.customRadius > 24.854847) {
@@ -117,50 +132,53 @@ struct MapView: View {
                     }
                 }
             }
-            
+
             .alert("Radius must be less than 25 miles. Please zoom in.", isPresented: $isShowingRadiusTooLargeAlert) {
                 Button("OK", role: .cancel) { }
             }
         }
         .navigationViewStyle(.stack)
         .accentColor(Color(UIColor(named: "fuchsia")!))
-        
+
         .onAppear {
             initialLatitude = filters.customLatitude
             initialLongitude = filters.customLongitude
             initialRadius = filters.customRadius
-            
+
             if let location = locationViewModel.location {
                 var latitude = location.coordinate.latitude
                 var longitude = location.coordinate.longitude
-                
+
                 // the customLatitude & customLongitude filters aren't set to 0.000000, and they aren't set to your current location, then use that custom location
                 // otherwise, use your current location
                 if ((filters.customLatitude != 0.000000 && filters.customLongitude != 0.000000) && (filters.customLatitude != latitude || filters.customLongitude != longitude)) {
                     latitude = filters.customLatitude
                     longitude = filters.customLongitude
                 }
-                
+
                 let degrees = convertRadiusToDegrees(radius: filters.customRadius)
                 region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: MKCoordinateSpan(latitudeDelta: degrees, longitudeDelta: degrees))
+
+                // Set the initial position to match the region
+                position = .region(region)
             } else {
                 print("no location")
             }
         }
-        
+
         .onDisappear {
             if !saveTapped {
                 filters.customLatitude = initialLatitude
                 filters.customLongitude = initialLongitude
                 filters.customRadius = initialRadius
             }
-            
+
             if filters.customRadius > 24.854847 {
                 filters.customRadius = 24.854847
             }
         }
     }
-    
+
     // latitudeDelta is the amount of degrees that are visible on the screen. 1 degree is equal to ~69 miles
     func convertRadiusToDegrees(radius: Double) -> Double {
         return (radius/69) * 2
