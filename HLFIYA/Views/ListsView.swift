@@ -17,35 +17,42 @@ struct ListsView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
-                List {
-                    ForEach(savedLists, id: \.self) { list in
-                        NavigationLink(destination: SavedRestaurantsView(list: list)) {
-                            Text(list.wrappedName)
-                        }
-                        .isDetailLink(false)
-                    }
-                    .onDelete(perform: removeList)
-                    
-                    if (savedLists.isEmpty) {
-                        Text("Create lists to easily save places for later.")
-                            .foregroundColor(.gray)
-                    }
-                }
-                .font(Font.system(.body, design: .rounded))
-                
-                Button(action: {
-                    isShowingCreateListSheet.toggle()
-                }) {
-                    HStack {
-                        Image(systemName: "plus.square.fill")
-                            .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                        Text("Create List")
-                            .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                    }
-                }
-                .font(Font.system(.headline, design: .rounded))
-            }
+			ZStack {
+				List {
+					ForEach(savedLists, id: \.self) { list in
+						NavigationLink(destination: SavedRestaurantsView(list: list)) {
+							Text(list.wrappedName)
+						}
+						.isDetailLink(false)
+					}
+					.onDelete(perform: removeList)
+
+					if (savedLists.isEmpty) {
+						Text("Create lists to easily save places for later.")
+							.foregroundColor(.gray)
+					}
+				}
+				.font(Font.system(.body, design: .rounded))
+				.safeAreaInset(edge: .bottom) {
+					Color.clear.frame(height: 5)
+				}
+
+				VStack {
+					Spacer()
+
+					GlassButton {
+						isShowingCreateListSheet.toggle()
+					} label: {
+						HStack {
+							Image(systemName: "plus.square.fill")
+								.foregroundColor(Color(UIColor(named: "fuchsia")!))
+							Text("Create List")
+								.foregroundColor(Color(UIColor(named: "fuchsia")!))
+						}
+					}
+					.font(Font.system(.headline, design: .rounded))
+				}
+			}
             .environment(\.editMode, $editMode)
             
             .popover(isPresented: $isShowingCreateListSheet) {

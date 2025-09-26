@@ -13,7 +13,7 @@ struct TopBarView: View {
     
     var body: some View {
         HStack {
-            GlassButton(
+            TintedGlassButton(
                 action: {
                     isShowingSettingsView.toggle()
                 },
@@ -31,7 +31,7 @@ struct TopBarView: View {
             
             Spacer()
 
-            GlassButton(
+            TintedGlassButton(
                 action: {
                     isShowingListsView.toggle()
                 },

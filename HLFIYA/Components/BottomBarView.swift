@@ -29,7 +29,7 @@ struct BottomBarView: View {
             Spacer()
 
             VStack(spacing: 5) {
-                GlassButton(
+                TintedGlassButton(
                     action: {
                         isShowingCategoriesView.toggle()
                     },
@@ -53,7 +53,7 @@ struct BottomBarView: View {
             Spacer()
 
             VStack(spacing: 5) {
-                GlassButton(
+                TintedGlassButton(
                     action: {
                         isShowingPriceView.toggle()
                     },
@@ -77,7 +77,7 @@ struct BottomBarView: View {
             Spacer()
 
             VStack(spacing: 5) {
-                GlassButton(
+                TintedGlassButton(
                     action: {
                         isShowingMapView.toggle()
                     },
