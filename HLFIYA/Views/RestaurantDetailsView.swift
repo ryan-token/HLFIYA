@@ -30,22 +30,6 @@ struct RestaurantDetailsView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            VStack {
-                HStack {
-                    Spacer()
-                    
-                    Button("Close") {
-                        dismiss()
-                    }
-                    .font(Font.system(.headline, design: .rounded))
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                }
-                .padding(.top, 10)
-                .padding(.trailing, 15)
-            }
-            
-            Spacer()
-            
             if apiError {
                 Text("😕 Error loading business details")
                     .font(Font.system(.body, design: .rounded))
@@ -54,12 +38,20 @@ struct RestaurantDetailsView: View {
             }
             
             List {
+				Button("Close") {
+					dismiss()
+				}
+				.frame(maxWidth: .infinity, alignment: .trailing)
+				.font(Font.system(.headline, design: .rounded))
+				.foregroundColor(Color(UIColor(named: "fuchsia")!))
+				.listRowBackground(Color.clear)
+				.listRowSeparator(.hidden)
+
                 Text(currentRestaurant.name ?? "")
                     .font(Font.system(.title2, design: .rounded))
                     .bold()
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
-                    .listRowInsets(EdgeInsets())
                 VStack(alignment: .leading, spacing: 5) {
                     StarRatingView(rating: currentRestaurant.rating ?? 0.0, label: "Rating:", reviewCount: currentRestaurant.review_count)
                     DollarView(price: currentRestaurant.price ?? "", label: "Price:")

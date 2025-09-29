@@ -34,7 +34,7 @@ struct ListsView: View {
 				}
 				.font(Font.system(.body, design: .rounded))
 				.safeAreaInset(edge: .bottom) {
-					Color.clear.frame(height: 5)
+					Color.clear.frame(height: 20)
 				}
 
 				VStack {

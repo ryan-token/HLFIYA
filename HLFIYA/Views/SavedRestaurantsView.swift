@@ -17,41 +17,44 @@ struct SavedRestaurantsView: View {
     @FetchRequest(sortDescriptors: [SortDescriptor(\.name)]) var savedRestaurants: FetchedResults<SavedRestaurant>
     
     var body: some View {
-        List {
-            if (list.restaurantsArray.isEmpty) {
-                Text("No places added to your \(list.wrappedName) list. Swipe right on a card to add some!")
-                    .foregroundColor(.gray)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            
-            ForEach(list.restaurantsArray) { restaurant in
-                NavigationLink(destination: SavedRestaurantsDetailsView(restaurantId: restaurant.wrappedId)) {
-                    Text(restaurant.wrappedName)
-                }
-            }
-            .onDelete(perform: { offsets in
-                removeRestaurantFromList(at: offsets, from: list)
-            })
+        ZStack {
+        	List {
+				if (list.restaurantsArray.isEmpty) {
+					Text("No places added to your \(list.wrappedName) list. Swipe right on a card to add some!")
+						.foregroundColor(.gray)
+						.fixedSize(horizontal: false, vertical: true)
+				}
+
+				ForEach(list.restaurantsArray) { restaurant in
+					NavigationLink(destination: SavedRestaurantsDetailsView(restaurantId: restaurant.wrappedId)) {
+						Text(restaurant.wrappedName)
+					}
+				}
+				.onDelete(perform: { offsets in
+					removeRestaurantFromList(at: offsets, from: list)
+				})
+			}
+			.font(Font.system(.body, design: .rounded))
+			.safeAreaInset(edge: .bottom) {
+				Color.clear.frame(height: 20)
+			}
+
+			VStack {
+				Spacer()
+				GlassButton {
+					isShowingUpdateListNameAlertForiOS16 = true
+				} label: {
+					HStack {
+						Image(systemName: "pencil")
+							.foregroundColor(Color(UIColor(named: "fuchsia")!))
+						Text("Change List Name")
+							.foregroundColor(Color(UIColor(named: "fuchsia")!))
+					}
+				}
+				.font(Font.system(.headline, design: .rounded))
+			}
         }
-        .font(Font.system(.body, design: .rounded))
-        
-        
-        Button(action: {
-            if #available(iOS 16, *) {
-                isShowingUpdateListNameAlertForiOS16 = true
-            } else {
-                isShowingUpdateListNameSheetForiOS15 = true
-            }
-        }) {
-            HStack {
-                Image(systemName: "pencil")
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                Text("Change List Name")
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
-            }
-        }
-        .font(Font.system(.headline, design: .rounded))
-        
+
         .alert("Change List Name", isPresented: $isShowingUpdateListNameAlertForiOS16) {
             TextField("New List Name", text: $newListName)
                 .textInputAutocapitalization(.words)

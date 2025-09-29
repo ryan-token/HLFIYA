@@ -33,7 +33,6 @@ struct SavedRestaurantsDetailsView: View {
                 .bold()
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
-                .listRowInsets(EdgeInsets())
             VStack(alignment: .leading, spacing: 5) {
                 StarRatingView(rating: currentRestaurant.rating ?? 0.0, label: "Rating:", reviewCount: currentRestaurant.review_count)
                 DollarView(price: currentRestaurant.price ?? "", label: "Price:")
