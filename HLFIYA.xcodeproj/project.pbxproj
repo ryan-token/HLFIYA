@@ -39,7 +39,6 @@
 		F47A9D0728441BCB00161653 /* PriceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47A9D0628441BCB00161653 /* PriceView.swift */; };
 		F47A9D0A28441C7600161653 /* AllPrices.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47A9D0928441C7600161653 /* AllPrices.swift */; };
 		F483659B2973269800F94A92 /* Calendar+numberOfDaysBetween.swift in Sources */ = {isa = PBXBuildFile; fileRef = F483659A2973269800F94A92 /* Calendar+numberOfDaysBetween.swift */; };
-		F483659D2974879400F94A92 /* EditListNameSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F483659C2974879400F94A92 /* EditListNameSheet.swift */; };
 		F48456F12895DA910037A1B7 /* View+If.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48456F02895DA910037A1B7 /* View+If.swift */; };
 		F484972A28261CC500C2DB89 /* Swipe+FetchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F484972928261CC500C2DB89 /* Swipe+FetchRequest.swift */; };
 		F484972F28261D9400C2DB89 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F484972E28261D9400C2DB89 /* CloudKit.framework */; };
@@ -101,7 +100,6 @@
 		F47A9D0628441BCB00161653 /* PriceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceView.swift; sourceTree = "<group>"; };
 		F47A9D0928441C7600161653 /* AllPrices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllPrices.swift; sourceTree = "<group>"; };
 		F483659A2973269800F94A92 /* Calendar+numberOfDaysBetween.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calendar+numberOfDaysBetween.swift"; sourceTree = "<group>"; };
-		F483659C2974879400F94A92 /* EditListNameSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditListNameSheet.swift; sourceTree = "<group>"; };
 		F48456F02895DA910037A1B7 /* View+If.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+If.swift"; sourceTree = "<group>"; };
 		F484972928261CC500C2DB89 /* Swipe+FetchRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Swipe+FetchRequest.swift"; sourceTree = "<group>"; };
 		F484972B28261D8000C2DB89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -204,7 +202,6 @@
 				F45B3F2C27970140003DCC31 /* BottomBarView.swift */,
 				F4D407412824C599009805CB /* MultiPicker.swift */,
 				F4BC0C212855017100D76EE5 /* CreateListSheet.swift */,
-				F483659C2974879400F94A92 /* EditListNameSheet.swift */,
 				F47742BF2E850B7C009A318B /* TintedGlassButton.swift */,
 				F47743222E86471E009A318B /* GlassButton.swift */,
 			);
@@ -443,7 +440,6 @@
 				F4BC0C302856468100D76EE5 /* HapticGenerator.swift in Sources */,
 				F4BC0C2D28555FA100D76EE5 /* StoreManager.swift in Sources */,
 				F4130FAA28541A3D0007D7E0 /* SavedList+FetchRequest.swift in Sources */,
-				F483659D2974879400F94A92 /* EditListNameSheet.swift in Sources */,
 				F49820F128178B2800035D1C /* DollarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

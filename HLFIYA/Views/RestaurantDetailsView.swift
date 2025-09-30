@@ -29,227 +29,227 @@ struct RestaurantDetailsView: View {
     @FetchRequest(sortDescriptors: [SortDescriptor(\.name)]) var savedLists: FetchedResults<SavedList>
     
     var body: some View {
-        VStack(alignment: .leading) {
-            if apiError {
-                Text("😕 Error loading business details")
-                    .font(Font.system(.body, design: .rounded))
-                    .foregroundColor(.gray)
-                    .padding(.leading)
-            }
-            
-            List {
-				Button("Close") {
-					dismiss()
-				}
-				.frame(maxWidth: .infinity, alignment: .trailing)
-				.font(Font.system(.headline, design: .rounded))
-				.foregroundColor(Color(UIColor(named: "fuchsia")!))
+		List {
+			Button("Close") {
+				dismiss()
+			}
+			.frame(maxWidth: .infinity, alignment: .trailing)
+			.font(Font.system(.headline, design: .rounded))
+			.foregroundColor(Color(UIColor(named: "fuchsia")!))
+			.listRowBackground(Color.clear)
+			.listRowSeparator(.hidden)
+
+			if apiError {
+				Text("😕 Error loading business details")
+					.font(Font.system(.body, design: .rounded))
+					.foregroundColor(.gray)
+					.padding(.leading)
+					.frame(maxWidth: .infinity, alignment: .center)
+			}
+
+			Text(currentRestaurant.name ?? "")
+				.font(Font.system(.title2, design: .rounded))
+				.bold()
 				.listRowBackground(Color.clear)
 				.listRowSeparator(.hidden)
 
-                Text(currentRestaurant.name ?? "")
-                    .font(Font.system(.title2, design: .rounded))
-                    .bold()
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-                VStack(alignment: .leading, spacing: 5) {
-                    StarRatingView(rating: currentRestaurant.rating ?? 0.0, label: "Rating:", reviewCount: currentRestaurant.review_count)
-                    DollarView(price: currentRestaurant.price ?? "", label: "Price:")
-                    
-                    if currentRestaurant.categories?.count ?? 0 < 2 {
-                        HStack {
-                            Text("Category:")
-                            ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
-                                Text(category.title ?? "")
-                                    .accessibilityLabel("\(currentRestaurant.name ?? "restaurant") is a \(category.title ?? "") place")
-                            }
-                        }
-                        .foregroundColor(.gray)
-                        
-                    } else {
-                        VStack(alignment: .leading) {
-                            Text("Categories:")
-                            
-                            Spacer()
-                                .frame(height: 5)
-                            
-                            ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
-                                Text("– \(category.title ?? "")")
-                                    .padding(.leading, 25)
-                                    .accessibilityLabel("\(currentRestaurant.name ?? "restaurant") is a \(category.title ?? "") place")
-                            }
-                        }
-                        .foregroundColor(.gray)
-                    }
-                }
-                .accessibilityLabel("Rating, price, and categories for \(currentRestaurant.name ?? "restaurant")")
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-                
-                Section(header: Text("Photos")) {
-                    ImageSliderView(selectedTab: $selectedTab, imageUrls: checkForPhotos(imageUrls: currentRestaurant.photos ?? [""]))
-                        .frame(height: 300)
-                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                }
-                
-                Section(header: Text("Add to List")) {
-                    ForEach(savedLists) { list in
-                        Button(action:  {
-                            listTappedName = list.wrappedName
-                            addToList(list: list, id: restaurant.id ?? "", name: restaurant.name ?? "")
-                        }) {
-                            Text(list.wrappedName)
-                        }
-                        .accessibilityLabel("Add to \(list.wrappedName) list")
-                    }
-                    .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                    
-                    Button(action: {
-                        isShowingCreateListSheet.toggle()
-                    }) {
-                        HStack {
-                            Image(systemName: "plus.square.fill")
-                            Text("Create List")
-                        }
-                        .font(Font.system(.headline, design: .rounded))
-                        .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                    }
-                }
-                
-                Section(header: Text("Order").foregroundColor(.gray)) {
-                    HStack {
-                        Button("Search DoorDash") {
-                            openAppOrSafari(appToTry: "DoorDash")
-                        }
-                        Spacer()
-                        Image(systemName: "arrow.up.forward")
-                            .foregroundColor(Color(uiColor: .lightGray))
-                            .font(.callout)
-                    }
-                    
-                    HStack {
-                        Button("Search Uber Eats") {
-                            openAppOrSafari(appToTry: "Uber Eats")
-                        }
-                        Spacer()
-                        Image(systemName: "arrow.up.forward")
-                            .foregroundColor(Color(uiColor: .lightGray))
-                            .font(.callout)
-                    }
-                    
-                    HStack {
-                        Button("Search OpenTable") {
-                            openAppOrSafari(appToTry: "OpenTable")
-                        }
-                        Spacer()
-                        Image(systemName: "arrow.up.forward")
-                            .foregroundColor(Color(uiColor: .lightGray))
-                            .font(.callout)
-                    }
-                    
-                    HStack {
-                        Link("See More on Yelp", destination: URL(string: currentRestaurant.url ?? "#")!)
-                        Spacer()
-                        Image(systemName: "arrow.up.forward")
-                            .foregroundColor(Color(uiColor: .lightGray))
-                            .font(.callout)
-                    }
-                }
-                .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                
-                Section(header: Text("Information")) {
-                    HStack {
-                        Text("Phone:")
-                            .foregroundColor(.gray)
-                        Button(action: {
-                            let phone = "tel://"
-                            let phoneNumberformatted = phone + (currentRestaurant.phone ?? "555-555-5555")
-                            guard let url = URL(string: phoneNumberformatted) else { return }
-                            UIApplication.shared.open(url)
-                        }) {
-                            Text(currentRestaurant.display_phone ?? "")
-                                .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                        }
-                    }
-                    
-                    VStack(alignment: .leading) {
-                        Text("Address:")
-                            .foregroundColor(.gray)
-                            .padding(.top, 2)
-                            .padding(.bottom, 2)
-                        
-                        Button {
-                            openAddressInAppleMaps(latitude: currentRestaurant.coordinates?.latitude ?? 0.0, longitude: currentRestaurant.coordinates?.longitude ?? 0.0)
-                        } label: {
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    ForEach(currentRestaurant.location?.display_address ?? [""], id: \.self) { addressPortion in
-                                        HStack {
-                                            Text(addressPortion)
-                                            Spacer()
-                                        }
-                                    }
-                                }
-                                Spacer()
-                                Image(systemName: "arrow.up.forward")
-                                    .foregroundColor(Color(uiColor: .lightGray))
-                                    .font(.callout)
-                            }
-                        }
-                        .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                        .padding(.bottom, 5)
-                    }
-                    
-                    VStack(alignment: .leading) {
-                        Text("Full Hours:")
-                            .foregroundColor(.gray)
-                            .padding(.top, 5)
-                            .padding(.bottom, 2)
-                        
-                        VStack(alignment: .leading) {
-                            ForEach((currentRestaurant.hours?[0].open ?? BusinessDetails.emptyBusiness.hours![0].open)!, id: \.self) { chunk in
-                                VStack(alignment: .leading) {
-                                    Text(convertDayNumberToWeekday(dayNumberString: chunk.day ?? 99999))
-                                        .foregroundColor(.secondary)
-                                    
-                                    HStack {
-                                        Text(convertMilitaryTimeToLocalTime(militaryTime: chunk.start ?? ""))
-                                        
-                                        Text("–")
-                                        
-                                        Text(convertMilitaryTimeToLocalTime(militaryTime: chunk.end ?? ""))
-                                    }
-                                    .accessibilityLabel("\(convertDayNumberToWeekday(dayNumberString: chunk.day ?? 99999)) hours: \(convertMilitaryTimeToLocalTime(militaryTime: chunk.start ?? "")) to \(convertMilitaryTimeToLocalTime(militaryTime: chunk.end ?? ""))")
-                                    .font(Font.system(.headline, design: .rounded))
-                                }
-                                .padding(.bottom, 5)
-                            }
-                        }
-                        .foregroundColor(.primary)
-                    }
-                }
-                
-                HStack {
-                    Text("Powered by:")
-                    
-                    if (colorScheme == .light) {
-                        Image("yelp_logo")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 75)
-                    } else {
-                        Image("yelp_logo_dark_bg")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 75)
-                    }
-                }
-                .accessibilityLabel("Powered by Yelp")
-                .listRowBackground(Color.clear)
-                
-            }
-            .font(Font.system(.body, design: .rounded))
-        }
+			VStack(alignment: .leading, spacing: 5) {
+				StarRatingView(rating: currentRestaurant.rating ?? 0.0, label: "Rating:", reviewCount: currentRestaurant.review_count)
+				DollarView(price: currentRestaurant.price ?? "", label: "Price:")
+
+				if currentRestaurant.categories?.count ?? 0 < 2 {
+					HStack {
+						Text("Category:")
+						ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
+							Text(category.title ?? "")
+								.accessibilityLabel("\(currentRestaurant.name ?? "restaurant") is a \(category.title ?? "") place")
+						}
+					}
+					.foregroundColor(.gray)
+
+				} else {
+					VStack(alignment: .leading) {
+						Text("Categories:")
+
+						Spacer()
+							.frame(height: 5)
+
+						ForEach(currentRestaurant.categories ?? [BusinessDetails.Category(alias: "", title: "")], id: \.self) { category in
+							Text("– \(category.title ?? "")")
+								.padding(.leading, 25)
+								.accessibilityLabel("\(currentRestaurant.name ?? "restaurant") is a \(category.title ?? "") place")
+						}
+					}
+					.foregroundColor(.gray)
+				}
+			}
+			.accessibilityLabel("Rating, price, and categories for \(currentRestaurant.name ?? "restaurant")")
+			.listRowBackground(Color.clear)
+			.listRowSeparator(.hidden)
+
+			Section(header: Text("Photos")) {
+				ImageSliderView(selectedTab: $selectedTab, imageUrls: checkForPhotos(imageUrls: currentRestaurant.photos ?? [""]))
+					.frame(height: 300)
+					.listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+			}
+
+			Section(header: Text("Add to List")) {
+				ForEach(savedLists) { list in
+					Button(action:  {
+						listTappedName = list.wrappedName
+						addToList(list: list, id: restaurant.id ?? "", name: restaurant.name ?? "")
+					}) {
+						Text(list.wrappedName)
+					}
+					.accessibilityLabel("Add to \(list.wrappedName) list")
+				}
+				.foregroundColor(Color(UIColor(named: "fuchsia")!))
+
+				Button(action: {
+					isShowingCreateListSheet.toggle()
+				}) {
+					HStack {
+						Image(systemName: "plus.square.fill")
+						Text("Create List")
+					}
+					.font(Font.system(.headline, design: .rounded))
+					.foregroundColor(Color(UIColor(named: "fuchsia")!))
+				}
+			}
+
+			Section(header: Text("Order").foregroundColor(.gray)) {
+				HStack {
+					Button("Search DoorDash") {
+						openAppOrSafari(appToTry: "DoorDash")
+					}
+					Spacer()
+					Image(systemName: "arrow.up.forward")
+						.foregroundColor(Color(uiColor: .lightGray))
+						.font(.callout)
+				}
+
+				HStack {
+					Button("Search Uber Eats") {
+						openAppOrSafari(appToTry: "Uber Eats")
+					}
+					Spacer()
+					Image(systemName: "arrow.up.forward")
+						.foregroundColor(Color(uiColor: .lightGray))
+						.font(.callout)
+				}
+
+				HStack {
+					Button("Search OpenTable") {
+						openAppOrSafari(appToTry: "OpenTable")
+					}
+					Spacer()
+					Image(systemName: "arrow.up.forward")
+						.foregroundColor(Color(uiColor: .lightGray))
+						.font(.callout)
+				}
+
+				HStack {
+					Link("See More on Yelp", destination: URL(string: currentRestaurant.url ?? "#")!)
+					Spacer()
+					Image(systemName: "arrow.up.forward")
+						.foregroundColor(Color(uiColor: .lightGray))
+						.font(.callout)
+				}
+			}
+			.foregroundColor(Color(UIColor(named: "fuchsia")!))
+
+			Section(header: Text("Information")) {
+				HStack {
+					Text("Phone:")
+						.foregroundColor(.gray)
+					Button(action: {
+						let phone = "tel://"
+						let phoneNumberformatted = phone + (currentRestaurant.phone ?? "555-555-5555")
+						guard let url = URL(string: phoneNumberformatted) else { return }
+						UIApplication.shared.open(url)
+					}) {
+						Text(currentRestaurant.display_phone ?? "")
+							.foregroundColor(Color(UIColor(named: "fuchsia")!))
+					}
+				}
+
+				VStack(alignment: .leading) {
+					Text("Address:")
+						.foregroundColor(.gray)
+						.padding(.top, 2)
+						.padding(.bottom, 2)
+
+					Button {
+						openAddressInAppleMaps(latitude: currentRestaurant.coordinates?.latitude ?? 0.0, longitude: currentRestaurant.coordinates?.longitude ?? 0.0)
+					} label: {
+						HStack {
+							VStack(alignment: .leading) {
+								ForEach(currentRestaurant.location?.display_address ?? [""], id: \.self) { addressPortion in
+									HStack {
+										Text(addressPortion)
+										Spacer()
+									}
+								}
+							}
+							Spacer()
+							Image(systemName: "arrow.up.forward")
+								.foregroundColor(Color(uiColor: .lightGray))
+								.font(.callout)
+						}
+					}
+					.foregroundColor(Color(UIColor(named: "fuchsia")!))
+					.padding(.bottom, 5)
+				}
+
+				VStack(alignment: .leading) {
+					Text("Full Hours:")
+						.foregroundColor(.gray)
+						.padding(.top, 5)
+						.padding(.bottom, 2)
+
+					VStack(alignment: .leading) {
+						ForEach((currentRestaurant.hours?[0].open ?? BusinessDetails.emptyBusiness.hours![0].open)!, id: \.self) { chunk in
+							VStack(alignment: .leading) {
+								Text(convertDayNumberToWeekday(dayNumberString: chunk.day ?? 99999))
+									.foregroundColor(.secondary)
+
+								HStack {
+									Text(convertMilitaryTimeToLocalTime(militaryTime: chunk.start ?? ""))
+
+									Text("–")
+
+									Text(convertMilitaryTimeToLocalTime(militaryTime: chunk.end ?? ""))
+								}
+								.accessibilityLabel("\(convertDayNumberToWeekday(dayNumberString: chunk.day ?? 99999)) hours: \(convertMilitaryTimeToLocalTime(militaryTime: chunk.start ?? "")) to \(convertMilitaryTimeToLocalTime(militaryTime: chunk.end ?? ""))")
+								.font(Font.system(.headline, design: .rounded))
+							}
+							.padding(.bottom, 5)
+						}
+					}
+					.foregroundColor(.primary)
+				}
+			}
+
+			HStack {
+				Text("Powered by:")
+
+				if (colorScheme == .light) {
+					Image("yelp_logo")
+						.resizable()
+						.scaledToFit()
+						.frame(width: 75)
+				} else {
+					Image("yelp_logo_dark_bg")
+						.resizable()
+						.scaledToFit()
+						.frame(width: 75)
+				}
+			}
+			.accessibilityLabel("Powered by Yelp")
+			.listRowBackground(Color.clear)
+
+		}
+		.font(Font.system(.body, design: .rounded))
         
         .task {
             let localYelpCacheForBusiness = Utils.getLocalYelpCacheForBusiness(id: restaurant.id ?? "")

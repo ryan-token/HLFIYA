@@ -49,6 +49,7 @@ struct ListsView: View {
 							Text("Create List")
 								.foregroundColor(Color(UIColor(named: "fuchsia")!))
 						}
+						.padding(10)
 					}
 					.font(Font.system(.headline, design: .rounded))
 				}
