@@ -184,13 +184,15 @@ private struct SettingsRow: View {
                 .foregroundStyle(iconColor)
             Text(title)
                 .foregroundStyle(.primary)
+            Spacer(minLength: 0)
             if showExternalLinkIndicator {
-                Spacer()
                 Image(systemName: "arrow.up.forward")
                     .foregroundStyle(.tertiary)
                     .font(.callout)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(.rect)
     }
 }
 

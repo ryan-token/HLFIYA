@@ -7,14 +7,14 @@
 
 import Foundation
 
-struct BusinessFetcher {
+enum BusinessFetcher {
     enum BusinessFetcherError: Error {
         case invalidURL
         case missingData
     }
-    
+
     // radius is in meters
-    static func getBusinessesNear(latitude: Double, longitude: Double, radius: Int, categories: Set<String>, prices: String, onlyGetOpenNow: Bool) async throws -> [Business] {
+    nonisolated static func getBusinessesNear(latitude: Double, longitude: Double, radius: Int, categories: Set<String>, prices: String, onlyGetOpenNow: Bool) async throws -> [Business] {
         var userCategories: Set = ["food"]
         if categories == userCategories { userCategories = ["food"] } else { userCategories = categories }
         let formattedCategories = userCategories.joined(separator: ",")
@@ -81,7 +81,7 @@ struct BusinessFetcher {
             print(error.localizedDescription)
         }
         
-        HapticGenerator.playSuccessHaptic()
+        await HapticGenerator.playSuccessHaptic()
         return shuffledBusinesses
     }
     

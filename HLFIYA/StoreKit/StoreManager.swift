@@ -13,23 +13,35 @@ public enum StoreError: Error {
     case failedVerification
 }
 
+@MainActor
 @Observable
-class StoreManager {
+final class StoreManager {
     private(set) var products: [Product] = []
     private(set) var purchasedIds: Set<String> = []
 
-    @ObservationIgnored nonisolated(unsafe) private var updateListenerTask: Task<Void, Error>?
+    @ObservationIgnored private var updateListenerTask: Task<Void, Never>?
 
     init() {
         // Start a transaction listener as close to app launch as possible so we don't miss any transactions.
-        updateListenerTask = listenForTransactions()
+        updateListenerTask = Task { [weak self] in
+            for await result in Transaction.updates {
+                guard let self else { return }
+                do {
+                    let transaction = try Self.checkVerified(result)
+                    self.updatePurchasedIdentifiers(transaction)
+                    await transaction.finish()
+                } catch {
+                    print("Transaction failed verification")
+                }
+            }
+        }
 
         Task { [weak self] in
             await self?.fetchProducts()
         }
     }
 
-    deinit {
+    isolated deinit {
         updateListenerTask?.cancel()
     }
 
@@ -87,21 +99,6 @@ class StoreManager {
             purchasedIds.insert(transaction.productID)
         } else {
             purchasedIds.remove(transaction.productID)
-        }
-    }
-
-    func listenForTransactions() -> Task<Void, Error> {
-        Task { [weak self] in
-            for await result in Transaction.updates {
-                guard let self else { return }
-                do {
-                    let transaction = try Self.checkVerified(result)
-                    self.updatePurchasedIdentifiers(transaction)
-                    await transaction.finish()
-                } catch {
-                    print("Transaction failed verification")
-                }
-            }
         }
     }
 }

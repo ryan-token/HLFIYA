@@ -5,9 +5,9 @@
 //  Created by Ryan Token on 4/24/22.
 //
 
-import UIKit
+import Foundation
 
-struct BusinessDetails: Identifiable, Codable {
+nonisolated struct BusinessDetails: Identifiable, Codable {
     // same as the Business struct
     var id: String?
     var rating: Double?
@@ -120,17 +120,17 @@ struct BusinessDetails: Identifiable, Codable {
 }
 
 extension BusinessDetails {
-    struct Category: Codable, Hashable {
+    nonisolated struct Category: Codable, Hashable {
         var alias: String?
         var title: String?
     }
-    
-    struct Coordinates: Codable {
+
+    nonisolated struct Coordinates: Codable {
         var latitude: Double?
         var longitude: Double?
     }
-    
-    struct Location: Codable {
+
+    nonisolated struct Location: Codable {
         var city: String?
         var country: String?
         var address2: String?
@@ -140,21 +140,21 @@ extension BusinessDetails {
         var zip_code: String?
         var display_address: [String]?
     }
-    
-    struct Hours: Codable, Hashable {
+
+    nonisolated struct Hours: Codable, Hashable {
         var open: [Hour]?
         var hours_type: String?
         var is_open_now: Bool?
     }
-    
-    struct Hour: Codable, Hashable {
+
+    nonisolated struct Hour: Codable, Hashable {
         var is_overnight: Bool?
         var start: String?
         var end: String?
         var day: Int?
     }
-    
-    struct SpecialHours: Codable {
+
+    nonisolated struct SpecialHours: Codable {
         var date: String?
         var is_closed: Bool?
         var start: String?

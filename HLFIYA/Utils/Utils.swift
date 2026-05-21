@@ -8,7 +8,7 @@
 import Foundation
 import CoreLocation
 
-class Utils {
+nonisolated enum Utils {
     static func convertMilesToMeters(miles: Double) -> Int {
         let distanceInMiles = Measurement(value: miles, unit: UnitLength.miles)
         let distanceInMeters = distanceInMiles.converted(to: UnitLength.meters)

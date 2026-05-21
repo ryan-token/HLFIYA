@@ -9,7 +9,7 @@ import CoreLocation
 import MapKit
 
 @Observable
-class LocationViewModel: NSObject, CLLocationManagerDelegate, @unchecked Sendable {
+final class LocationViewModel: NSObject, CLLocationManagerDelegate {
     var authorizationStatus: CLAuthorizationStatus
     var location: CLLocation?
     var currentPlacemark: MKMapItem?
@@ -32,16 +32,16 @@ class LocationViewModel: NSObject, CLLocationManagerDelegate, @unchecked Sendabl
 
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         let status = manager.authorizationStatus
-        Task { @MainActor in
-            self.authorizationStatus = status
+        Task { @MainActor [weak self] in
+            self?.authorizationStatus = status
         }
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let first = locations.first
-        Task { @MainActor in
-            self.location = first
-            await self.fetchCountryAndCity(for: first)
+        Task { @MainActor [weak self] in
+            self?.location = first
+            await self?.fetchCountryAndCity(for: first)
         }
     }
 
