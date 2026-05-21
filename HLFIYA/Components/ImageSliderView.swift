@@ -8,50 +8,33 @@
 import SwiftUI
 
 struct ImageSliderView: View {
-    var tabOptions = [Int]()
+    @Binding var selectedTab: Int
     let imageUrls: [String]
-    
-    @Binding private var selectedTab: Int
-    
-    init(selectedTab: Binding<Int>, imageUrls: [String]) {
-        _selectedTab = selectedTab
-        self.imageUrls = imageUrls
-        if imageUrls.count > 0 {
-            for number in 1...imageUrls.count {
-                tabOptions.append(number)
-            }
-        }
-    }
-    
+
     var body: some View {
         TabView(selection: $selectedTab) {
-            ForEach(imageUrls, id: \.self) { url in
-                let index = imageUrls.firstIndex(of: url)
-                
+            ForEach(imageUrls.enumerated(), id: \.offset) { index, url in
                 AsyncImageHack(url: url, isScaledToFill: true)
-                    .tag(tabOptions[index ?? 0])
+                    .tag(index + 1)
             }
         }
-        .tabViewStyle(PageTabViewStyle())
+        .tabViewStyle(.page)
         .animation(.default, value: selectedTab)
-        
         .onTapGesture {
-            if selectedTab == imageUrls.count {
-                selectedTab = 1
-            } else {
-                selectedTab += 1
-            }
+            selectedTab = selectedTab == imageUrls.count ? 1 : selectedTab + 1
         }
+        .accessibilityAddTraits(.isButton)
     }
 }
 
-struct ImageSliderView_Previews: PreviewProvider {
-    static var previews: some View {
-        ImageSliderView(selectedTab: .constant(1), imageUrls: [
+#Preview {
+    ImageSliderView(
+        selectedTab: .constant(1),
+        imageUrls: [
             "https://s3-media2.fl.yelpcdn.com/bphoto/4avfA7HWOW_Bl0J_8J60rg/o.jpg",
             "https://s3-media4.fl.yelpcdn.com/bphoto/ahmWdH7P0UIc4lM1c8zhcQ/o.jpg",
             "https://s3-media2.fl.yelpcdn.com/bphoto/BlG7QLi2mseijvxFnAb5yg/o.jpg"
-        ])
-            .previewLayout(.fixed(width: 400, height: 300))
-    }
+        ]
+    )
+    .frame(width: 400, height: 300)
 }

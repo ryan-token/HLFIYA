@@ -12,47 +12,36 @@ struct StarRatingView: View {
     var label: String?
     var reviewCount: Int?
     var maximumRating = 5
-    var halfStarImage = Image(systemName: "star.leadinghalf.filled")
-    var fullStarImage = Image(systemName: "star.fill")
     var offColor = Color.gray
     var onColor = Color.yellow
-    
+
     var body: some View {
         HStack {
-            if let label = label {
+            if let label {
                 Text(label)
-                    .foregroundColor(.gray)
-                    .font(Font.system(.body, design: .rounded))
+                    .foregroundStyle(.gray)
             }
-            
+
             ForEach(1..<maximumRating + 1, id: \.self) { number in
                 starImage(for: number)
-                    .foregroundColor(Double(number) > rating + 0.5 ? offColor : onColor)
+                    .foregroundStyle(Double(number) > rating + 0.5 ? offColor : onColor)
             }
-            
-            if let reviewCount = reviewCount {
-                Spacer()
+
+            if let reviewCount {
                 Text("(\(reviewCount))")
-                    .foregroundColor(.gray)
+                    .foregroundStyle(.gray)
             }
         }
-        .accessibilityLabel("Yelp rating: \(rating, specifier: "%.1f") stars")
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Yelp rating: \(rating, format: .number.precision(.fractionLength(1))) stars")
     }
-    
-    func starImage(for number: Int) -> Image {
-        let numberAsDouble = Double(number)
-        let difference = numberAsDouble - rating
-        
-        if difference == 0.5 {
-            return halfStarImage
-        } else {
-            return fullStarImage
-        }
+
+    private func starImage(for number: Int) -> Image {
+        let difference = Double(number) - rating
+        return difference == 0.5 ? Image(systemName: "star.leadinghalf.filled") : Image(systemName: "star.fill")
     }
 }
 
-struct StarRatingView_Previews: PreviewProvider {
-    static var previews: some View {
-        StarRatingView(rating: -0.5, label: "Rating:")
-    }
+#Preview {
+    StarRatingView(rating: -0.5, label: "Rating:")
 }

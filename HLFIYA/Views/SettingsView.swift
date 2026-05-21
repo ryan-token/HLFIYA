@@ -9,246 +9,192 @@ import SwiftUI
 import StoreKit
 
 struct SettingsView: View {
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
     @Environment(StoreManager.self) private var storeManager
 
     @State private var isShowingAboutScreen = false
     @State private var isShowingPrivacyActionSheet = false
     @State private var isShowingError = false
     @State private var errorTitle = ""
-    
+
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
-                Section(header: Text("Support")) {
-                    Button(action: {
-                        requestReviewManually()
-                    }) {
-                        HStack {
-                            Image(systemName: "heart.square.fill")
-                                .font(.title)
-                                .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                            Text("Rate on the App Store")
-                                .font(Font.system(.body, design: .rounded))
-                                .foregroundColor(.primary)
-                            Spacer()
-                            Image(systemName: "arrow.up.forward")
-                                .foregroundColor(Color(uiColor: .lightGray))
-                                .font(.callout)
-                        }
-                    }
-                    
-                    if storeManager.purchasedIds.isEmpty {
-                        if let removeAdsProduct = storeManager.products.first {
-                            AsyncButton(action: {
-                                await purchaseRemoveAds(product: removeAdsProduct)
-                            }) {
-                                HStack {
-                                    Image(systemName: "star.square.fill")
-                                        .font(Font.system(.title, design: .rounded))
-                                        .foregroundColor(.green)
-                                    Text("Remove Ads for \(removeAdsProduct.displayPrice)")
-                                        .font(Font.system(.body, design: .rounded))
-                                        .foregroundColor(.primary)
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                Section(header: Text("General")) {
-                    NavigationLink(destination: LocationRequestView()) {
-                        HStack {
-                            Image(systemName: "location.square.fill")
-                                .font(.title)
-                                .foregroundColor(.blue)
-                            Text("Location Permissions")
-                                .font(Font.system(.body, design: .rounded))
-                                .foregroundColor(.primary)
-                        }
-                    }
-                    .accessibilityLabel("Open Location Permissions Screen")
-                    
-                    Button(action: {
-                        sendFeatureRequestEmail()
-                    }) {
-                        HStack {
-                            Image(systemName: "bolt.square.fill")
-                                .font(.title)
-                                .foregroundColor(.mint)
-                            Text("Feature Request")
-                                .font(Font.system(.body, design: .rounded))
-                                .foregroundColor(.primary)
-                            Spacer()
-                            Image(systemName: "arrow.up.forward")
-                                .foregroundColor(Color(uiColor: .lightGray))
-                                .font(.callout)
-                        }
-                    }
-                    .accessibilityLabel("Send an email with a feature request")
-                    
-                    Button(action: {
-                        isShowingAboutScreen.toggle()
-                    }) {
-                        HStack {
-                            Image(systemName: "person.crop.square.fill")
-                                .font(.title)
-                                .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                            Text("About")
-                                .font(Font.system(.body, design: .rounded))
-                                .foregroundColor(.primary)
-                        }
-                    }
-                    .accessibilityLabel("About Hot Local Food In Your Area")
-                    
-                    Button(action: {
-                        isShowingPrivacyActionSheet.toggle()
-                    }) {
-                        HStack {
-                            Image(systemName: "lock.square.fill")
-                                .font(.title)
-                                .foregroundColor(.gray)
-                            Text("Terms & Privacy Policy")
-                                .font(Font.system(.body, design: .rounded))
-                                .foregroundColor(.primary)
-                        }
-                    }
-                    .accessibilityLabel("Terms of Use and Privacy Policy")
-                    
-                    .actionSheet(isPresented: $isShowingPrivacyActionSheet) {
-                        ActionSheet(title: Text("Terms of Use and Privacy Policy"), buttons: [
-                                .default(Text("Terms of Use")) {
-                                    openTermsOfUseLink()
-                                },
-                                .default(Text("Privacy Policy")) {
-                                    openPrivacyPolicyLink()
-                                },
-                                .cancel()
-                            ]
+                Section("Support") {
+                    Button(action: requestReviewManually) {
+                        SettingsRow(
+                            iconName: "heart.square.fill",
+                            iconColor: .fuchsia,
+                            title: "Rate on the App Store",
+                            showExternalLinkIndicator: true
                         )
                     }
-                    .font(Font.system(.body, design: .rounded))
-                }
-                
-                Section(header: Text("Data")) {
-                    NavigationLink(destination: SwipesStatsView()) {
-                        HStack {
-                            Image(systemName: "arrow.left.arrow.right.square.fill")
-                                .font(.title)
-                                .foregroundColor(.orange)
-                            Text("Swipes")
-                                .font(Font.system(.body, design: .rounded))
+                    .buttonStyle(.plain)
+
+                    if storeManager.purchasedIds.isEmpty,
+                       let removeAdsProduct = storeManager.products.first {
+                        AsyncButton {
+                            await purchaseRemoveAds(product: removeAdsProduct)
+                        } label: {
+                            SettingsRow(
+                                iconName: "star.square.fill",
+                                iconColor: .green,
+                                title: "Remove Ads for \(removeAdsProduct.displayPrice)"
+                            )
                         }
-                    }
-                    
-                    NavigationLink(destination: DeleteDataView()) {
-                        HStack {
-                            Image(systemName: "trash.square.fill")
-                                .font(.title)
-                                .foregroundColor(.pink)
-                            Text("Delete Data")
-                                .font(Font.system(.body, design: .rounded))
-                        }
+                        .buttonStyle(.plain)
                     }
                 }
-                
+
+                Section("General") {
+                    NavigationLink {
+                        LocationRequestView()
+                    } label: {
+                        SettingsRow(iconName: "location.square.fill", iconColor: .blue, title: "Location Permissions")
+                    }
+                    .accessibilityLabel("Open Location Permissions Screen")
+
+                    Button(action: sendFeatureRequestEmail) {
+                        SettingsRow(
+                            iconName: "bolt.square.fill",
+                            iconColor: .mint,
+                            title: "Feature Request",
+                            showExternalLinkIndicator: true
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Send an email with a feature request")
+
+                    Button { isShowingAboutScreen.toggle() } label: {
+                        SettingsRow(iconName: "person.crop.square.fill", iconColor: .fuchsia, title: "About")
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("About Hot Local Food In Your Area")
+
+                    Button { isShowingPrivacyActionSheet.toggle() } label: {
+                        SettingsRow(iconName: "lock.square.fill", iconColor: .gray, title: "Terms & Privacy Policy")
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Terms of Use and Privacy Policy")
+                    .confirmationDialog(
+                        "Terms of Use and Privacy Policy",
+                        isPresented: $isShowingPrivacyActionSheet,
+                        titleVisibility: .visible
+                    ) {
+                        Button("Terms of Use", action: openTermsOfUseLink)
+                        Button("Privacy Policy", action: openPrivacyPolicyLink)
+                    }
+                }
+
+                Section("Data") {
+                    NavigationLink {
+                        SwipesStatsView()
+                    } label: {
+                        SettingsRow(iconName: "arrow.left.arrow.right.square.fill", iconColor: .orange, title: "Swipes")
+                    }
+
+                    NavigationLink {
+                        DeleteDataView()
+                    } label: {
+                        SettingsRow(iconName: "trash.square.fill", iconColor: .pink, title: "Delete Data")
+                    }
+                }
+
                 if !storeManager.purchasedIds.isEmpty {
                     Text("You paid to remove ads. Thank you!")
-                        .font(Font.system(.body, design: .rounded))
-                        .foregroundColor(.gray)
+                        .foregroundStyle(.gray)
                         .listRowBackground(Color.clear)
                 }
             }
-            
             .sheet(isPresented: $isShowingAboutScreen) {
                 AboutView()
             }
-            
-            .alert(isPresented: $isShowingError, content: {
-                Alert(title: Text(errorTitle), message: nil, dismissButton: .default(Text("Okay")))
-            })
-            
+            .alert(errorTitle, isPresented: $isShowingError) {}
             .navigationTitle("Settings")
-            
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        restorePurchases()
-                    }) {
-                        Text("Restore Purchases")
-                            .font(Font.system(.headline, design: .rounded))
-                    }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Restore Purchases", action: restorePurchases)
+                        .font(.headline)
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Text("Close")
-                            .font(Font.system(.headline, design: .rounded))
-                    }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Close", action: dismiss.callAsFunction)
+                        .font(.headline)
                 }
             }
         }
-        .navigationViewStyle(.stack)
-        .accentColor(Color(UIColor(named: "fuchsia")!))
+        .tint(.fuchsia)
     }
-    
-    func requestReviewManually() {
-        guard let writeReviewURL = URL(string: "https://apps.apple.com/us/app/hot-local-food/id1621818779?action=write-review") else {
-            fatalError("Expected a valid URL")
-        }
-        UIApplication.shared.open(writeReviewURL, options: [:], completionHandler: nil)
+
+    private func requestReviewManually() {
+        guard let url = URL(string: "https://apps.apple.com/us/app/hot-local-food/id1621818779?action=write-review") else { return }
+        openURL(url)
     }
-    
-    func sendFeatureRequestEmail() {
+
+    private func sendFeatureRequestEmail() {
         let email = "hotlocalfood@gmail.com"
         let subject = "Feature Request - Hot Local Food"
-                    
-        let coded = "mailto:\(email)?subject=\(subject)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
-            
-        if let emailURL:NSURL = NSURL(string: coded!) {
-            if UIApplication.shared.canOpenURL(emailURL as URL){
-                UIApplication.shared.open(emailURL as URL)
-            }
-       }
+
+        guard let encoded = "mailto:\(email)?subject=\(subject)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: encoded) else { return }
+        openURL(url)
     }
-    
-    func openPrivacyPolicyLink() {
+
+    private func openPrivacyPolicyLink() {
         if let url = URL(string: "https://ryantoken.com/privacy-policy") {
-            UIApplication.shared.open(url)
+            openURL(url)
         }
     }
-    
-    func openTermsOfUseLink() {
+
+    private func openTermsOfUseLink() {
         if let url = URL(string: "https://ryantoken.com/terms-of-use") {
-            UIApplication.shared.open(url)
+            openURL(url)
         }
     }
-    
-    func purchaseRemoveAds(product: Product) async {
+
+    private func purchaseRemoveAds(product: Product) async {
         do {
-            if try await storeManager.purchase(product) != nil {
-                print("Purchase was successful")
-            }
+            _ = try await storeManager.purchase(product)
         } catch StoreError.failedVerification {
             HapticGenerator.playErrorHaptic()
             errorTitle = "Your purchase could not be verified by the App Store"
-            isShowingError.toggle()
+            isShowingError = true
         } catch {
             HapticGenerator.playErrorHaptic()
             print("Failed purchase for \(product.id): \(error)")
         }
     }
-    
-    func restorePurchases() {
+
+    private func restorePurchases() {
         SKPaymentQueue.default().restoreCompletedTransactions()
     }
 }
 
-struct SettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        SettingsView()
-            .environment(StoreManager())
+private struct SettingsRow: View {
+    let iconName: String
+    let iconColor: Color
+    let title: String
+    var showExternalLinkIndicator: Bool = false
+
+    var body: some View {
+        HStack {
+            Image(systemName: iconName)
+                .font(.title)
+                .foregroundStyle(iconColor)
+            Text(title)
+                .foregroundStyle(.primary)
+            if showExternalLinkIndicator {
+                Spacer()
+                Image(systemName: "arrow.up.forward")
+                    .foregroundStyle(.tertiary)
+                    .font(.callout)
+            }
+        }
     }
+}
+
+#Preview {
+    SettingsView()
+        .environment(StoreManager())
 }

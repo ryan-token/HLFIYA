@@ -11,100 +11,116 @@ struct BottomBarView: View {
     @State private var isShowingCategoriesView = false
     @State private var isShowingPriceView = false
     @State private var isShowingMapView = false
-    
+
     @Binding var nearbyRestaurants: [Business]
     @Binding var remainingRestaurantsInList: Int
     @Binding var currentRestaurantIndex: Int
     @Binding var showRefreshButton: Bool
     @Binding var noResultsFound: Bool
     @Binding var apiError: Bool
-    
+
     @Environment(LocationViewModel.self) private var locationViewModel
     var filters: FiltersState
 
-    let buttonSize: CGFloat = 30
+    private let buttonSize: CGFloat = 30
 
     var body: some View {
         HStack {
             Spacer()
 
-            VStack(spacing: 5) {
-                TintedGlassButton(
-                    action: {
-                        isShowingCategoriesView.toggle()
-                    },
-                    label: {
-                        Image(systemName: "line.3.horizontal.decrease.circle")
-                            .font(Font.system(size: buttonSize, design: .rounded))
-                    },
-                    tintColor: .pink,
-                    style: .prominent
-                )
-
-                Text("Categories")
-                    .font(Font.system(.body, design: .rounded))
-                    .foregroundColor(.gray)
-            }
-            .accessibilityLabel("Select Categories")
+            BottomBarItem(
+                title: "Categories",
+                systemImage: "line.3.horizontal.decrease.circle",
+                tintColor: .pink,
+                buttonSize: buttonSize,
+                accessibilityLabel: "Select Categories",
+                action: { isShowingCategoriesView.toggle() }
+            )
             .popover(isPresented: $isShowingCategoriesView) {
-                CategoriesView(nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, showRefreshButton: $showRefreshButton, noResultsFound: $noResultsFound, apiError: $apiError, filters: filters)
+                CategoriesView(
+                    nearbyRestaurants: $nearbyRestaurants,
+                    remainingRestaurantsInList: $remainingRestaurantsInList,
+                    currentRestaurantIndex: $currentRestaurantIndex,
+                    showRefreshButton: $showRefreshButton,
+                    noResultsFound: $noResultsFound,
+                    apiError: $apiError,
+                    filters: filters
+                )
             }
-            
+
             Spacer()
 
-            VStack(spacing: 5) {
-                TintedGlassButton(
-                    action: {
-                        isShowingPriceView.toggle()
-                    },
-                    label: {
-                        Image(systemName: "dollarsign.circle")
-                            .font(Font.system(size: buttonSize, design: .rounded))
-                    },
-                    tintColor: .green,
-                    style: .prominent
-                )
-
-                Text("Price")
-                    .font(Font.system(.body, design: .rounded))
-                    .foregroundColor(.gray)
-            }
-            .accessibilityLabel("Select Prices")
+            BottomBarItem(
+                title: "Price",
+                systemImage: "dollarsign.circle",
+                tintColor: .green,
+                buttonSize: buttonSize,
+                accessibilityLabel: "Select Prices",
+                action: { isShowingPriceView.toggle() }
+            )
             .popover(isPresented: $isShowingPriceView) {
-                PriceView(nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, showRefreshButton: $showRefreshButton, noResultsFound: $noResultsFound, apiError: $apiError, filters: filters)
+                PriceView(
+                    nearbyRestaurants: $nearbyRestaurants,
+                    remainingRestaurantsInList: $remainingRestaurantsInList,
+                    currentRestaurantIndex: $currentRestaurantIndex,
+                    showRefreshButton: $showRefreshButton,
+                    noResultsFound: $noResultsFound,
+                    apiError: $apiError,
+                    filters: filters
+                )
             }
-            
+
             Spacer()
 
-            VStack(spacing: 5) {
-                TintedGlassButton(
-                    action: {
-                        isShowingMapView.toggle()
-                    },
-                    label: {
-                        Image(systemName: "map.circle")
-                            .font(Font.system(size: buttonSize, design: .rounded))
-                    },
-                    tintColor: .blue,
-                    style: .prominent
-                )
-
-                Text("Location")
-                    .font(Font.system(.body, design: .rounded))
-                    .foregroundColor(.gray)
-            }
-            .accessibilityLabel("Select Location")
+            BottomBarItem(
+                title: "Location",
+                systemImage: "map.circle",
+                tintColor: .blue,
+                buttonSize: buttonSize,
+                accessibilityLabel: "Select Location",
+                action: { isShowingMapView.toggle() }
+            )
             .popover(isPresented: $isShowingMapView) {
-                MapView(nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, showRefreshButton: $showRefreshButton, noResultsFound: $noResultsFound, apiError: $apiError, filters: filters)
+                MapView(
+                    nearbyRestaurants: $nearbyRestaurants,
+                    remainingRestaurantsInList: $remainingRestaurantsInList,
+                    currentRestaurantIndex: $currentRestaurantIndex,
+                    showRefreshButton: $showRefreshButton,
+                    noResultsFound: $noResultsFound,
+                    apiError: $apiError,
+                    filters: filters
+                )
             }
-            
+
             Spacer()
         }
     }
 }
 
-//struct BottomBarView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        BottomBarView()
-//    }
-//}
+private struct BottomBarItem: View {
+    let title: String
+    let systemImage: String
+    let tintColor: Color
+    let buttonSize: CGFloat
+    let accessibilityLabel: String
+    let action: () -> Void
+
+    var body: some View {
+        VStack(spacing: 5) {
+            TintedGlassButton(
+                action: action,
+                label: {
+                    Image(systemName: systemImage)
+                        .font(.system(size: buttonSize))
+                },
+                tintColor: tintColor,
+                style: .prominent
+            )
+
+            Text(title)
+                .foregroundStyle(.gray)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityLabel)
+    }
+}

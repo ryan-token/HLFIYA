@@ -1,54 +1,56 @@
 //
-//  LocationManager.swift
+//  LocationViewModel.swift
 //  HLFIYA
 //
 //  Created by Ryan Token on 4/26/22.
 //
 
 import CoreLocation
+import MapKit
 
 @Observable
 class LocationViewModel: NSObject, CLLocationManagerDelegate, @unchecked Sendable {
     var authorizationStatus: CLAuthorizationStatus
     var location: CLLocation?
-    var currentPlacemark: CLPlacemark?
-    
+    var currentPlacemark: MKMapItem?
+
     private let locationManager: CLLocationManager
 
     override init() {
         locationManager = CLLocationManager()
         authorizationStatus = locationManager.authorizationStatus
-        
+
         super.init()
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
     }
-    
+
     func requestPermission() {
         locationManager.requestWhenInUseAuthorization()
     }
 
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        authorizationStatus = manager.authorizationStatus
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        location = locations.first
-
+    nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        let status = manager.authorizationStatus
         Task { @MainActor in
-            await fetchCountryAndCity(for: locations.first)
+            self.authorizationStatus = status
         }
     }
 
-    @MainActor
-    func fetchCountryAndCity(for location: CLLocation?) async {
-        guard let location = location else { return }
-        let geocoder = CLGeocoder()
+    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let first = locations.first
+        Task { @MainActor in
+            self.location = first
+            await self.fetchCountryAndCity(for: first)
+        }
+    }
 
+    func fetchCountryAndCity(for location: CLLocation?) async {
+        guard let location else { return }
+        let request = MKReverseGeocodingRequest(location: location)
         do {
-            let placemarks = try await geocoder.reverseGeocodeLocation(location)
-            currentPlacemark = placemarks.first
+            let items = try await request?.mapItems ?? []
+            currentPlacemark = items.first
         } catch {
             print("Geocoding error: \(error)")
             currentPlacemark = nil

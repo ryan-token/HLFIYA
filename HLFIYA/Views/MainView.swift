@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  MainView.swift
 //  HLFIYA
 //
 //  Created by Ryan Token on 1/17/22.
@@ -12,248 +12,188 @@ import GoogleMobileAds
 import StoreKit
 
 struct MainView: View {
-    @State private var currentLocationSet = false
     @State private var nearbyRestaurants = [Business]()
-    @State private var remainingRestaurantsInList = Int()
+    @State private var remainingRestaurantsInList = 0
     @State private var currentRestaurantIndex = 0
     @State private var showRefreshButton = false
     @State private var noResultsFound = false
     @State private var apiError = false
     @State private var isShowingError = false
     @State private var errorTitle = ""
-    
+
     @State private var restaurantsSwipedLeft = [Business]()
     @State private var restaurantsSwipedRight = [Business]()
-    
-    @State var filters = FiltersState()
-    @State var storeManager = StoreManager()
+
+    @State private var filters = FiltersState()
+    @State private var storeManager = StoreManager()
     @Environment(LocationViewModel.self) private var locationViewModel
-    
-    @Environment(\.managedObjectContext) var moc
-    @AppStorage("userHasOpenedAppBefore") var userHasOpenedAppBefore = false
-    
-    init() {
-        let design = UIFontDescriptor.SystemDesign.rounded
-        let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .largeTitle)
-            .withDesign(design)!
-            .withSymbolicTraits(UIFontDescriptor.SymbolicTraits.traitBold)!
-        let font = UIFont.init(descriptor: descriptor, size: 30)
-        UINavigationBar.appearance().largeTitleTextAttributes = [.font : font]
-    }
-    
+
+    @Environment(\.managedObjectContext) private var moc
+    @AppStorage("userHasOpenedAppBefore") private var userHasOpenedAppBefore = false
+
     var body: some View {
         VStack {
             TopBarView()
-            
+
             if apiError {
                 Text("😕 Error loading restaurants")
-                    .foregroundColor(.gray)
+                    .foregroundStyle(.gray)
             }
-            
-            if !nearbyRestaurants.isEmpty {
-                Text(nearbyRestaurants[currentRestaurantIndex].location?.city ?? "")
-                    .font(Font.system(.title, design: .rounded))
-                    .bold()
-                    .padding(5)
-            } else {
-                ProgressView()
-                    .font(.largeTitle)
-                    .padding(5)
-            }
-            
-            VStack(spacing: 10) {
-                HStack {
-                    Text("Categories:")
-                        .foregroundColor(.gray)
-                    Text(filters.categoriesNames)
-                        .bold()
-                        .lineLimit(1)
-                }
-                
-                HStack {
-                    Text("Prices:")
-                        .foregroundColor(.gray)
-                    Text(filters.priceName)
-                        .bold()
-                }
-                
-                HStack {
-                    Text("Location:")
-                        .foregroundColor(.gray)
-                    Text("Within \(String(format:"%.1f", filters.customRadius)) Miles")
-                        .bold()
-                }
-            }
-            .font(Font.system(.body, design: .rounded))
-            
+
+            CityHeaderView(city: nearbyRestaurants[safe: currentRestaurantIndex]?.location?.city)
+
+            FilterSummaryView(filters: filters)
+
             ZStack {
                 if noResultsFound {
-                    VStack {
-                        Spacer()
-                        Text("No results found. Try changing the filters at the bottom")
-                            .foregroundColor(.gray)
-                        Spacer()
-                    }
-                } else if nearbyRestaurants.isEmpty && apiError == false {
+                    ContentUnavailableView(
+                        "No Results",
+                        systemImage: "magnifyingglass",
+                        description: Text("Try changing the filters at the bottom.")
+                    )
+                } else if nearbyRestaurants.isEmpty && !apiError {
                     ProgressView()
                         .frame(maxHeight: .infinity)
-                } else {
-                    if !nearbyRestaurants.isEmpty {
-                        ForEach($nearbyRestaurants.reversed()) { restaurant in
-                            CardView(totalRestaurants: nearbyRestaurants.count, restaurant: restaurant, nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, restaurantsSwipedLeft: $restaurantsSwipedLeft, restaurantsSwipedRight: $restaurantsSwipedRight)
-                                .padding(8)
-                        }
-                        .accessibilityLabel("\(nearbyRestaurants[currentRestaurantIndex].name ?? ""), \(nearbyRestaurants[currentRestaurantIndex].rating ?? 0.0, specifier: "%.1f") stars, \(nearbyRestaurants[currentRestaurantIndex].price?.count ?? -1) dollar signs, \(nearbyRestaurants[currentRestaurantIndex].categories?.first?.title ?? ""). Swipe left to skip, swipe right for details.")
-                    }
+                } else if !nearbyRestaurants.isEmpty {
+                    CardStack(
+                        nearbyRestaurants: $nearbyRestaurants,
+                        remainingRestaurantsInList: $remainingRestaurantsInList,
+                        currentRestaurantIndex: $currentRestaurantIndex,
+                        restaurantsSwipedLeft: $restaurantsSwipedLeft,
+                        restaurantsSwipedRight: $restaurantsSwipedRight
+                    )
                 }
-                
-                if remainingRestaurantsInList <= 0 && showRefreshButton && !noResultsFound {
-                    AsyncButton(action: {
-                        let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices, onlyGetOpenNow: filters.openNow)
-                        setState(fetchedBusinesses: fetchedBusinesses)
-                    }, label: {
-                        HStack {
-                            Image(systemName: "arrow.clockwise.circle")
-                            Text("Refresh Food")
-                        }
-                        .frame(width: 150, height: 100)
-                        .font(Font.system(.headline, design: .rounded))
-                        .foregroundColor(.red)
-                    })
-                }
-            }
-            .zIndex(1.0)
-            
-            BottomBarView(nearbyRestaurants: $nearbyRestaurants, remainingRestaurantsInList: $remainingRestaurantsInList, currentRestaurantIndex: $currentRestaurantIndex, showRefreshButton: $showRefreshButton, noResultsFound: $noResultsFound, apiError: $apiError, filters: filters)
-            
-            
-            if storeManager.purchasedIds.isEmpty {
-                VStack(alignment: .trailing, spacing: 0) {
-                    if let removeAdsProduct = storeManager.products.first {
-                        AsyncButton(action: {
-                            await purchaseRemoveAds(product: removeAdsProduct)
-                        }) {
-                            Text("Remove Ads")
-                                .font(Font.system(.callout, design: .rounded))
-                                .foregroundColor(Color(UIColor(named: "fuchsia")!))
-                        }
-                    }
-                    GADBannerViewController()
-                        .frame(width: AdSizeBanner.size.width, height: AdSizeBanner.size.height)
-                }
-            }
-        }
-        
-        // First, check if we have cached data to use. Use that if we do
-        // Clear all caches once we have any files that 
-        // If we don't have a local cache, run the network request (which saves results to the cache)
-        .task {
-            Utils.clearAnyCacheFilesOverAMonthOld()
-            
-            let localYelpCache = Utils.getLocalYelpCache()
-            
-            if !localYelpCache.isEmpty {
-                setState(fetchedBusinesses: localYelpCache)
-                print("set state based on cached data")
-                useCachedIsOpenNowFilter()
-                useCachedCategoriesFilter()
-                useCachedPricesFilter()
-                useCachedLocationFilter()
-            } else if nearbyRestaurants.isEmpty {
-                print("refreshing restaurants")
-                let fetchedBusinesses = await MainView.refreshBusinesses(customLatitude: filters.customLatitude, customLongitude: filters.customLongitude, locationViewModel: locationViewModel, customRadius: filters.customRadius, categories: filters.categories, prices: filters.prices, onlyGetOpenNow: filters.openNow)
-                setState(fetchedBusinesses: fetchedBusinesses)
-                print("set state based on network data")
-            } else {
-                print("We already have restaurants, not fetching onAppear")
-            }
-        }
-        
-        .onAppear() {
-            if locationViewModel.location == nil {
-                locationViewModel.location = CLLocation(latitude: 37.334633, longitude: -122.012682)
-            }
-            
-            if !userHasOpenedAppBefore && !itemExists("Favorites") {
-                print("User hasn't opened the app before; adding a Favorites list")
-                let favoritesList = SavedList(context: moc)
-                favoritesList.name = "Favorites"
 
-                try? moc.save()
+                if remainingRestaurantsInList <= 0 && showRefreshButton && !noResultsFound {
+                    AsyncButton(action: refresh) {
+                        Label("Refresh Food", systemImage: "arrow.clockwise.circle")
+                            .frame(width: 150, height: 100)
+                            .font(.headline)
+                            .foregroundStyle(.red)
+                    }
+                }
             }
-            
-            if !userHasOpenedAppBefore {
-                userHasOpenedAppBefore = true
+            .zIndex(1)
+
+            BottomBarView(
+                nearbyRestaurants: $nearbyRestaurants,
+                remainingRestaurantsInList: $remainingRestaurantsInList,
+                currentRestaurantIndex: $currentRestaurantIndex,
+                showRefreshButton: $showRefreshButton,
+                noResultsFound: $noResultsFound,
+                apiError: $apiError,
+                filters: filters
+            )
+
+            if storeManager.purchasedIds.isEmpty {
+                RemoveAdsBannerView(
+                    onPurchase: purchaseRemoveAds(product:)
+                )
             }
         }
-        
+        .task { await loadInitialRestaurants() }
+        .onAppear { ensureLocationAndFavoritesList() }
         .environment(storeManager)
-        
-        .alert(isPresented: $isShowingError, content: {
-            Alert(title: Text(errorTitle), message: nil, dismissButton: .default(Text("Okay")))
-        })
+        .alert(errorTitle, isPresented: $isShowingError) {}
     }
-    
+
+    private func loadInitialRestaurants() async {
+        Utils.clearAnyCacheFilesOverAMonthOld()
+
+        let localYelpCache = Utils.getLocalYelpCache()
+
+        if !localYelpCache.isEmpty {
+            setState(fetchedBusinesses: localYelpCache)
+            useCachedFilters()
+            return
+        }
+
+        guard nearbyRestaurants.isEmpty else { return }
+        await refresh()
+    }
+
+    private func refresh() async {
+        let fetched = await MainView.refreshBusinesses(
+            customLatitude: filters.customLatitude,
+            customLongitude: filters.customLongitude,
+            locationViewModel: locationViewModel,
+            customRadius: filters.customRadius,
+            categories: filters.categories,
+            prices: filters.prices,
+            onlyGetOpenNow: filters.openNow
+        )
+        setState(fetchedBusinesses: fetched)
+    }
+
+    private func ensureLocationAndFavoritesList() {
+        if locationViewModel.location == nil {
+            locationViewModel.location = CLLocation(latitude: 37.334633, longitude: -122.012682)
+        }
+
+        if !userHasOpenedAppBefore && !itemExists("Favorites") {
+            let favoritesList = SavedList(context: moc)
+            favoritesList.name = "Favorites"
+            try? moc.save()
+        }
+
+        if !userHasOpenedAppBefore {
+            userHasOpenedAppBefore = true
+        }
+    }
+
     // radius is in meters
-    static func refreshBusinesses(customLatitude: CLLocationDegrees, customLongitude: CLLocationDegrees, locationViewModel: LocationViewModel, customRadius: Double, categories: Set<String>, prices: Set<String>, onlyGetOpenNow: Bool) async -> [Business] {
-        var latitude: CLLocationDegrees
-        var longitude: CLLocationDegrees
-        var fetchedBusinesses: [Business]
-        
-        if customLatitude != 0.000000 && customLongitude != 0.000000 {
+    static func refreshBusinesses(
+        customLatitude: CLLocationDegrees,
+        customLongitude: CLLocationDegrees,
+        locationViewModel: LocationViewModel,
+        customRadius: Double,
+        categories: Set<String>,
+        prices: Set<String>,
+        onlyGetOpenNow: Bool
+    ) async -> [Business] {
+        let latitude: CLLocationDegrees
+        let longitude: CLLocationDegrees
+
+        if customLatitude != 0.0 && customLongitude != 0.0 {
             latitude = customLatitude
             longitude = customLongitude
+        } else if let currentLocation = locationViewModel.location {
+            latitude = currentLocation.coordinate.latitude
+            longitude = currentLocation.coordinate.longitude
         } else {
-            if let currentLocation = locationViewModel.location {
-                latitude = currentLocation.coordinate.latitude
-                longitude = currentLocation.coordinate.longitude
-            } else {
-                latitude = 37.334633
-                longitude = -122.012682
-            }
+            latitude = 37.334633
+            longitude = -122.012682
         }
-        
-        var stringPrices: String
-        if prices == ["All Prices"] {
-            stringPrices = "1,2,3,4"
-        } else {
-            stringPrices = prices.joined(separator: ",")
-        }
-        
+
+        let stringPrices = prices == ["All Prices"] ? "1,2,3,4" : prices.joined(separator: ",")
+
         do {
-            fetchedBusinesses = try await BusinessFetcher.getBusinessesNear(latitude: latitude, longitude: longitude, radius: Utils.convertMilesToMeters(miles: customRadius), categories: categories, prices: stringPrices, onlyGetOpenNow: onlyGetOpenNow)
+            return try await BusinessFetcher.getBusinessesNear(
+                latitude: latitude,
+                longitude: longitude,
+                radius: Utils.convertMilesToMeters(miles: customRadius),
+                categories: categories,
+                prices: stringPrices,
+                onlyGetOpenNow: onlyGetOpenNow
+            )
         } catch {
             print("Request failed with error: \(error)")
-            fetchedBusinesses = []
+            return []
         }
-        
-        return fetchedBusinesses
     }
-    
-    func setState(fetchedBusinesses: [Business]) {
+
+    private func setState(fetchedBusinesses: [Business]) {
         nearbyRestaurants = fetchedBusinesses
         remainingRestaurantsInList = fetchedBusinesses.count
         currentRestaurantIndex = 0
         showRefreshButton = true
         apiError = false
-        if fetchedBusinesses.isEmpty {
-            noResultsFound = true
-        }
+        noResultsFound = fetchedBusinesses.isEmpty
     }
-    
-    func checkForApiError(fetchedBusinesses: [Business]) {
-        if (fetchedBusinesses.count == 0) {
-            apiError = true
-        } else {
-            apiError = false
-        }
-    }
-    
-    func purchaseRemoveAds(product: Product) async {
+
+    private func purchaseRemoveAds(product: Product) async {
         do {
-            if try await storeManager.purchase(product) != nil {
-                print("Purchase was successful")
-            }
+            _ = try await storeManager.purchase(product)
         } catch StoreError.failedVerification {
             HapticGenerator.playErrorHaptic()
             errorTitle = "Your purchase could not be verified by the App Store"
@@ -263,31 +203,24 @@ struct MainView: View {
             print("Failed purchase for \(product.id): \(error)")
         }
     }
-    
-    func useCachedIsOpenNowFilter() {
-        let localIsOpenNowFilter = Utils.getIsOpenNowFilterCache()
-        filters.openNow = localIsOpenNowFilter
+
+    private func useCachedFilters() {
+        filters.openNow = Utils.getIsOpenNowFilterCache()
+
+        let categoriesCache = Utils.getCategoriesFilterCache()
+        filters.categories = categoriesCache.categories
+        filters.categoriesNames = categoriesCache.categoriesNames
+
+        let pricesCache = Utils.getPricesFilterCache()
+        filters.prices = pricesCache.prices
+        filters.priceName = pricesCache.priceName
+
+        let locationCache = Utils.getLocationFilterCache()
+        filters.customLatitude = locationCache.customLatitude
+        filters.customLongitude = locationCache.customLongitude
+        filters.customRadius = locationCache.customRadius
     }
-    
-    func useCachedCategoriesFilter() {
-        let localCategoriesFilter = Utils.getCategoriesFilterCache()
-        filters.categories = localCategoriesFilter.categories
-        filters.categoriesNames = localCategoriesFilter.categoriesNames
-    }
-    
-    func useCachedPricesFilter() {
-        let localPricesFilter = Utils.getPricesFilterCache()
-        filters.prices = localPricesFilter.prices
-        filters.priceName = localPricesFilter.priceName
-    }
-    
-    func useCachedLocationFilter() {
-        let localLocationFilter = Utils.getLocationFilterCache()
-        filters.customLatitude = localLocationFilter.customLatitude
-        filters.customLongitude = localLocationFilter.customLongitude
-        filters.customRadius = localLocationFilter.customRadius
-    }
-    
+
     private func itemExists(_ item: String) -> Bool {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "SavedList")
         fetchRequest.predicate = NSPredicate(format: "name == %@", item)
@@ -295,9 +228,117 @@ struct MainView: View {
     }
 }
 
-struct MainView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainView()
-            .environment(LocationViewModel())
+private struct CityHeaderView: View {
+    let city: String?
+
+    var body: some View {
+        if let city {
+            Text(city)
+                .font(.title)
+                .bold()
+                .padding(5)
+        } else {
+            ProgressView()
+                .font(.largeTitle)
+                .padding(5)
+        }
     }
+}
+
+private struct FilterSummaryView: View {
+    let filters: FiltersState
+
+    var body: some View {
+        VStack(spacing: 10) {
+            LabeledRow(label: "Categories:") {
+                Text(filters.categoriesNames)
+                    .bold()
+                    .lineLimit(1)
+            }
+
+            LabeledRow(label: "Prices:") {
+                Text(filters.priceName).bold()
+            }
+
+            LabeledRow(label: "Location:") {
+                Text("Within \(filters.customRadius, format: .number.precision(.fractionLength(1))) Miles")
+                    .bold()
+            }
+        }
+    }
+}
+
+private struct LabeledRow<Content: View>: View {
+    let label: String
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .foregroundStyle(.gray)
+            content
+        }
+    }
+}
+
+private struct CardStack: View {
+    @Binding var nearbyRestaurants: [Business]
+    @Binding var remainingRestaurantsInList: Int
+    @Binding var currentRestaurantIndex: Int
+    @Binding var restaurantsSwipedLeft: [Business]
+    @Binding var restaurantsSwipedRight: [Business]
+
+    var body: some View {
+        ForEach($nearbyRestaurants.reversed()) { restaurant in
+            CardView(
+                totalRestaurants: nearbyRestaurants.count,
+                restaurant: restaurant,
+                nearbyRestaurants: $nearbyRestaurants,
+                remainingRestaurantsInList: $remainingRestaurantsInList,
+                currentRestaurantIndex: $currentRestaurantIndex,
+                restaurantsSwipedLeft: $restaurantsSwipedLeft,
+                restaurantsSwipedRight: $restaurantsSwipedRight
+            )
+            .padding(8)
+        }
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    private var accessibilityLabel: String {
+        guard let current = nearbyRestaurants[safe: currentRestaurantIndex] else { return "" }
+        let rating = (current.rating ?? 0.0).formatted(.number.precision(.fractionLength(1)))
+        return "\(current.name ?? ""), \(rating) stars, \(current.price?.count ?? 0) dollar signs, \(current.categories?.first?.title ?? ""). Swipe left to skip, swipe right for details."
+    }
+}
+
+private struct RemoveAdsBannerView: View {
+    @Environment(StoreManager.self) private var storeManager
+    let onPurchase: (Product) async -> Void
+
+    var body: some View {
+        VStack(alignment: .trailing, spacing: 0) {
+            if let removeAdsProduct = storeManager.products.first {
+                AsyncButton {
+                    await onPurchase(removeAdsProduct)
+                } label: {
+                    Text("Remove Ads")
+                        .font(.callout)
+                        .foregroundStyle(.fuchsia)
+                }
+            }
+            GADBannerViewController()
+                .frame(width: AdSizeBanner.size.width, height: AdSizeBanner.size.height)
+        }
+    }
+}
+
+private extension Array {
+    subscript(safe index: Int) -> Element? {
+        indices.contains(index) ? self[index] : nil
+    }
+}
+
+#Preview {
+    MainView()
+        .environment(LocationViewModel())
 }

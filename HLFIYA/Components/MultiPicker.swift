@@ -16,7 +16,6 @@ struct MultiPicker: View {
         Button(action: action) {
             HStack {
                 Text(title)
-                    .font(Font.system(.body, design: .rounded))
                 if isSelected {
                     Spacer()
                     Image(systemName: "checkmark")

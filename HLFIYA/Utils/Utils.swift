@@ -31,7 +31,7 @@ class Utils {
         let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("localYelpCache.json")
         
         do {
-            let localYelpCache = try String(contentsOf: localCacheUrl)
+            let localYelpCache = try String(contentsOf: localCacheUrl, encoding: .utf8)
             let localCacheAsData = Data(localYelpCache.utf8)
             let localCacheAsBusinesses = try! JSONDecoder().decode(Businesses.self, from: localCacheAsData)
             
@@ -46,7 +46,7 @@ class Utils {
         let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("localYelpCacheForBusId-\(id).json")
         
         do {
-            let localYelpCacheForBusiness = try String(contentsOf: localCacheUrl)
+            let localYelpCacheForBusiness = try String(contentsOf: localCacheUrl, encoding: .utf8)
             
             let localCacheAsData = Data(localYelpCacheForBusiness.utf8)
             let localCacheAsBusiness = try! JSONDecoder().decode(BusinessDetails.self, from: localCacheAsData)
@@ -75,7 +75,7 @@ class Utils {
         let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("isOpenNowFilterCache.txt")
         
         do {
-            let isOpenNowCache = try String(contentsOf: localCacheUrl)
+            let isOpenNowCache = try String(contentsOf: localCacheUrl, encoding: .utf8)
             if (isOpenNowCache == "true") {
                 return true
             } else {
@@ -110,7 +110,7 @@ class Utils {
         let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("categoriesFilterCache.json")
         
         do {
-            let localYelpCache = try String(contentsOf: localCacheUrl)
+            let localYelpCache = try String(contentsOf: localCacheUrl, encoding: .utf8)
             let localCacheAsData = Data(localYelpCache.utf8)
             let localCacheAsCategories = try! JSONDecoder().decode(CategoriesFilter.self, from: localCacheAsData)
             
@@ -144,7 +144,7 @@ class Utils {
         let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("pricesFilterCache.json")
         
         do {
-            let localYelpCache = try String(contentsOf: localCacheUrl)
+            let localYelpCache = try String(contentsOf: localCacheUrl, encoding: .utf8)
             let localCacheAsData = Data(localYelpCache.utf8)
             let localCacheAsPrices = try! JSONDecoder().decode(PricesFilter.self, from: localCacheAsData)
             
@@ -172,7 +172,7 @@ class Utils {
         let lastReviewDateDoc = Utils.getDocumentsDirectory().appendingPathComponent("lastReviewData.txt")
         
         do {
-            let lastReviewDateString = try String(contentsOf: lastReviewDateDoc)
+            let lastReviewDateString = try String(contentsOf: lastReviewDateDoc, encoding: .utf8)
             return lastReviewDateString
         } catch {
             print(error.localizedDescription)
@@ -203,7 +203,7 @@ class Utils {
         let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("locationFilterCache.json")
         
         do {
-            let localYelpCache = try String(contentsOf: localCacheUrl)
+            let localYelpCache = try String(contentsOf: localCacheUrl, encoding: .utf8)
             let localCacheAsData = Data(localYelpCache.utf8)
             let localCacheAsLocation = try! JSONDecoder().decode(LocationFilter.self, from: localCacheAsData)
             

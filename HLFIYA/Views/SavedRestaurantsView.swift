@@ -9,95 +9,76 @@ import SwiftUI
 
 struct SavedRestaurantsView: View {
     let list: SavedList
-    
+
     @State private var isShowingUpdateListNameAlert = false
     @State private var newListName = ""
-    @Environment(\.managedObjectContext) var moc
-    @FetchRequest(sortDescriptors: [SortDescriptor(\.name)]) var savedRestaurants: FetchedResults<SavedRestaurant>
-    
+    @Environment(\.managedObjectContext) private var moc
+
     var body: some View {
         ZStack {
-        	List {
-				if (list.restaurantsArray.isEmpty) {
-					Text("No places added to your \(list.wrappedName) list. Swipe right on a card to add some!")
-						.foregroundColor(.gray)
-						.fixedSize(horizontal: false, vertical: true)
-				}
+            Group {
+                if list.restaurantsArray.isEmpty {
+                    ContentUnavailableView(
+                        "No Places Saved",
+                        systemImage: "fork.knife",
+                        description: Text("No places added to your \(list.wrappedName) list. Swipe right on a card to add some!")
+                    )
+                } else {
+                    List {
+                        ForEach(list.restaurantsArray) { restaurant in
+                            NavigationLink {
+                                SavedRestaurantsDetailsView(restaurantId: restaurant.wrappedId)
+                            } label: {
+                                Text(restaurant.wrappedName)
+                            }
+                        }
+                        .onDelete { offsets in
+                            removeRestaurantFromList(at: offsets, from: list)
+                        }
+                    }
+                    .safeAreaInset(edge: .bottom) {
+                        Color.clear.frame(height: 20)
+                    }
+                }
+            }
 
-				ForEach(list.restaurantsArray) { restaurant in
-					NavigationLink(destination: SavedRestaurantsDetailsView(restaurantId: restaurant.wrappedId)) {
-						Text(restaurant.wrappedName)
-					}
-				}
-				.onDelete(perform: { offsets in
-					removeRestaurantFromList(at: offsets, from: list)
-				})
-			}
-			.font(Font.system(.body, design: .rounded))
-			.safeAreaInset(edge: .bottom) {
-				Color.clear.frame(height: 20)
-			}
-
-			VStack {
-				Spacer()
-				GlassButton {
-					isShowingUpdateListNameAlert = true
-				} label: {
-					HStack {
-						Image(systemName: "pencil")
-							.foregroundColor(Color(UIColor(named: "fuchsia")!))
-						Text("Change List Name")
-							.foregroundColor(Color(UIColor(named: "fuchsia")!))
-					}
-					.padding(10)
-				}
-				.font(Font.system(.headline, design: .rounded))
-			}
+            VStack {
+                Spacer()
+                GlassButton(action: { isShowingUpdateListNameAlert = true }) {
+                    Label("Change List Name", systemImage: "pencil")
+                        .foregroundStyle(.fuchsia)
+                        .padding(10)
+                }
+                .font(.headline)
+            }
         }
-		.onAppear {
-			newListName = list.name ?? ""
-		}
-
+        .onAppear {
+            newListName = list.name ?? ""
+        }
         .alert("Change List Name", isPresented: $isShowingUpdateListNameAlert) {
             TextField("New List Name", text: $newListName)
                 .textInputAutocapitalization(.words)
-            Button(action: { updateListNameViaAlert(list: list) }) {
-                Text("Change List Name")
-            }
+            Button("Change List Name") { updateListNameViaAlert(list: list) }
             Button("Cancel", role: .cancel) {}
         }
-        .font(Font.system(.body, design: .rounded))
-
         .navigationTitle(list.wrappedName)
     }
-    
-    func removeRestaurantFromList(at offsets: IndexSet, from list: SavedList) {
+
+    private func removeRestaurantFromList(at offsets: IndexSet, from list: SavedList) {
         for index in offsets.sorted() {
             let restaurantToDelete = list.restaurantsArray[index]
             list.removeFromRestaurants(restaurantToDelete)
             moc.delete(restaurantToDelete)
         }
-        
+
         if moc.hasChanges {
             try? moc.save()
         }
     }
-    
-    func updateListNameViaAlert(list: SavedList) {
-		if !newListName.isEmpty {
-			list.name = newListName
 
-			do {
-				try moc.save()
-			} catch {
-				print("Error saving moc: \(error)")
-			}
-        }
+    private func updateListNameViaAlert(list: SavedList) {
+        guard !newListName.isEmpty else { return }
+        list.name = newListName
+        try? moc.save()
     }
 }
-
-//struct SavedRestaurantsView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        SavedRestaurantsView()
-//    }
-//}
