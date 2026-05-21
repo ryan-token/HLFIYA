@@ -114,8 +114,12 @@ struct SettingsView: View {
             .navigationTitle("Settings")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Restore Purchases", action: restorePurchases)
-                        .font(.headline)
+                    AsyncButton {
+                        await restorePurchases()
+                    } label: {
+                        Text("Restore Purchases")
+                            .font(.headline)
+                    }
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
@@ -166,8 +170,14 @@ struct SettingsView: View {
         }
     }
 
-    private func restorePurchases() {
-        SKPaymentQueue.default().restoreCompletedTransactions()
+    private func restorePurchases() async {
+        do {
+            try await storeManager.restorePurchases()
+        } catch {
+            HapticGenerator.playErrorHaptic()
+            errorTitle = "Restoring purchases failed. Please try again."
+            isShowingError = true
+        }
     }
 }
 

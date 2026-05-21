@@ -9,36 +9,31 @@ import StoreKit
 
 typealias Transaction = StoreKit.Transaction
 
-public enum StoreError: Error {
+enum StoreError: Error {
     case failedVerification
 }
 
 @MainActor
 @Observable
 final class StoreManager {
+    static let removeAdsProductID = "nonconsumable.removeAds"
+
     private(set) var products: [Product] = []
     private(set) var purchasedIds: Set<String> = []
 
     @ObservationIgnored private var updateListenerTask: Task<Void, Never>?
 
     init() {
-        // Start a transaction listener as close to app launch as possible so we don't miss any transactions.
+        // Start the transaction listener as close to launch as possible so we don't miss any
+        // transactions that occur outside the app or on other devices.
         updateListenerTask = Task { [weak self] in
             for await result in Transaction.updates {
-                guard let self else { return }
-                do {
-                    let transaction = try Self.checkVerified(result)
-                    self.updatePurchasedIdentifiers(transaction)
-                    await transaction.finish()
-                } catch {
-                    print("Transaction failed verification")
-                }
+                await self?.handle(transactionResult: result)
             }
         }
 
-        Task { [weak self] in
-            await self?.fetchProducts()
-        }
+        Task { [weak self] in await self?.fetchProducts() }
+        Task { [weak self] in await self?.refreshEntitlements() }
     }
 
     isolated deinit {
@@ -47,26 +42,22 @@ final class StoreManager {
 
     func fetchProducts() async {
         do {
-            let products = try await Product.products(for: ["nonconsumable.removeAds"])
-            self.products = products
-
-            for product in products where product.id == "nonconsumable.removeAds" {
-                await isPurchased(product: product)
-            }
+            products = try await Product.products(for: [Self.removeAdsProductID])
         } catch {
-            print(error)
+            print("Failed to fetch products: \(error)")
         }
     }
 
-    func isPurchased(product: Product) async {
-        guard let state = await product.currentEntitlement else { return }
-
-        switch state {
-        case .verified(let transaction):
-            purchasedIds.insert(transaction.productID)
-        case .unverified:
-            print("Unverified transaction")
+    /// Rebuilds `purchasedIds` from the customer's current entitlements.
+    func refreshEntitlements() async {
+        var ids: Set<String> = []
+        for await result in Transaction.currentEntitlements {
+            guard case .verified(let transaction) = result, transaction.revocationDate == nil else {
+                continue
+            }
+            ids.insert(transaction.productID)
         }
+        purchasedIds = ids
     }
 
     func purchase(_ product: Product) async throws -> Transaction? {
@@ -85,6 +76,13 @@ final class StoreManager {
         }
     }
 
+    /// Asks the App Store to re-sync signed transactions, the StoreKit 2 equivalent of
+    /// "Restore Purchases".
+    func restorePurchases() async throws {
+        try await AppStore.sync()
+        await refreshEntitlements()
+    }
+
     nonisolated static func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
         switch result {
         case .unverified:
@@ -94,7 +92,17 @@ final class StoreManager {
         }
     }
 
-    func updatePurchasedIdentifiers(_ transaction: Transaction) {
+    private func handle(transactionResult: VerificationResult<Transaction>) async {
+        do {
+            let transaction = try Self.checkVerified(transactionResult)
+            updatePurchasedIdentifiers(transaction)
+            await transaction.finish()
+        } catch {
+            print("Transaction failed verification: \(error)")
+        }
+    }
+
+    private func updatePurchasedIdentifiers(_ transaction: Transaction) {
         if transaction.revocationDate == nil {
             purchasedIds.insert(transaction.productID)
         } else {
