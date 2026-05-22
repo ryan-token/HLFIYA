@@ -6,16 +6,14 @@
 //
 
 import CoreLocation
-import MapKit
 
 @Observable
 final class LocationViewModel: NSObject, CLLocationManagerDelegate {
-    var authorizationStatus: CLAuthorizationStatus
+    private(set) var authorizationStatus: CLAuthorizationStatus
     var location: CLLocation?
-    var currentPlacemark: MKMapItem?
 
     private let locationManager: CLLocationManager
-    private var geocodeTask: Task<Void, Never>?
+    private var locationUpdatesTask: Task<Void, Never>?
 
     // Must be initialised on the main run loop. `CLLocationManager` binds its
     // delegate callbacks to the run loop that's active at init time, and the
@@ -26,8 +24,12 @@ final class LocationViewModel: NSObject, CLLocationManagerDelegate {
 
         super.init()
         locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.startUpdatingLocation()
+        // Assigning the delegate triggers `locationManagerDidChangeAuthorization` immediately,
+        // which is what kicks off the live-updates stream once the user is authorized.
+    }
+
+    isolated deinit {
+        locationUpdatesTask?.cancel()
     }
 
     func requestPermission() {
@@ -41,32 +43,35 @@ final class LocationViewModel: NSObject, CLLocationManagerDelegate {
         let status = manager.authorizationStatus
         MainActor.assumeIsolated {
             self.authorizationStatus = status
-        }
-    }
-
-    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let first = locations.first
-        MainActor.assumeIsolated {
-            self.location = first
-            self.geocodeTask?.cancel()
-            self.geocodeTask = Task { [weak self] in
-                await self?.fetchCountryAndCity(for: first)
+            if status.isAuthorizedForLocation {
+                self.startLocationUpdates()
+            } else {
+                self.locationUpdatesTask?.cancel()
+                self.locationUpdatesTask = nil
             }
         }
     }
 
-    func fetchCountryAndCity(for location: CLLocation?) async {
-        guard let location else { return }
-        let request = MKReverseGeocodingRequest(location: location)
-        do {
-            let items = try await request?.mapItems ?? []
-            try Task.checkCancellation()
-            currentPlacemark = items.first
-        } catch is CancellationError {
-            // A newer location update superseded this one; leave currentPlacemark to the winner.
-        } catch {
-            print("Geocoding error: \(error)")
-            currentPlacemark = nil
+    private func startLocationUpdates() {
+        locationUpdatesTask?.cancel()
+        locationUpdatesTask = Task { [weak self] in
+            do {
+                for try await update in CLLocationUpdate.liveUpdates() {
+                    guard let self else { return }
+                    if let newLocation = update.location {
+                        self.location = newLocation
+                    }
+                }
+            } catch {
+                // Stream ended (authorization revoked or system error). The
+                // delegate callback above is responsible for restarting it.
+            }
         }
+    }
+}
+
+private extension CLAuthorizationStatus {
+    var isAuthorizedForLocation: Bool {
+        self == .authorizedWhenInUse || self == .authorizedAlways
     }
 }
