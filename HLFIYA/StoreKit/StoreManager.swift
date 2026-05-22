@@ -18,12 +18,19 @@ enum StoreError: Error {
 final class StoreManager {
     static let removeAdsProductID = "nonconsumable.removeAds"
 
+    private static let cachedPurchasedIdsKey = "StoreManager.cachedPurchasedIds"
+
     private(set) var products: [Product] = []
-    private(set) var purchasedIds: Set<String> = []
+    // Seeded synchronously from UserDefaults so the UI starts in the correct state on cold
+    // launch and doesn't shift when `refreshEntitlements()` finishes.
+    private(set) var purchasedIds: Set<String>
 
     @ObservationIgnored private var updateListenerTask: Task<Void, Never>?
 
     init() {
+        let cached = UserDefaults.standard.stringArray(forKey: Self.cachedPurchasedIdsKey) ?? []
+        purchasedIds = Set(cached)
+
         // Start the transaction listener as close to launch as possible so we don't miss any
         // transactions that occur outside the app or on other devices.
         updateListenerTask = Task { [weak self] in
@@ -58,6 +65,7 @@ final class StoreManager {
             ids.insert(transaction.productID)
         }
         purchasedIds = ids
+        persistPurchasedIds()
     }
 
     func purchase(_ product: Product) async throws -> Transaction? {
@@ -108,5 +116,10 @@ final class StoreManager {
         } else {
             purchasedIds.remove(transaction.productID)
         }
+        persistPurchasedIds()
+    }
+
+    private func persistPurchasedIds() {
+        UserDefaults.standard.set(Array(purchasedIds), forKey: Self.cachedPurchasedIdsKey)
     }
 }
