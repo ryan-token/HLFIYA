@@ -58,7 +58,11 @@ struct PersistenceController {
         }
 
         container.viewContext.automaticallyMergesChangesFromParent = true
-        container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+        // Store-trump is the right default for an NSPersistentCloudKitContainer:
+        // changes pulled in from iCloud (or from background contexts) have
+        // already been merged into the store, and they should win over stale
+        // in-memory edits to avoid clobbering a freshly synced record.
+        container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyStoreTrump
         container.viewContext.shouldDeleteInaccessibleFaults = true
         container.viewContext.name = "ViewContext"
         container.viewContext.transactionAuthor = "app"

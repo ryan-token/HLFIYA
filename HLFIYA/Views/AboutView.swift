@@ -49,20 +49,20 @@ struct AboutView: View {
                     .padding(5)
 
                     Section("Try my other apps") {
-                        otherAppRow(
-                            image: "Outrank-1024",
-                            title: "Outrank",
-                            subtitle: "College football stat rankings",
-                            url: URL(string: "itms-apps://apps.apple.com/us/app/outrank/id1588983785"),
-                            accessibility: "Try out this developer's other app: Outrank"
-                        )
+						OtherAppRow(
+							image: "CatchUp-1024",
+							title: "CatchUp: Keep in Touch",
+							subtitle: "Personal relationship manager",
+							url: URL(string: "itms-apps://apps.apple.com/us/app/catchup-keep-in-touch/id1358023550"),
+							accessibility: "Try out this developer's other app, CatchUp: Keep in Touch"
+						)
 
-                        otherAppRow(
-                            image: "CatchUp-1024",
-                            title: "CatchUp – Keep in Touch",
-                            subtitle: "Stay in touch with those who matter most",
-                            url: URL(string: "itms-apps://apps.apple.com/us/app/catchup-keep-in-touch/id1358023550"),
-                            accessibility: "Try out this developer's other app: CatchUp – Keep in Touch"
+                        OtherAppRow(
+                            image: "Outrank-1024",
+                            title: "Outrank: CFB Stat Rankings",
+                            subtitle: "College football team stats",
+                            url: URL(string: "itms-apps://apps.apple.com/us/app/outrank/id1588983785"),
+                            accessibility: "Try out this developer's other app, Outrank: CFB Stat Rankings"
                         )
                     }
                 }
@@ -78,39 +78,49 @@ struct AboutView: View {
         .tint(.fuchsia)
     }
 
-    private func otherAppRow(image: String, title: String, subtitle: String, url: URL?, accessibility: String) -> some View {
-        Button {
-            if let url { openURL(url) }
-        } label: {
-            HStack {
-                Image(image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 60, height: 60)
-                    .clipShape(.rect(cornerRadius: 11))
-
-                Spacer()
-                    .frame(width: 15)
-
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(title)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-
-                    Text(subtitle)
-                        .multilineTextAlignment(.leading)
-                        .foregroundStyle(.gray)
-                }
-            }
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(accessibility)
-    }
-
     private func requestReviewManually() {
         guard let url = URL(string: "https://apps.apple.com/us/app/hot-local-food/id1621818779?action=write-review") else { return }
         openURL(url)
     }
+}
+
+private struct OtherAppRow: View {
+	@Environment(\.openURL) private var openURL
+
+	let image: String
+	let title: String
+	let subtitle: String
+	let url: URL?
+	let accessibility: String
+
+	var body: some View {
+		Button {
+			if let url { openURL(url) }
+		} label: {
+			HStack {
+				Image(image)
+					.resizable()
+					.scaledToFit()
+					.frame(width: 60, height: 60)
+					.clipShape(.rect(cornerRadius: 11))
+
+				Spacer()
+					.frame(width: 15)
+
+				VStack(alignment: .leading, spacing: 3) {
+					Text(title)
+						.font(.headline)
+						.foregroundStyle(.primary)
+
+					Text(subtitle)
+						.multilineTextAlignment(.leading)
+						.foregroundStyle(.gray)
+				}
+			}
+		}
+		.buttonStyle(.plain)
+		.accessibilityLabel(accessibility)
+	}
 }
 
 #Preview {

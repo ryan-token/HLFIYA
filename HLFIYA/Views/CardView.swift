@@ -11,7 +11,7 @@ struct CardView: View {
     var totalRestaurants: Int
 
     @State private var showingRestaurantDetails = false
-    @State private var userTappedToShowMorePhotos = false
+    @State private var wantsMorePhotos = false
     @State private var selectedTab = 1
     @State private var imageUrls = [String]()
     @State private var apiError = false
@@ -40,7 +40,7 @@ struct CardView: View {
 
             ImageSliderView(
                 selectedTab: $selectedTab,
-                imageUrls: userTappedToShowMorePhotos ? imageUrls : [restaurant.image_url ?? ""]
+                imageUrls: wantsMorePhotos && !imageUrls.isEmpty ? imageUrls : [restaurant.image_url ?? ""]
             )
 
             LinearGradient(gradient: cardGradient, startPoint: .top, endPoint: .bottom)
@@ -79,6 +79,12 @@ struct CardView: View {
         .sheet(isPresented: $showingRestaurantDetails) {
             RestaurantDetailsView(restaurant: restaurant)
         }
+        // Driven by `wantsMorePhotos` so the fetch is auto-cancelled if the
+        // card disappears (e.g. user swipes away) before it completes.
+        .task(id: wantsMorePhotos) {
+            guard wantsMorePhotos, thereAreImages, imageUrls.isEmpty else { return }
+            await loadBusinessPhotos(id: restaurant.id ?? "")
+        }
     }
 
     private var dragGesture: some Gesture {
@@ -110,26 +116,28 @@ struct CardView: View {
     }
 
     private func handleCardTap() {
-        if userTappedToShowMorePhotos {
+        if wantsMorePhotos, !imageUrls.isEmpty {
             selectedTab = selectedTab == imageUrls.count ? 1 : selectedTab + 1
         } else {
-            Task { await loadBusinessPhotos(id: restaurant.id ?? "") }
+            wantsMorePhotos = true
         }
     }
 
     private func loadBusinessPhotos(id: String) async {
-        guard thereAreImages else { return }
         do {
             let details = try await BusinessFetcher.getBusiness(id: id)
-            imageUrls = details.photos ?? [restaurant.image_url ?? ""]
+            try Task.checkCancellation()
+            let urls = details.photos ?? [restaurant.image_url ?? ""]
             apiError = false
 
-            if imageUrls.isEmpty {
+            if urls.isEmpty {
                 thereAreImages = false
             } else {
+                imageUrls = urls
                 selectedTab = 2
-                userTappedToShowMorePhotos = true
             }
+        } catch is CancellationError {
+            // Card disappeared mid-fetch — let the new view drive its own load.
         } catch {
             print("Request failed with error: \(error)")
             apiError = true

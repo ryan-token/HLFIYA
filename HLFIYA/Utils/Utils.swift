@@ -157,10 +157,7 @@ nonisolated enum Utils {
     
     static func writeReviewDateToDocumentsDir(date: Date) {
         let lastReviewDateDoc = Utils.getDocumentsDirectory().appendingPathComponent("lastReviewData.txt")
-        let today = Date.now
-        let formatter = DateFormatter()
-        formatter.dateStyle = .full
-        let dateString = formatter.string(from: today)
+        let dateString = date.formatted(.iso8601)
         do {
             try dateString.write(to: lastReviewDateDoc, atomically: true, encoding: .utf8)
         } catch {

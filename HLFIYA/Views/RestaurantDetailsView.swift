@@ -119,7 +119,7 @@ struct RestaurantDetailsView: View {
     private func maybeRequestReview() {
         let lastReviewDateString = Utils.getLastReviewRequestFromDocumentsDir()
         let sevenDaysAgo = Date.now.addingTimeInterval(-604800)
-        let lastReviewDate = (try? Date(lastReviewDateString, strategy: .dateTime)) ?? .distantPast
+        let lastReviewDate = (try? Date(lastReviewDateString, strategy: .iso8601)) ?? .distantPast
 
         if lastReviewDateString == "Unknown" || lastReviewDate < sevenDaysAgo {
             requestReview()

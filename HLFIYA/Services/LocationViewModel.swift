@@ -17,6 +17,9 @@ final class LocationViewModel: NSObject, CLLocationManagerDelegate {
     private let locationManager: CLLocationManager
     private var geocodeTask: Task<Void, Never>?
 
+    // Must be initialised on the main run loop. `CLLocationManager` binds its
+    // delegate callbacks to the run loop that's active at init time, and the
+    // delegate methods below use `MainActor.assumeIsolated` on that promise.
     override init() {
         locationManager = CLLocationManager()
         authorizationStatus = locationManager.authorizationStatus

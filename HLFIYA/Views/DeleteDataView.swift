@@ -116,9 +116,15 @@ struct DeleteDataView: View {
     private func deleteAllLocalAndCloudKitData() async {
         Utils.clearAllCacheFilesInDocumentsDir()
 
-        for leftSwipe in leftSwipes { moc.delete(leftSwipe) }
-        for rightSwipe in rightSwipes { moc.delete(rightSwipe) }
-        for savedList in savedLists { moc.delete(savedList) }
+        // Snapshot FetchedResults before deleting so we aren't iterating a
+        // collection that the controller is mutating in response to .delete().
+        let leftSwipesToDelete = Array(leftSwipes)
+        let rightSwipesToDelete = Array(rightSwipes)
+        let listsToDelete = Array(savedLists)
+
+        for leftSwipe in leftSwipesToDelete { moc.delete(leftSwipe) }
+        for rightSwipe in rightSwipesToDelete { moc.delete(rightSwipe) }
+        for savedList in listsToDelete { moc.delete(savedList) }
 
         do {
             try moc.save()
