@@ -8,10 +8,16 @@
 import CoreData
 
 extension SavedList {
-  static var allListsFetchRequest: NSFetchRequest<SavedList> {
-      let request = SavedList.fetchRequest()
-      request.sortDescriptors = [NSSortDescriptor(keyPath: \SavedList.name, ascending: true)]
+    static var allListsFetchRequest: NSFetchRequest<SavedList> {
+        let request = SavedList.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \SavedList.name, ascending: true)]
+        return request
+    }
 
-      return request
-  }
+    static func fetchRequest(named name: String) -> NSFetchRequest<SavedList> {
+        let request = SavedList.fetchRequest()
+        request.predicate = NSPredicate(format: "name == %@", name)
+        request.fetchLimit = 1
+        return request
+    }
 }

@@ -96,7 +96,9 @@ struct DeleteDataView: View {
             Text("Proceed if you're seeing stale Yelp data.")
         }
         .alert("This will permanently delete all of your swipes data and all of your Lists.", isPresented: $isShowingDeleteAlert) {
-            Button("Delete All Saved Data", role: .destructive, action: deleteAllLocalAndCloudKitData)
+            Button("Delete All Saved Data", role: .destructive) {
+                Task { await deleteAllLocalAndCloudKitData() }
+            }
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("Are you sure you want to do this?")
@@ -111,29 +113,38 @@ struct DeleteDataView: View {
         leftSwipes.count + rightSwipes.count
     }
 
-    private func deleteAllLocalAndCloudKitData() {
+    private func deleteAllLocalAndCloudKitData() async {
         Utils.clearAllCacheFilesInDocumentsDir()
+
         for leftSwipe in leftSwipes { moc.delete(leftSwipe) }
         for rightSwipe in rightSwipes { moc.delete(rightSwipe) }
         for savedList in savedLists { moc.delete(savedList) }
 
-        for container in containers {
-            container.privateCloudDatabase.fetchAllRecordZones { zones, error in
-                guard let zones, error == nil else {
-                    print("Error fetching zones.")
-                    return
-                }
-
-                let zoneIDs = zones.map(\.zoneID)
-                let deletionOperation = CKModifyRecordZonesOperation(recordZonesToSave: nil, recordZoneIDsToDelete: zoneIDs)
-                deletionOperation.modifyRecordZonesResultBlock = { result in
-                    print("deletion result: \(result)")
-                }
-                container.privateCloudDatabase.add(deletionOperation)
-            }
+        do {
+            try moc.save()
+        } catch {
+            print("Failed to save Core Data deletions: \(error)")
         }
 
-        try? moc.save()
+        await withTaskGroup(of: Void.self) { group in
+            for container in containers {
+                group.addTask {
+                    await Self.deleteAllZones(in: container)
+                }
+            }
+        }
+    }
+
+    private static func deleteAllZones(in container: CKContainer) async {
+        do {
+            let database = container.privateCloudDatabase
+            let zones = try await database.allRecordZones()
+            let zoneIDs = zones.map(\.zoneID)
+            guard !zoneIDs.isEmpty else { return }
+            _ = try await database.modifyRecordZones(saving: [], deleting: zoneIDs)
+        } catch {
+            print("Failed to delete CloudKit zones in \(container.containerIdentifier ?? "default"): \(error)")
+        }
     }
 }
 

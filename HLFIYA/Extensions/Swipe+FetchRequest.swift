@@ -8,19 +8,19 @@
 import CoreData
 
 extension RightSwipe {
-  static var allRightSwipesFetchRequest: NSFetchRequest<RightSwipe> {
-      let request = RightSwipe.fetchRequest()
-      request.sortDescriptors = [NSSortDescriptor(keyPath: \RightSwipe.name, ascending: true)]
-
-      return request
-  }
+    static var allRightSwipesFetchRequest: NSFetchRequest<RightSwipe> {
+        let request = RightSwipe.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \RightSwipe.name, ascending: true)]
+        request.fetchBatchSize = 50
+        return request
+    }
 }
 
 extension LeftSwipe {
-  static var allLeftSwipesFetchRequest: NSFetchRequest<LeftSwipe> {
-      let request = LeftSwipe.fetchRequest()
-      request.sortDescriptors = [NSSortDescriptor(keyPath: \LeftSwipe.name, ascending: true)]
-
-      return request
-  }
+    static var allLeftSwipesFetchRequest: NSFetchRequest<LeftSwipe> {
+        let request = LeftSwipe.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \LeftSwipe.name, ascending: true)]
+        request.fetchBatchSize = 50
+        return request
+    }
 }

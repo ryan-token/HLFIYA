@@ -9,31 +9,27 @@
 import Foundation
 import CoreData
 
-
 extension SavedList {
-
     @nonobjc public class func fetchRequest() -> NSFetchRequest<SavedList> {
-        return NSFetchRequest<SavedList>(entityName: "SavedList")
+        NSFetchRequest<SavedList>(entityName: "SavedList")
     }
 
     @NSManaged public var name: String?
     @NSManaged public var restaurants: NSSet?
 
     public var wrappedName: String {
-        return name ?? "Unknown"
+        name ?? "Unknown"
     }
-    
+
     public var restaurantsArray: [SavedRestaurant] {
-        let set = restaurants as? Set<SavedRestaurant> ?? []
-        return set.sorted {
-            $0.wrappedName < $1.wrappedName
-        }
+        let restaurants = restaurants as? Set<SavedRestaurant> ?? []
+        return restaurants.sorted { $0.wrappedName < $1.wrappedName }
     }
 }
 
 // MARK: Generated accessors for restaurants
-extension SavedList {
 
+extension SavedList {
     @objc(addRestaurantsObject:)
     @NSManaged public func addToRestaurants(_ value: SavedRestaurant)
 
@@ -45,9 +41,6 @@ extension SavedList {
 
     @objc(removeRestaurants:)
     @NSManaged public func removeFromRestaurants(_ values: NSSet)
-
 }
 
-extension SavedList : Identifiable {
-
-}
+extension SavedList: Identifiable {}

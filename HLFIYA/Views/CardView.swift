@@ -195,7 +195,12 @@ struct CardView: View {
             leftSwipe.name = restaurant.name ?? ""
             leftSwipe.uuid = UUID()
         }
-        try? moc.save()
+
+        do {
+            try moc.save()
+        } catch {
+            print("Failed to save swipe to Core Data: \(error)")
+        }
     }
 }
 

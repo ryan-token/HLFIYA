@@ -222,9 +222,8 @@ struct MainView: View {
     }
 
     private func itemExists(_ item: String) -> Bool {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "SavedList")
-        fetchRequest.predicate = NSPredicate(format: "name == %@", item)
-        return ((try? moc.count(for: fetchRequest)) ?? 0) > 0
+        let request = SavedList.fetchRequest(named: item)
+        return ((try? moc.count(for: request)) ?? 0) > 0
     }
 }
 
