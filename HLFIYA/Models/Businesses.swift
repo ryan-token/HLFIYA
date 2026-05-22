@@ -5,15 +5,15 @@
 //  Created by Ryan Token on 1/18/22.
 //
 
-import UIKit
+import Foundation
 
-struct Businesses: Codable {
+nonisolated struct Businesses: Codable {
     let total: Int?
     let businesses: [Business]?
     let region: Region?
 }
 
-struct Business: Identifiable, Codable {
+nonisolated struct Business: Identifiable, Codable {
     let id: String?
     let rating: Double?
     let price: String?
@@ -58,17 +58,17 @@ struct Business: Identifiable, Codable {
 }
 
 extension Business {
-    struct Category: Codable {
+    nonisolated struct Category: Codable {
         let alias: String
         let title: String
     }
-    
-    struct Coordinates: Codable {
+
+    nonisolated struct Coordinates: Codable {
         let latitude: Double
         let longitude: Double
     }
-    
-    struct Location: Codable {
+
+    nonisolated struct Location: Codable {
         let city: String
         let country: String
         let address2: String?
@@ -81,11 +81,11 @@ extension Business {
 }
 
 extension Businesses {
-    struct Region: Codable {
+    nonisolated struct Region: Codable {
         let center: Center
     }
-    
-    struct Center: Codable {
+
+    nonisolated struct Center: Codable {
         let longitude: Double
         let latitude: Double
     }

@@ -9,25 +9,17 @@
 import Foundation
 import CoreData
 
-
 extension LeftSwipe {
-
     @nonobjc public class func fetchRequest() -> NSFetchRequest<LeftSwipe> {
-        return NSFetchRequest<LeftSwipe>(entityName: "LeftSwipe")
+        NSFetchRequest<LeftSwipe>(entityName: "LeftSwipe")
     }
 
     @NSManaged public var name: String?
     @NSManaged public var uuid: UUID?
 
     public var wrappedName: String {
-        return name ?? "Unknown"
-    }
-
-    public var wrappedUuid: UUID {
-        return uuid ?? UUID()
+        name ?? "Unknown"
     }
 }
 
-extension LeftSwipe : Identifiable {
-
-}
+extension LeftSwipe: Identifiable {}

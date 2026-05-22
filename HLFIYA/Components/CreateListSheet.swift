@@ -9,62 +9,54 @@ import SwiftUI
 
 struct CreateListSheet: View {
     @FocusState private var listNameInFocus: Bool
-    
-    @Environment(\.dismiss) var dismiss
-    @Environment(\.managedObjectContext) var moc
-    
-    @State private var listName = String()
-    
+
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.managedObjectContext) private var moc
+
+    @State private var listName = ""
+
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 TextField("List Name", text: $listName)
                     .focused($listNameInFocus)
                     .textInputAutocapitalization(.words)
-                    .font(Font.system(.largeTitle, design: .rounded))
+                    .font(.largeTitle)
                     .padding()
-                    .background(Color(UIColor.systemGray5))
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .background(Color(.systemGray5))
+                    .clipShape(.rect(cornerRadius: 15))
             }
             .padding()
-            
             .navigationTitle("Create New List")
-            
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .font(Font.system(.headline, design: .rounded))
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel", action: dismiss.callAsFunction)
+                        .font(.headline)
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        if (!listName.isEmpty) {
-                            let newList = SavedList(context: moc)
-                            newList.name = listName
 
-                            try? moc.save()
-                        }
-                        
-                        dismiss()
-                    }
-                    .font(Font.system(.headline, design: .rounded))
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save", action: save)
+                        .font(.headline)
                 }
             }
         }
-        .accentColor(Color(UIColor(named: "fuchsia")!))
-        
-        .onAppear() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-                listNameInFocus = true
-              }
+        .tint(.fuchsia)
+        .task {
+            try? await Task.sleep(for: .milliseconds(750))
+            listNameInFocus = true
         }
+    }
+
+    private func save() {
+        if !listName.isEmpty {
+            let newList = SavedList(context: moc)
+            newList.name = listName
+            try? moc.save()
+        }
+        dismiss()
     }
 }
 
-struct CreateListSheet_Previews: PreviewProvider {
-    static var previews: some View {
-        CreateListSheet()
-    }
+#Preview {
+    CreateListSheet()
 }

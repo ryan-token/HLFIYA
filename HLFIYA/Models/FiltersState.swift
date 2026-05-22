@@ -8,8 +8,9 @@
 import SwiftUI
 import MapKit
 
+@MainActor
 @Observable
-class FiltersState {
+final class FiltersState {
     var openNow = false
     var categories: Set = ["food"]
     var categoriesNames = "All Food"

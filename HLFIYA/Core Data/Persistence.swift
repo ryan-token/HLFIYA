@@ -6,55 +6,65 @@
 //
 
 import CoreData
+import os
 
 struct PersistenceController {
     static let shared = PersistenceController()
 
-    @MainActor static var preview: PersistenceController = {
-        let result = PersistenceController(inMemory: true)
-        let viewContext = result.container.viewContext
-        
+    static let preview: PersistenceController = {
+        let controller = PersistenceController(inMemory: true)
+        let context = controller.container.viewContext
+
         for _ in 0..<10 {
-            let rightSwipe = RightSwipe(context: viewContext)
+            let rightSwipe = RightSwipe(context: context)
             rightSwipe.name = "Chick Fil A"
+            rightSwipe.uuid = UUID()
         }
-        
+
         do {
-            try viewContext.save()
+            try context.save()
         } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            Self.logger.error("Failed to seed preview store: \(error.localizedDescription, privacy: .public)")
         }
-        return result
+        return controller
     }()
 
     let container: NSPersistentCloudKitContainer
 
+    private static let logger = Logger(subsystem: "com.ryantoken.HLFIYA", category: "Persistence")
+
     init(inMemory: Bool = false) {
         container = NSPersistentCloudKitContainer(name: "HLFIYA")
-        container.viewContext.automaticallyMergesChangesFromParent = true
-        
-        if inMemory {
-            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
-        }
-        
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-            if let error = error as NSError? {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
 
-                /*
-                Typical reasons for an error here include:
-                * The parent directory does not exist, cannot be created, or disallows writing.
-                * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                * The device is out of space.
-                * The store could not be migrated to the current model version.
-                Check the error message to determine what the actual problem was.
-                */
-                fatalError("Unresolved error \(error), \(error.userInfo)")
+        guard let description = container.persistentStoreDescriptions.first else {
+            fatalError("Failed to retrieve a persistent store description.")
+        }
+
+        if inMemory {
+            description.url = URL(fileURLWithPath: "/dev/null")
+        }
+
+        // Persistent history tracking and remote-change notifications are required
+        // for NSPersistentCloudKitContainer so the view context picks up changes
+        // pulled in from iCloud (and from any background contexts).
+        description.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
+        description.setOption(true as NSNumber, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
+
+        container.loadPersistentStores { _, error in
+            if let error = error as NSError? {
+                Self.logger.error("Failed to load persistent store: \(error.localizedDescription, privacy: .public)")
+                assertionFailure("Failed to load persistent store: \(error), \(error.userInfo)")
             }
-        })
+        }
+
+        container.viewContext.automaticallyMergesChangesFromParent = true
+        // Store-trump is the right default for an NSPersistentCloudKitContainer:
+        // changes pulled in from iCloud (or from background contexts) have
+        // already been merged into the store, and they should win over stale
+        // in-memory edits to avoid clobbering a freshly synced record.
+        container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyStoreTrump
+        container.viewContext.shouldDeleteInaccessibleFaults = true
+        container.viewContext.name = "ViewContext"
+        container.viewContext.transactionAuthor = "app"
     }
 }

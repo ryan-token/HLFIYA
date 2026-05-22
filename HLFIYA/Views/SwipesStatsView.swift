@@ -9,78 +9,47 @@ import SwiftUI
 
 struct SwipesStatsView: View {
     @FetchRequest(fetchRequest: RightSwipe.allRightSwipesFetchRequest, animation: .default)
-    var rightSwipes: FetchedResults<RightSwipe>
-    
+    private var rightSwipes: FetchedResults<RightSwipe>
+
     @FetchRequest(fetchRequest: LeftSwipe.allLeftSwipesFetchRequest, animation: .default)
-    var leftSwipes: FetchedResults<LeftSwipe>
-    
+    private var leftSwipes: FetchedResults<LeftSwipe>
+
     var body: some View {
-        List {
-            if !leftSwipes.isEmpty || !rightSwipes.isEmpty {
-                Section(header: Text("Top 5 Right Swipes").font(.callout).foregroundColor(.gray)) {
-                    ForEach(formattedRightSwipes().prefix(5), id: \.key) { business, count in
-                        Text("\(business.trimmingCharacters(in: .whitespacesAndNewlines)): \(count)")
-                    }
-                }
-                
-                Section(header: Text("Top 5 Left Swipes").font(.callout).foregroundColor(.gray)) {
-                    ForEach(formattedLeftSwipes().prefix(5), id: \.key) { business, count in
-                        Text("\(business.trimmingCharacters(in: .whitespacesAndNewlines)): \(count)")
-                    }
-                }
+        Group {
+            if leftSwipes.isEmpty && rightSwipes.isEmpty {
+                ContentUnavailableView(
+                    "No swipes yet",
+                    systemImage: "hand.draw",
+                    description: Text("Use the app for a bit, then come back 🙂")
+                )
             } else {
-                Text("No swipes yet! Use the app for a bit, then come back 🙂")
-                    .foregroundColor(.gray)
+                List {
+                    Section("Top 5 Right Swipes") {
+                        ForEach(topSwipes(from: rightSwipes.map(\.wrappedName)), id: \.key) { business, count in
+                            Text("\(business.trimmingCharacters(in: .whitespacesAndNewlines)): \(count)")
+                        }
+                    }
+
+                    Section("Top 5 Left Swipes") {
+                        ForEach(topSwipes(from: leftSwipes.map(\.wrappedName)), id: \.key) { business, count in
+                            Text("\(business.trimmingCharacters(in: .whitespacesAndNewlines)): \(count)")
+                        }
+                    }
+                }
             }
         }
-        .font(Font.system(.body, design: .rounded))
-        
         .navigationTitle("Swipe Stats")
     }
-    
-    func formattedRightSwipes() -> [Dictionary<String, Int>.Element] {
-        var businessDictionary = [String:Int]()
-        
-        for business in rightSwipes {
-            let keyExists = businessDictionary[business.wrappedName] != nil
-            
-            if keyExists {
-                businessDictionary.updateValue(businessDictionary[business.wrappedName]!+1, forKey: business.wrappedName)
-            } else {
-                businessDictionary[business.wrappedName] = 1
-            }
-        }
-        
-        let sortedDictionary = businessDictionary.sorted{
-            return ($0.value, $1.key) > ($1.value, $0.key)
-        }
-        
-        return sortedDictionary
-    }
-    
-    func formattedLeftSwipes() -> [Dictionary<String, Int>.Element] {
-        var businessDictionary = [String:Int]()
-        
-        for business in leftSwipes {
-            let keyExists = businessDictionary[business.wrappedName] != nil
-            
-            if keyExists {
-                businessDictionary.updateValue(businessDictionary[business.wrappedName]!+1, forKey: business.wrappedName)
-            } else {
-                businessDictionary[business.wrappedName] = 1
-            }
-        }
-        
-        let sortedDictionary = businessDictionary.sorted{
-            return ($0.value, $1.key) > ($1.value, $0.key)
-        }
-        
-        return sortedDictionary
+
+    private func topSwipes(from names: [String]) -> [(key: String, value: Int)] {
+        Dictionary(grouping: names, by: { $0 })
+            .mapValues(\.count)
+            .sorted { ($0.value, $1.key) > ($1.value, $0.key) }
+            .prefix(5)
+            .map { (key: $0.key, value: $0.value) }
     }
 }
 
-struct SwipesStatsView_Previews: PreviewProvider {
-    static var previews: some View {
-        SwipesStatsView()
-    }
+#Preview {
+    NavigationStack { SwipesStatsView() }
 }

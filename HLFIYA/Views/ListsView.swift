@@ -9,88 +9,72 @@ import SwiftUI
 
 struct ListsView: View {
     @State private var isShowingCreateListSheet = false
-    @State private var editMode = EditMode.inactive
-    
-    @Environment(\.dismiss) var dismiss
-    @Environment(\.managedObjectContext) var moc
-    @FetchRequest(sortDescriptors: [SortDescriptor(\.name)]) var savedLists: FetchedResults<SavedList>
-    
+
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.managedObjectContext) private var moc
+    @FetchRequest(fetchRequest: SavedList.allListsFetchRequest, animation: .default)
+    private var savedLists: FetchedResults<SavedList>
+
     var body: some View {
-        NavigationView {
-			ZStack {
-				List {
-					ForEach(savedLists, id: \.self) { list in
-						NavigationLink(destination: SavedRestaurantsView(list: list)) {
-							Text(list.wrappedName)
-						}
-						.isDetailLink(false)
-					}
-					.onDelete(perform: removeList)
+        NavigationStack {
+            ZStack {
+                Group {
+                    if savedLists.isEmpty {
+                        ContentUnavailableView(
+                            "No Lists Yet",
+                            systemImage: "list.bullet.rectangle",
+                            description: Text("Create lists to easily save places for later.")
+                        )
+                    } else {
+                        List {
+                            ForEach(savedLists, id: \.self) { list in
+                                NavigationLink {
+                                    SavedRestaurantsView(list: list)
+                                } label: {
+                                    Text(list.wrappedName)
+                                }
+                            }
+                            .onDelete(perform: removeList)
+                        }
+                        .safeAreaInset(edge: .bottom) {
+                            Color.clear.frame(height: 20)
+                        }
+                    }
+                }
 
-					if (savedLists.isEmpty) {
-						Text("Create lists to easily save places for later.")
-							.foregroundColor(.gray)
-					}
-				}
-				.font(Font.system(.body, design: .rounded))
-				.safeAreaInset(edge: .bottom) {
-					Color.clear.frame(height: 20)
-				}
+                VStack {
+                    Spacer()
 
-				VStack {
-					Spacer()
-
-					GlassButton {
-						isShowingCreateListSheet.toggle()
-					} label: {
-						HStack {
-							Image(systemName: "plus.square.fill")
-								.foregroundColor(Color(UIColor(named: "fuchsia")!))
-							Text("Create List")
-								.foregroundColor(Color(UIColor(named: "fuchsia")!))
-						}
-						.padding(10)
-					}
-					.font(Font.system(.headline, design: .rounded))
-				}
-			}
-            .environment(\.editMode, $editMode)
-            
+                    GlassButton(action: { isShowingCreateListSheet.toggle() }) {
+                        Label("Create List", systemImage: "plus.square.fill")
+                            .foregroundStyle(.fuchsia)
+                            .padding(10)
+                    }
+                    .font(.headline)
+                }
+            }
             .popover(isPresented: $isShowingCreateListSheet) {
                 CreateListSheet()
             }
-            
             .navigationTitle("Lists")
-            
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Close") {
-                        dismiss()
-                    }
-                    .font(Font.system(.headline, design: .rounded))
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Close", action: dismiss.callAsFunction)
+                        .font(.headline)
                 }
             }
         }
-        .navigationViewStyle(.stack)
-        .accentColor(Color(UIColor(named: "fuchsia")!))
+        .tint(.fuchsia)
     }
-    
-    func removeList(at offsets: IndexSet) {
+
+    private func removeList(at offsets: IndexSet) {
         for index in offsets {
-            let list = savedLists[index]
-            moc.delete(list)
+            moc.delete(savedLists[index])
         }
-        
-        do {
-            try moc.save()
-        } catch {
-            print("Error deleting the list")
-        }
+        try? moc.save()
     }
 }
 
-struct ListsView_Previews: PreviewProvider {
-    static var previews: some View {
-        ListsView()
-    }
+#Preview {
+    ListsView()
 }

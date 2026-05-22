@@ -11,44 +11,30 @@ struct TintedGlassButton<Label: View>: View {
     enum GlassTintStyle { case standard, prominent }
 
     let action: () -> Void
-    @ViewBuilder let label: () -> Label
+    @ViewBuilder let label: Label
     let tintColor: Color
     let style: GlassTintStyle
 
-    init(action: @escaping () -> Void, @ViewBuilder label: @escaping () -> Label, tintColor: Color, style: GlassTintStyle) {
-        self.action = action
-        self.label = label
-        self.tintColor = tintColor
-        self.style = style
-    }
-
     var body: some View {
-        if #available(iOS 26.0, *) {
-            if style == .standard {
-                Button(action: action, label: label)
+        Group {
+            switch style {
+            case .standard:
+                Button(action: action) { label }
                     .buttonStyle(.glass)
-                    .tint(tintColor)
-            } else {
-                Button(action: action, label: label)
+            case .prominent:
+                Button(action: action) { label }
                     .buttonStyle(.glassProminent)
-                    .tint(tintColor)
             }
-        } else {
-            Button(action: action, label: label)
-                .foregroundColor(tintColor)
         }
+        .tint(tintColor)
     }
 }
 
 #Preview {
     TintedGlassButton(
-        action: {
-            print("Button tapped!")
-        },
-        label: {
-            Text("My Button")
-        },
-        tintColor: Color(UIColor(named: "fuchsia")!),
+        action: { print("Button tapped!") },
+        label: { Text("My Button") },
+        tintColor: .fuchsia,
         style: .prominent
     )
 }
