@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+    <entity name="LeftSwipe" representedClassName="LeftSwipe" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="uuid" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+    </entity>
+    <entity name="RightSwipe" representedClassName="RightSwipe" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="uuid" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+    </entity>
+    <entity name="SavedList" representedClassName="SavedList" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="restaurants" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="SavedRestaurant" inverseName="lists" inverseEntity="SavedRestaurant"/>
+    </entity>
+    <entity name="SavedRestaurant" representedClassName="SavedRestaurant" syncable="YES">
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="lists" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="SavedList" inverseName="restaurants" inverseEntity="SavedList"/>
+    </entity>
+    <elements>
+        <element name="LeftSwipe" positionX="-63" positionY="-9" width="128" height="59"/>
+        <element name="RightSwipe" positionX="-63" positionY="-18" width="128" height="59"/>
+        <element name="SavedList" positionX="-54" positionY="18" width="128" height="59"/>
+        <element name="SavedRestaurant" positionX="-63" positionY="0" width="128" height="74"/>
+    </elements>
+</model>

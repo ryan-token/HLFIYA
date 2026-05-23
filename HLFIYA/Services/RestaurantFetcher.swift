@@ -1,0 +1,119 @@
+//
+//  BusinessFetcher.swift
+//  HLFIYA
+//
+//  Created by Ryan Token on 2/22/22.
+//
+
+import Foundation
+
+enum BusinessFetcher {
+    private nonisolated static let yelpKey = Bundle.main.infoDictionary?["YelpAPIKey"] as? String ?? ""
+
+    enum BusinessFetcherError: Error {
+        case invalidURL
+        case missingData
+    }
+
+    // radius is in meters
+    nonisolated static func getBusinessesNear(latitude: Double, longitude: Double, radius: Int, categories: Set<String>, prices: String, onlyGetOpenNow: Bool) async throws -> [Business] {
+        var userCategories: Set = ["food"]
+        if categories == userCategories { userCategories = ["food"] } else { userCategories = categories }
+        let formattedCategories = userCategories.joined(separator: ",")
+        
+        var userPrice = ""
+        if prices == "" { userPrice = "1, 2, 3, 4" } else { userPrice = prices }
+        
+        print("getting businesses near \(latitude), \(longitude), within a radius of \(radius) meters")
+        var endpoint = ""
+        if onlyGetOpenNow {
+            endpoint = "https://api.yelp.com/v3/businesses/search?latitude=\(latitude)&longitude=\(longitude)&radius=\(radius)&limit=50&categories=\(formattedCategories)&price=\(userPrice)&open_now=true"
+        } else {
+            endpoint = "https://api.yelp.com/v3/businesses/search?latitude=\(latitude)&longitude=\(longitude)&radius=\(radius)&limit=50&categories=\(formattedCategories)&price=\(userPrice)"
+        }
+        
+        let cleanEndpoint = endpoint.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        print("hit endpoint: \(cleanEndpoint)")
+        
+        guard let url = URL(string: cleanEndpoint) else {
+            throw BusinessFetcherError.invalidURL
+        }
+        
+        var yelpRequest = URLRequest(url: url)
+        yelpRequest.httpMethod = "GET"
+        yelpRequest.setValue("Bearer \(yelpKey)", forHTTPHeaderField: "Authorization")
+        yelpRequest.setValue("application/json;charset=utf-8", forHTTPHeaderField: "Content-Type")
+
+        let (data, _) = try await URLSession.shared.data(for: yelpRequest)
+
+        let response = try JSONDecoder().decode(Businesses.self, from: data)
+        let businesses = response.businesses
+        
+        // Filter out grocery stores, convenience stores, and gift shops
+        var filteredBusinesses = [Business]()
+        for business in businesses ?? [] {
+            var containsGroceryCategory = false
+            for category in business.categories ?? [] {
+                if category.alias == "grocery" || category.alias == "intlgrocery" || category.alias == "ethicgrocery" || category.alias == "healthmarkets" || category.alias == "organic_stores" || category.alias == "convenience" || category.alias == "giftshops" {
+                    containsGroceryCategory = true
+                }
+            }
+            
+            if !containsGroceryCategory {
+                filteredBusinesses.append(business)
+            }
+        }
+        
+        let shuffledBusinesses = filteredBusinesses.shuffled()
+        
+        // Write JSON data to local document as cache
+        let encodedData = try JSONEncoder().encode(response)
+        let jsonString = String(data: encodedData,
+                                encoding: .utf8)
+        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("localYelpCache.json")
+
+        do {
+            try jsonString?.write(to: localCacheUrl, atomically: true, encoding: .utf8)
+        } catch {
+            print(error.localizedDescription)
+        }
+        
+        await HapticGenerator.playSuccessHaptic()
+        return shuffledBusinesses
+    }
+    
+    static func getBusiness(id: String) async throws -> BusinessDetails {
+        print("getting business with ID \(id)")
+        let endpoint = "https://api.yelp.com/v3/businesses/\(id)"
+        let cleanEndpoint = endpoint.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        print("getBusiness endpoint: \(cleanEndpoint)")
+        
+        guard let url = URL(string: cleanEndpoint) else {
+            throw BusinessFetcherError.invalidURL
+        }
+        
+        var yelpRequest = URLRequest(url: url)
+        yelpRequest.httpMethod = "GET"
+        yelpRequest.setValue("Bearer \(yelpKey)", forHTTPHeaderField: "Authorization")
+        yelpRequest.setValue("application/json;charset=utf-8", forHTTPHeaderField: "Content-Type")
+
+        let (data, _) = try await URLSession.shared.data(for: yelpRequest)
+
+        // Parse the JSON data
+        let businessDetails = try JSONDecoder().decode(BusinessDetails.self, from: data)
+        
+        // Write JSON data to local document as cache
+        let encodedData = try JSONEncoder().encode(businessDetails)
+        let jsonString = String(data: encodedData,
+                                encoding: .utf8)
+        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("localYelpCacheForBusId-\(businessDetails.id ?? "unknown").json")
+
+        do {
+            try jsonString?.write(to: localCacheUrl, atomically: true, encoding: .utf8)
+        } catch {
+            print(error.localizedDescription)
+        }
+        
+        return businessDetails
+    }
+}
