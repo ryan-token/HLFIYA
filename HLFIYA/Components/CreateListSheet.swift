@@ -2,56 +2,65 @@
 //  CreateListSheet.swift
 //  HLFIYA
 //
-//  Created by Ryan Token on 6/11/22.
+//  Created by Ryan Token on 6/12/22.
 //
 
+import CoreData
 import SwiftUI
 
+/// A sheet for naming and creating a new saved list.
 struct CreateListSheet: View {
-    @FocusState private var listNameInFocus: Bool
+    @FocusState private var isNameFocused: Bool
+    @State private var listName = ""
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var moc
 
-    @State private var listName = ""
-
     var body: some View {
         NavigationStack {
-            VStack {
+            Form {
                 TextField("List Name", text: $listName)
-                    .focused($listNameInFocus)
+                    .focused($isNameFocused)
                     .textInputAutocapitalization(.words)
-                    .font(.largeTitle)
-                    .padding()
-                    .background(Color(.systemGray5))
-                    .clipShape(.rect(cornerRadius: 15))
+                    .submitLabel(.done)
+                    .onSubmit(save)
             }
-            .padding()
             .navigationTitle("Create New List")
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel", action: dismiss.callAsFunction)
-                        .font(.headline)
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .cancel) {
+                        dismiss()
+                    }
                 }
 
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Save", action: save)
-                        .font(.headline)
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(role: .confirm, action: save)
+                        .disabled(trimmedName.isEmpty)
                 }
             }
         }
         .tint(.fuchsia)
         .task {
+            // Wait for the sheet to finish presenting so the keyboard appears with it.
             try? await Task.sleep(for: .milliseconds(750))
-            listNameInFocus = true
+            isNameFocused = true
         }
     }
 
+    private var trimmedName: String {
+        listName.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private func save() {
-        if !listName.isEmpty {
-            let newList = SavedList(context: moc)
-            newList.name = listName
-            try? moc.save()
+        guard !trimmedName.isEmpty else { return }
+
+        let newList = SavedList(context: moc)
+        newList.name = trimmedName
+        do {
+            try moc.save()
+        } catch {
+            moc.rollback()
         }
         dismiss()
     }
@@ -59,4 +68,5 @@ struct CreateListSheet: View {
 
 #Preview {
     CreateListSheet()
+        .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

@@ -5,44 +5,36 @@
 
 import SwiftUI
 
+/// The rating, price, and categories at the top of a restaurant's details.
 struct RestaurantSummarySection: View {
-    let restaurant: BusinessDetails
+    let rating: Double
+    let reviewCount: Int?
+    let price: String
+    let categories: [String]
 
     var body: some View {
-        Group {
-            VStack(alignment: .leading, spacing: 5) {
-                StarRatingView(rating: restaurant.rating ?? 0.0, label: "Rating:", reviewCount: restaurant.review_count)
-                DollarView(price: restaurant.price ?? "", label: "Price:")
+        VStack(alignment: .leading) {
+            StarRatingView(rating: rating, label: "Rating:", reviewCount: reviewCount)
+            DollarView(price: price, label: "Price:")
 
-                if (restaurant.categories?.count ?? 0) < 2 {
-                    HStack {
-                        Text("Category:")
-                        ForEach(restaurant.categories ?? [], id: \.self) { category in
-                            Text(category.title ?? "")
-                                .accessibilityLabel("\(restaurant.name ?? "restaurant") is a \(category.title ?? "") place")
-                        }
-                    }
-                    .foregroundStyle(.gray)
-                } else {
-                    VStack(alignment: .leading) {
-                        Text("Categories:")
-
-                        Spacer()
-                            .frame(height: 5)
-
-                        ForEach(restaurant.categories ?? [], id: \.self) { category in
-                            Text("– \(category.title ?? "")")
-                                .padding(.leading, 25)
-                                .accessibilityLabel("\(restaurant.name ?? "restaurant") is a \(category.title ?? "") place")
-                        }
-                    }
-                    .foregroundStyle(.gray)
-                }
+            if !categories.isEmpty {
+                Text("\(categories.count == 1 ? "Category" : "Categories"): \(categories.formatted())")
+                    .foregroundStyle(.secondary)
             }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("Rating, price, and categories for \(restaurant.name ?? "restaurant")")
-            .listRowBackground(Color.clear)
-            .listRowSeparator(.hidden)
         }
+        .accessibilityElement(children: .combine)
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+    }
+}
+
+#Preview {
+    List {
+        RestaurantSummarySection(
+            rating: 4.5,
+            reviewCount: 6352,
+            price: "$$",
+            categories: ["Seafood", "Seafood Markets"]
+        )
     }
 }

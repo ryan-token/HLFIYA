@@ -11,7 +11,18 @@
 		F4BC0C272855303A00D76EE5 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = F4BC0C262855303A00D76EE5 /* GoogleMobileAds */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		F40E54E0308ADB54005F0696 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F45B3F0427963D96003DCC31 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F45B3F0B27963D96003DCC31;
+			remoteInfo = HLFIYA;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		F40E54D2308ADB54005F0696 /* HLFIYATests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HLFIYATests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F45B3F0C27963D96003DCC31 /* HLFIYA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HLFIYA.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F484972E28261D9400C2DB89 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -21,6 +32,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Secrets.xcconfig,
 				StoreKit/Products.storekit,
 			);
 			target = F45B3F0B27963D96003DCC31 /* HLFIYA */;
@@ -28,10 +40,18 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		F40E54D3308ADB54005F0696 /* HLFIYATests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = HLFIYATests; sourceTree = "<group>"; };
 		F43F9A382FBFBF49001AD973 /* HLFIYA */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (F43F9A732FBFBF4A001AD973 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = HLFIYA; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		F40E54CF308ADB54005F0696 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F45B3F0927963D96003DCC31 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -48,6 +68,7 @@
 			isa = PBXGroup;
 			children = (
 				F43F9A382FBFBF49001AD973 /* HLFIYA */,
+				F40E54D3308ADB54005F0696 /* HLFIYATests */,
 				F45B3F0D27963D96003DCC31 /* Products */,
 				F484972D28261D9400C2DB89 /* Frameworks */,
 			);
@@ -57,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				F45B3F0C27963D96003DCC31 /* HLFIYA.app */,
+				F40E54D2308ADB54005F0696 /* HLFIYATests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -72,6 +94,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		F40E54D1308ADB54005F0696 /* HLFIYATests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F40E54D6308ADB54005F0696 /* Build configuration list for PBXNativeTarget "HLFIYATests" */;
+			buildPhases = (
+				F40E54CE308ADB54005F0696 /* Sources */,
+				F40E54CF308ADB54005F0696 /* Frameworks */,
+				F40E54D0308ADB54005F0696 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F40E54E1308ADB54005F0696 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				F40E54D3308ADB54005F0696 /* HLFIYATests */,
+			);
+			name = HLFIYATests;
+			packageProductDependencies = (
+			);
+			productName = HLFIYATests;
+			productReference = F40E54D2308ADB54005F0696 /* HLFIYATests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		F45B3F0B27963D96003DCC31 /* HLFIYA */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F45B3F1F27963D97003DCC31 /* Build configuration list for PBXNativeTarget "HLFIYA" */;
@@ -102,9 +147,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1320;
-				LastUpgradeCheck = 2600;
+				LastSwiftUpdateCheck = 2710;
+				LastUpgradeCheck = 2710;
 				TargetAttributes = {
+					F40E54D1308ADB54005F0696 = {
+						CreatedOnToolsVersion = 27.1;
+					};
 					F45B3F0B27963D96003DCC31 = {
 						CreatedOnToolsVersion = 13.2.1;
 					};
@@ -127,11 +175,19 @@
 			projectRoot = "";
 			targets = (
 				F45B3F0B27963D96003DCC31 /* HLFIYA */,
+				F40E54D1308ADB54005F0696 /* HLFIYATests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		F40E54D0308ADB54005F0696 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F45B3F0A27963D96003DCC31 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -142,6 +198,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		F40E54CE308ADB54005F0696 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F45B3F0827963D96003DCC31 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -151,7 +214,68 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		F40E54E1308ADB54005F0696 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F45B3F0B27963D96003DCC31 /* HLFIYA */;
+			targetProxy = F40E54E0308ADB54005F0696 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		F40E54D7308ADB54005F0696 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ryantoken.HLFIYATests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HLFIYA.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HLFIYA";
+			};
+			name = Debug;
+		};
+		F40E54D8308ADB54005F0696 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ryantoken.HLFIYATests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HLFIYA.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HLFIYA";
+			};
+			name = Release;
+		};
 		F45B3F1D27963D97003DCC31 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -309,7 +433,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ryantoken.HLFIYA;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -352,7 +476,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ryantoken.HLFIYA;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -369,6 +493,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		F40E54D6308ADB54005F0696 /* Build configuration list for PBXNativeTarget "HLFIYATests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F40E54D7308ADB54005F0696 /* Debug */,
+				F40E54D8308ADB54005F0696 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F45B3F0727963D96003DCC31 /* Build configuration list for PBXProject "HLFIYA" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

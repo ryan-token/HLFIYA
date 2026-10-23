@@ -2,12 +2,15 @@
 //  DeleteDataView.swift
 //  HLFIYA
 //
-//  Created by Ryan Token on 8/15/22.
+//  Created by Ryan Token on 5/23/22.
 //
 
-import SwiftUI
 import CloudKit
+import CoreData
+import os
+import SwiftUI
 
+/// Clears cached Yelp data, or deletes all swipes and lists locally and from iCloud.
 struct DeleteDataView: View {
     @State private var isShowingClearCachesAlert = false
     @State private var isShowingDeleteAlert = false
@@ -23,69 +26,48 @@ struct DeleteDataView: View {
 
     @Environment(\.managedObjectContext) private var moc
 
-    private let containers: [CKContainer] = [
-        CKContainer.default(),
-        CKContainer(identifier: "iCloud.com.ryantoken.HLFIYA")
-    ]
+    private static let containerIdentifiers = ["iCloud.com.ryantoken.HLFIYA"]
+    private nonisolated static let logger = Logger(subsystem: "com.ryantoken.HLFIYA", category: "DeleteData")
 
     var body: some View {
-        Group {
-            if hasAnyData {
-                List {
-                    Text("Total Swipes: \(totalSwipes)")
-                    Text("Number of Lists: \(savedLists.count)")
+        List {
+            Section {
+                LabeledContent("Total Swipes", value: leftSwipes.count + rightSwipes.count, format: .number)
+                LabeledContent("Number of Lists", value: savedLists.count, format: .number)
+            }
 
-                    Section {
-                        Text("We cache Yelp data to improve the app. Cached data is intermittently refreshed, but you can manually clear the cached data here.")
-                            .foregroundStyle(.gray)
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
-
-                        Button {
-                            isShowingClearCachesAlert = true
-                        } label: {
-                            Text("Clear Cached Yelp Data")
-                                .padding()
-                                .font(.headline)
-                                .foregroundStyle(.white)
-                                .frame(maxWidth: .infinity)
-                        }
-                        .background(Color.orange)
-                        .clipShape(.capsule)
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                    }
-
-                    Section {
-                        Text("Your swipes data and all of your saved Lists are stored in iCloud so they can sync across your devices. You can delete all saved data from your device and from iCloud by tapping below.")
-                            .foregroundStyle(.gray)
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
-
-                        Button {
-                            isShowingDeleteAlert = true
-                        } label: {
-                            Text("Delete All Saved Data")
-                                .padding()
-                                .font(.headline)
-                                .foregroundStyle(.white)
-                                .frame(maxWidth: .infinity)
-                        }
-                        .background(Color.pink)
-                        .clipShape(.capsule)
-                        .padding()
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                    }
+            Section {
+                Button("Clear Cached Yelp Data") {
+                    isShowingClearCachesAlert = true
                 }
-            } else {
-                ContentUnavailableView(
-                    "No Data Yet",
-                    systemImage: "tray",
-                    description: Text("Use the app for a bit, then come back 🙂")
+                .buttonStyle(.borderedProminent)
+                .tint(.orange)
+            } footer: {
+                Text(
+                    """
+                    We cache Yelp data to improve the app. Cached data is intermittently refreshed, \
+                    but you can manually clear the cached data here.
+                    """
+                )
+            }
+
+            Section {
+                Button("Delete All Saved Data", role: .destructive) {
+                    isShowingDeleteAlert = true
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(!hasSavedData)
+            } footer: {
+                Text(
+                    """
+                    Your swipes data and all of your saved Lists are stored in iCloud so they can sync across \
+                    your devices. You can delete all saved data from your device and from iCloud by tapping below.
+                    """
                 )
             }
         }
+        .buttonBorderShape(.capsule)
+        .controlSize(.large)
         .navigationTitle("Delete Data")
         .alert("This will clear all cached data received from the Yelp API.", isPresented: $isShowingClearCachesAlert) {
             Button("Clear Caches", role: .destructive) {
@@ -95,7 +77,10 @@ struct DeleteDataView: View {
         } message: {
             Text("Proceed if you're seeing stale Yelp data.")
         }
-        .alert("This will permanently delete all of your swipes data and all of your Lists.", isPresented: $isShowingDeleteAlert) {
+        .alert(
+            "This will permanently delete all of your swipes data and all of your Lists.",
+            isPresented: $isShowingDeleteAlert
+        ) {
             Button("Delete All Saved Data", role: .destructive) {
                 Task { await deleteAllLocalAndCloudKitData() }
             }
@@ -105,34 +90,28 @@ struct DeleteDataView: View {
         }
     }
 
-    private var hasAnyData: Bool {
+    private var hasSavedData: Bool {
         !leftSwipes.isEmpty || !rightSwipes.isEmpty || !savedLists.isEmpty
-    }
-
-    private var totalSwipes: Int {
-        leftSwipes.count + rightSwipes.count
     }
 
     private func deleteAllLocalAndCloudKitData() async {
         Utils.clearAllCacheFilesInDocumentsDir()
 
-        // Snapshot FetchedResults before deleting so we aren't iterating a
-        // collection that the controller is mutating in response to .delete().
-        let leftSwipesToDelete = Array(leftSwipes)
-        let rightSwipesToDelete = Array(rightSwipes)
-        let listsToDelete = Array(savedLists)
-
-        for leftSwipe in leftSwipesToDelete { moc.delete(leftSwipe) }
-        for rightSwipe in rightSwipesToDelete { moc.delete(rightSwipe) }
-        for savedList in listsToDelete { moc.delete(savedList) }
+        // Snapshot the results before deleting, so we aren't iterating a collection
+        // that the fetched results controller is mutating in response to delete().
+        let objects: [NSManagedObject] = Array(leftSwipes) + Array(rightSwipes) + Array(savedLists)
+        for object in objects {
+            moc.delete(object)
+        }
 
         do {
             try moc.save()
         } catch {
-            print("Failed to save Core Data deletions: \(error)")
+            Self.logger.error("Failed to save Core Data deletions: \(error.localizedDescription, privacy: .public)")
         }
 
-        await withTaskGroup(of: Void.self) { group in
+        let containers = [CKContainer.default()] + Self.containerIdentifiers.map(CKContainer.init(identifier:))
+        await withTaskGroup { group in
             for container in containers {
                 group.addTask {
                     await Self.deleteAllZones(in: container)
@@ -141,19 +120,23 @@ struct DeleteDataView: View {
         }
     }
 
-    private static func deleteAllZones(in container: CKContainer) async {
+    private nonisolated static func deleteAllZones(in container: CKContainer) async {
         do {
             let database = container.privateCloudDatabase
-            let zones = try await database.allRecordZones()
-            let zoneIDs = zones.map(\.zoneID)
+            let zoneIDs = try await database.allRecordZones().map(\.zoneID)
             guard !zoneIDs.isEmpty else { return }
             _ = try await database.modifyRecordZones(saving: [], deleting: zoneIDs)
         } catch {
-            print("Failed to delete CloudKit zones in \(container.containerIdentifier ?? "default"): \(error)")
+            let containerName = container.containerIdentifier ?? "default"
+            let reason = error.localizedDescription
+            logger.error("Failed to delete zones in \(containerName, privacy: .public): \(reason, privacy: .public)")
         }
     }
 }
 
 #Preview {
-    NavigationStack { DeleteDataView() }
+    NavigationStack {
+        DeleteDataView()
+    }
+    .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

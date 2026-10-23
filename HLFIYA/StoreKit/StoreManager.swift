@@ -5,6 +5,7 @@
 //  Created by Ryan Token on 6/11/22.
 //
 
+import os
 import StoreKit
 
 typealias Transaction = StoreKit.Transaction
@@ -26,6 +27,17 @@ final class StoreManager {
     private(set) var purchasedIds: Set<String>
 
     @ObservationIgnored private var updateListenerTask: Task<Void, Never>?
+
+    private static let logger = Logger(subsystem: "com.ryantoken.HLFIYA", category: "StoreManager")
+
+    /// The "Remove Ads" product, once it has loaded from the App Store.
+    var removeAdsProduct: Product? {
+        products.first { $0.id == Self.removeAdsProductID }
+    }
+
+    var hasRemovedAds: Bool {
+        purchasedIds.contains(Self.removeAdsProductID)
+    }
 
     init() {
         let cached = UserDefaults.standard.stringArray(forKey: Self.cachedPurchasedIdsKey) ?? []
@@ -51,7 +63,7 @@ final class StoreManager {
         do {
             products = try await Product.products(for: [Self.removeAdsProductID])
         } catch {
-            print("Failed to fetch products: \(error)")
+            Self.logger.error("Failed to fetch products: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -84,6 +96,25 @@ final class StoreManager {
         }
     }
 
+    /// Buys "Remove Ads", returning a message to show if the purchase failed.
+    func purchaseRemoveAds() async -> String? {
+        guard let product = removeAdsProduct else {
+            return "Remove Ads isn't available right now. Please try again later."
+        }
+
+        do {
+            _ = try await purchase(product)
+            return nil
+        } catch StoreError.failedVerification {
+            return "Your purchase could not be verified by the App Store."
+        } catch {
+            Self.logger.error(
+                "Failed purchase for \(product.id, privacy: .public): \(error.localizedDescription, privacy: .public)"
+            )
+            return "Your purchase couldn't be completed. Please try again."
+        }
+    }
+
     /// Asks the App Store to re-sync signed transactions, the StoreKit 2 equivalent of
     /// "Restore Purchases".
     func restorePurchases() async throws {
@@ -106,7 +137,7 @@ final class StoreManager {
             updatePurchasedIdentifiers(transaction)
             await transaction.finish()
         } catch {
-            print("Transaction failed verification: \(error)")
+            Self.logger.error("Transaction failed verification: \(error.localizedDescription, privacy: .public)")
         }
     }
 

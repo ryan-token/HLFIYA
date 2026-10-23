@@ -5,80 +5,66 @@
 //  Created by Ryan Token on 6/11/22.
 //
 
+import CoreData
+import os
 import SwiftUI
 
+/// The restaurants saved to one list.
 struct SavedRestaurantsView: View {
-    let list: SavedList
+    /// Observed so deleting a restaurant or renaming the list updates the screen.
+    @ObservedObject var list: SavedList
 
-    @State private var isShowingUpdateListNameAlert = false
-    @State private var newListName = ""
+    @State private var isShowingRenameAlert = false
     @Environment(\.managedObjectContext) private var moc
 
-    var body: some View {
-        ZStack {
-            Group {
-                if list.restaurantsArray.isEmpty {
-                    ContentUnavailableView(
-                        "No Places Saved",
-                        systemImage: "fork.knife",
-                        description: Text("No places added to your \(list.wrappedName) list. Swipe right on a card to add some!")
-                    )
-                } else {
-                    List {
-                        ForEach(list.restaurantsArray) { restaurant in
-                            NavigationLink {
-                                SavedRestaurantsDetailsView(restaurantId: restaurant.wrappedId)
-                            } label: {
-                                Text(restaurant.wrappedName)
-                            }
-                        }
-                        .onDelete { offsets in
-                            removeRestaurantFromList(at: offsets, from: list)
-                        }
-                    }
-                    .safeAreaInset(edge: .bottom) {
-                        Color.clear.frame(height: 20)
-                    }
-                }
-            }
+    private static let logger = Logger(subsystem: "com.ryantoken.HLFIYA", category: "Lists")
 
-            VStack {
-                Spacer()
-                GlassButton(action: { isShowingUpdateListNameAlert = true }) {
-                    Label("Change List Name", systemImage: "pencil")
-                        .foregroundStyle(.fuchsia)
-                        .padding(10)
-                }
-                .font(.headline)
+    var body: some View {
+        let restaurants = list.restaurantsArray
+
+        List {
+            ForEach(restaurants, id: \.objectID) { restaurant in
+                NavigationLink(restaurant.wrappedName, value: restaurant)
+            }
+            .onDelete { offsets in
+                removeRestaurants(at: offsets, from: restaurants)
             }
         }
-        .onAppear {
-            newListName = list.name ?? ""
-        }
-        .alert("Change List Name", isPresented: $isShowingUpdateListNameAlert) {
-            TextField("New List Name", text: $newListName)
-                .textInputAutocapitalization(.words)
-            Button("Change List Name") { updateListNameViaAlert(list: list) }
-            Button("Cancel", role: .cancel) {}
+        .overlay {
+            if restaurants.isEmpty {
+                ContentUnavailableView(
+                    "No Places Saved",
+                    systemImage: "fork.knife",
+                    description: Text(
+                        "No places added to your \(list.wrappedName) list. Swipe right on a card to add some!"
+                    )
+                )
+            }
         }
         .navigationTitle(list.wrappedName)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button("Rename List", systemImage: "pencil") {
+                    isShowingRenameAlert = true
+                }
+            }
+        }
+        .renameListAlert(isPresented: $isShowingRenameAlert, list: list)
     }
 
-    private func removeRestaurantFromList(at offsets: IndexSet, from list: SavedList) {
-        for index in offsets.sorted() {
-            let restaurantToDelete = list.restaurantsArray[index]
-            list.removeFromRestaurants(restaurantToDelete)
-            moc.delete(restaurantToDelete)
+    private func removeRestaurants(at offsets: IndexSet, from restaurants: [SavedRestaurant]) {
+        for index in offsets {
+            let restaurant = restaurants[index]
+            list.removeFromRestaurants(restaurant)
+            moc.delete(restaurant)
         }
 
-        if moc.hasChanges {
-            try? moc.save()
+        guard moc.hasChanges else { return }
+        do {
+            try moc.save()
+        } catch {
+            Self.logger.error("Failed to remove restaurants: \(error.localizedDescription, privacy: .public)")
+            moc.rollback()
         }
-    }
-
-    private func updateListNameViaAlert(list: SavedList) {
-        guard !newListName.isEmpty else { return }
-        list.name = newListName
-        try? moc.save()
     }
 }

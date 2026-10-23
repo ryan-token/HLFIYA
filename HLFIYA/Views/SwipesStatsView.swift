@@ -1,12 +1,14 @@
 //
-//  SwipesView.swift
+//  SwipesStatsView.swift
 //  HLFIYA
 //
-//  Created by Ryan Token on 5/6/22.
+//  Created by Ryan Token on 6/14/22.
 //
 
+import CoreData
 import SwiftUI
 
+/// The places the person has swiped on most, in each direction.
 struct SwipesStatsView: View {
     @FetchRequest(fetchRequest: RightSwipe.allRightSwipesFetchRequest, animation: .default)
     private var rightSwipes: FetchedResults<RightSwipe>
@@ -14,42 +16,47 @@ struct SwipesStatsView: View {
     @FetchRequest(fetchRequest: LeftSwipe.allLeftSwipesFetchRequest, animation: .default)
     private var leftSwipes: FetchedResults<LeftSwipe>
 
-    var body: some View {
-        Group {
-            if leftSwipes.isEmpty && rightSwipes.isEmpty {
-                ContentUnavailableView(
-                    "No swipes yet",
-                    systemImage: "hand.draw",
-                    description: Text("Use the app for a bit, then come back 🙂")
-                )
-            } else {
-                List {
-                    Section("Top 5 Right Swipes") {
-                        ForEach(topSwipes(from: rightSwipes.map(\.wrappedName)), id: \.key) { business, count in
-                            Text("\(business.trimmingCharacters(in: .whitespacesAndNewlines)): \(count)")
-                        }
-                    }
+    // Tallying every swipe is proportional to the swipe history, so it's done
+    // only when the counts change rather than on every body evaluation.
+    @State private var topRightSwipes: [SwipeTally] = []
+    @State private var topLeftSwipes: [SwipeTally] = []
 
-                    Section("Top 5 Left Swipes") {
-                        ForEach(topSwipes(from: leftSwipes.map(\.wrappedName)), id: \.key) { business, count in
-                            Text("\(business.trimmingCharacters(in: .whitespacesAndNewlines)): \(count)")
-                        }
-                    }
+    var body: some View {
+        List {
+            Section("Top 5 Right Swipes") {
+                ForEach(topRightSwipes) { tally in
+                    LabeledContent(tally.name, value: tally.count, format: .number)
+                }
+            }
+
+            Section("Top 5 Left Swipes") {
+                ForEach(topLeftSwipes) { tally in
+                    LabeledContent(tally.name, value: tally.count, format: .number)
                 }
             }
         }
+        .overlay {
+            if leftSwipes.isEmpty && rightSwipes.isEmpty {
+                ContentUnavailableView(
+                    "No Swipes Yet",
+                    systemImage: "hand.draw",
+                    description: Text("Use the app for a bit, then come back 🙂")
+                )
+            }
+        }
         .navigationTitle("Swipe Stats")
-    }
-
-    private func topSwipes(from names: [String]) -> [(key: String, value: Int)] {
-        Dictionary(grouping: names, by: { $0 })
-            .mapValues(\.count)
-            .sorted { ($0.value, $1.key) > ($1.value, $0.key) }
-            .prefix(5)
-            .map { (key: $0.key, value: $0.value) }
+        .onChange(of: rightSwipes.count, initial: true) {
+            topRightSwipes = SwipeTally.top(5, from: rightSwipes.map(\.wrappedName))
+        }
+        .onChange(of: leftSwipes.count, initial: true) {
+            topLeftSwipes = SwipeTally.top(5, from: leftSwipes.map(\.wrappedName))
+        }
     }
 }
 
 #Preview {
-    NavigationStack { SwipesStatsView() }
+    NavigationStack {
+        SwipesStatsView()
+    }
+    .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

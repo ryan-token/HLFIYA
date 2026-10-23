@@ -2,46 +2,41 @@
 //  StarRatingView.swift
 //  HLFIYA
 //
-//  Created by Ryan Token on 4/25/22.
+//  Created by Ryan Token on 5/26/22.
 //
 
 import SwiftUI
 
+/// A five-star Yelp rating, with an optional label and review count.
 struct StarRatingView: View {
-    var rating: Double
-    var label: String?
+    let rating: Double
+    var label: LocalizedStringResource?
     var reviewCount: Int?
-    var maximumRating = 5
-    var offColor = Color.gray
-    var onColor = Color.yellow
+
+    private static let maximumRating = 5
 
     var body: some View {
         HStack {
             if let label {
                 Text(label)
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(.secondary)
             }
 
-            ForEach(1..<maximumRating + 1, id: \.self) { number in
-                starImage(for: number)
-                    .foregroundStyle(Double(number) > rating + 0.5 ? offColor : onColor)
+            ForEach(1...Self.maximumRating, id: \.self) { star in
+                Image(systemName: Double(star) - rating == 0.5 ? "star.leadinghalf.filled" : "star.fill")
+                    .foregroundStyle(Double(star) > rating + 0.5 ? .gray : .yellow)
             }
 
             if let reviewCount {
                 Text("(\(reviewCount))")
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(.secondary)
             }
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Yelp rating: \(rating, format: .number.precision(.fractionLength(1))) stars")
     }
-
-    private func starImage(for number: Int) -> Image {
-        let difference = Double(number) - rating
-        return difference == 0.5 ? Image(systemName: "star.leadinghalf.filled") : Image(systemName: "star.fill")
-    }
 }
 
 #Preview {
-    StarRatingView(rating: -0.5, label: "Rating:")
+    StarRatingView(rating: 3.5, label: "Rating:", reviewCount: 120)
 }

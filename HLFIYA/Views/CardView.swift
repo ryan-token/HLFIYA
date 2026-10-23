@@ -5,301 +5,243 @@
 //  Created by Ryan Token on 1/18/22.
 //
 
+import CoreData
 import SwiftUI
 
+/// A swipeable restaurant card. Swipe left to skip, swipe right for details,
+/// and tap to page through more photos.
 struct CardView: View {
-    var totalRestaurants: Int
+    let business: Business
+    let isSwipedAway: Bool
+    let isTopCard: Bool
+    let showsSwipeHint: Bool
+    let feed: RestaurantFeed
 
-    @State private var showingRestaurantDetails = false
-    @State private var wantsMorePhotos = false
-    @State private var selectedTab = 1
-    @State private var imageUrls = [String]()
-    @State private var apiError = false
-    @State private var thereAreImages = true
-
-    @Binding var restaurant: Business
-    @Binding var nearbyRestaurants: [Business]
-    @Binding var remainingRestaurantsInList: Int
-    @Binding var currentRestaurantIndex: Int
-    @Binding var restaurantsSwipedLeft: [Business]
-    @Binding var restaurantsSwipedRight: [Business]
+    @State private var dragOffset = CGSize.zero
+    @State private var cardWidth = 0.0
+    @State private var isShowingDetails = false
+    @State private var photoURLs: [String] = []
+    @State private var selectedPhoto = 0
+    @State private var photoLoadState = PhotoLoadState.notRequested
 
     @Environment(\.managedObjectContext) private var moc
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private let cardGradient = Gradient(colors: [Color.black.opacity(0), Color.black.opacity(0.5)])
+    private enum PhotoLoadState {
+        case notRequested, loading, loaded, failed
+    }
+
+    private enum SwipeDirection {
+        case left, right
+    }
+
+    private static let swipeAnimation = Animation.interpolatingSpring(mass: 1, stiffness: 50, damping: 8)
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            if apiError {
-                Text("😕 Error loading restaurant photos")
-                    .foregroundStyle(.gray)
-                    .padding(.leading)
+        ImageSliderView(selection: $selectedPhoto, imageURLs: displayedPhotoURLs)
+            .allowsHitTesting(false)
+            .overlay {
+                LinearGradient(colors: [.clear, .black.opacity(0.5)], startPoint: .top, endPoint: .bottom)
+                    .allowsHitTesting(false)
             }
-
-            Color.black
-
-            ImageSliderView(
-                selectedTab: $selectedTab,
-                imageUrls: wantsMorePhotos && !imageUrls.isEmpty ? imageUrls : [restaurant.image_url ?? ""]
-            )
-
-            LinearGradient(gradient: cardGradient, startPoint: .top, endPoint: .bottom)
-
-            VStack {
-                if currentRestaurantIndex == 0 {
-                    Text("Swipe ← to skip, swipe → for details")
-                        .foregroundStyle(.white)
-                        .font(.footnote)
-                        .padding(8)
-                        .background(Color.gray.opacity(0.6))
-                        .clipShape(.capsule)
-                        .padding(.top)
+            .overlay {
+                // Tapping anywhere on the photo shows more photos. VoiceOver uses
+                // the card's own actions instead.
+                Button(action: showMorePhotos) {
+                    Color.clear
+                        .contentShape(.rect)
                 }
-                Spacer()
-
+                .buttonStyle(.plain)
+                .accessibilityHidden(true)
+            }
+            .overlay(alignment: .top) {
+                CardStatusBadge(showsSwipeHint: showsSwipeHint, photosFailedToLoad: photoLoadState == .failed)
+            }
+            .overlay(alignment: .bottom) {
                 CardFooter(
-                    restaurant: restaurant,
-                    canUndo: totalRestaurants != remainingRestaurantsInList,
-                    undoAction: undo
+                    name: business.name ?? "",
+                    rating: business.rating ?? 0,
+                    price: business.price ?? "",
+                    category: business.categories?.first?.title ?? "",
+                    canUndo: feed.canUndo,
+                    undo: UndoSwipeAction(feed: feed)
                 )
             }
-            .padding(.horizontal)
-            .foregroundStyle(.white)
+            .overlay {
+                HotNotOverlay(dragDistance: dragOffset.width)
+            }
+            .background(.black)
+            .clipShape(.rect(cornerRadius: 8))
+            .padding(8)
+            .onGeometryChange(for: Double.self) { proxy in
+                proxy.size.width
+            } action: { width in
+                cardWidth = width
+            }
+            .offset(x: horizontalOffset, y: verticalOffset)
+            .rotationEffect(.degrees(rotation))
+            .highPriorityGesture(dragGesture, isEnabled: isTopCard)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(accessibilityLabel)
+            .accessibilityHint("Swipe left to skip, or open details.")
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction(named: "Show Details", swipeRight)
+            .accessibilityAction(named: "Skip", swipeLeft)
+            .accessibilityAction(named: "More Photos", showMorePhotos)
+            .accessibilityAction(named: "Undo") {
+                UndoSwipeAction(feed: feed)()
+            }
+            .accessibilityHidden(!isTopCard)
+            .sheet(isPresented: $isShowingDetails) {
+                RestaurantDetailsSheet(restaurantID: business.id ?? "", restaurantName: business.name ?? "")
+            }
+            // Keyed by the load state so the fetch is cancelled if the card
+            // leaves the deck before it completes.
+            .task(id: photoLoadState == .loading) {
+                guard photoLoadState == .loading else { return }
+                await loadPhotos()
+            }
+    }
 
-            HotNotOverlay(opacity: restaurant.x)
-        }
-        .clipShape(.rect(cornerRadius: 8))
-        .offset(x: restaurant.x, y: restaurant.y)
-        .rotationEffect(.degrees(restaurant.degree))
-        .onTapGesture {
-            handleCardTap()
-        }
-        .accessibilityAddTraits(.isButton)
-        .gesture(dragGesture)
-        .sheet(isPresented: $showingRestaurantDetails) {
-            RestaurantDetailsView(restaurant: restaurant)
-        }
-        // Driven by `wantsMorePhotos` so the fetch is auto-cancelled if the
-        // card disappears (e.g. user swipes away) before it completes.
-        .task(id: wantsMorePhotos) {
-            guard wantsMorePhotos, thereAreImages, imageUrls.isEmpty else { return }
-            await loadBusinessPhotos(id: restaurant.id ?? "")
+    // MARK: Layout
+
+    private var displayedPhotoURLs: [String] {
+        photoURLs.isEmpty ? [business.imageURL ?? ""] : photoURLs
+    }
+
+    /// How far a card travels when swiped away, relative to its width so it
+    /// always leaves the screen, even on iPhone Duo's inner display.
+    private var swipeAwayDistance: Double {
+        max(cardWidth, 320) * 1.5
+    }
+
+    private var swipeThreshold: Double {
+        max(cardWidth / 4, 80)
+    }
+
+    private var horizontalOffset: Double {
+        isSwipedAway ? -swipeAwayDistance : dragOffset.width
+    }
+
+    private var verticalOffset: Double {
+        isSwipedAway ? -12 : dragOffset.height
+    }
+
+    private var rotation: Double {
+        if isSwipedAway {
+            -7
+        } else if dragOffset == .zero {
+            0
+        } else {
+            dragOffset.width > 0 ? 7 : -7
         }
     }
+
+    private var accessibilityLabel: String {
+        let rating = (business.rating ?? 0).formatted(.number.precision(.fractionLength(1)))
+        let price = business.price ?? ""
+        let category = business.categories?.first?.title ?? ""
+        return [business.name ?? "", "\(rating) stars", "\(price.count) dollar signs", category]
+            .filter { !$0.isEmpty }
+            .formatted(.list(type: .and, width: .narrow))
+    }
+
+    // MARK: Gestures
 
     private var dragGesture: some Gesture {
         DragGesture()
             .onChanged { value in
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    restaurant.x = value.translation.width
-                    restaurant.y = value.translation.height
-                    restaurant.degree = 7 * (value.translation.width > 0 ? 1 : -1)
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
+                    dragOffset = value.translation
                 }
             }
             .onEnded { value in
-                withAnimation(.interpolatingSpring(mass: 1.0, stiffness: 50, damping: 8, initialVelocity: 0)) {
-                    switch value.translation.width {
-                    case 0...100:
-                        almostSwipedRight()
-                    case let x where x > 100:
-                        swipedRight()
-                    case (-100)...(-1):
-                        almostSwipedLeft()
-                    case let x where x < -100:
-                        swipedLeft()
-                    default:
-                        restaurant.x = 0
-                        restaurant.y = 0
-                    }
+                if value.translation.width > swipeThreshold {
+                    swipeRight()
+                } else if value.translation.width < -swipeThreshold {
+                    swipeLeft()
+                } else {
+                    withAnimation(Self.swipeAnimation) { dragOffset = .zero }
                 }
             }
     }
 
-    private func handleCardTap() {
-        if wantsMorePhotos, !imageUrls.isEmpty {
-            selectedTab = selectedTab == imageUrls.count ? 1 : selectedTab + 1
-        } else {
-            wantsMorePhotos = true
+    private func swipeLeft() {
+        withAnimation(Self.swipeAnimation) {
+            dragOffset = .zero
+            feed.swipeLeft()
+        }
+        recordSwipe(.left)
+    }
+
+    private func swipeRight() {
+        withAnimation(Self.swipeAnimation) { dragOffset = .zero }
+        recordSwipe(.right)
+        isShowingDetails = true
+    }
+
+    // MARK: Photos
+
+    private func showMorePhotos() {
+        switch photoLoadState {
+        case .loaded where photoURLs.count > 1:
+            selectedPhoto = (selectedPhoto + 1) % photoURLs.count
+        case .notRequested, .failed:
+            photoLoadState = .loading
+        default:
+            break
         }
     }
 
-    private func loadBusinessPhotos(id: String) async {
+    private func loadPhotos() async {
         do {
-            let details = try await BusinessFetcher.getBusiness(id: id)
+            let details = try await BusinessFetcher.getBusiness(id: business.id ?? "")
             try Task.checkCancellation()
-            let urls = details.photos ?? [restaurant.image_url ?? ""]
-            apiError = false
 
-            if urls.isEmpty {
-                thereAreImages = false
-            } else {
-                imageUrls = urls
-                selectedTab = 2
+            let photos = details.photoURLs
+            if !photos.isEmpty {
+                photoURLs = photos
+                // The first photo is usually the cover already showing, so jump to the next.
+                selectedPhoto = photos.count > 1 ? 1 : 0
             }
+            photoLoadState = .loaded
         } catch is CancellationError {
-            // Card disappeared mid-fetch — let the new view drive its own load.
+            photoLoadState = .notRequested
         } catch {
-            print("Request failed with error: \(error)")
-            apiError = true
+            photoLoadState = .failed
         }
     }
 
-    private func undo() {
-        guard totalRestaurants != remainingRestaurantsInList else { return }
-        withAnimation(.interpolatingSpring(mass: 1.0, stiffness: 50, damping: 100, initialVelocity: 7)) {
-            nearbyRestaurants[currentRestaurantIndex - 1].x = 0
-            nearbyRestaurants[currentRestaurantIndex - 1].y = 0
-            nearbyRestaurants[currentRestaurantIndex - 1].degree = 0.0
-        }
-        remainingRestaurantsInList += 1
-        currentRestaurantIndex -= 1
-    }
+    // MARK: Persistence
 
-    private func almostSwipedLeft() {
-        restaurant.x = 0
-        restaurant.degree = 0
-        restaurant.y = 0
-    }
-
-    private func swipedLeft() {
-        restaurant.x = -500
-        restaurant.y = -12
-
-        remainingRestaurantsInList -= 1
-        if remainingRestaurantsInList > 0 {
-            currentRestaurantIndex += 1
-        }
-
-        restaurantsSwipedLeft.append(restaurant)
-        addSwipeToCoreData(direction: .left)
-    }
-
-    private func almostSwipedRight() {
-        restaurant.x = 0
-        restaurant.degree = 0
-        restaurant.y = 0
-    }
-
-    private func swipedRight() {
-        restaurant.x = 0
-        restaurant.y = 0
-        restaurant.degree = 0
-
-        restaurantsSwipedRight.append(restaurant)
-        addSwipeToCoreData(direction: .right)
-        showingRestaurantDetails.toggle()
-    }
-
-    private enum SwipeDirection { case left, right }
-
-    private func addSwipeToCoreData(direction: SwipeDirection) {
+    private func recordSwipe(_ direction: SwipeDirection) {
+        let name = business.name ?? ""
         switch direction {
         case .right:
-            let rightSwipe = RightSwipe(context: moc)
-            rightSwipe.name = restaurant.name ?? ""
-            rightSwipe.uuid = UUID()
+            let swipe = RightSwipe(context: moc)
+            swipe.name = name
+            swipe.uuid = UUID()
         case .left:
-            let leftSwipe = LeftSwipe(context: moc)
-            leftSwipe.name = restaurant.name ?? ""
-            leftSwipe.uuid = UUID()
+            let swipe = LeftSwipe(context: moc)
+            swipe.name = name
+            swipe.uuid = UUID()
         }
 
         do {
             try moc.save()
         } catch {
-            print("Failed to save swipe to Core Data: \(error)")
+            moc.rollback()
         }
-    }
-}
-
-private struct CardFooter: View {
-    let restaurant: Business
-    let canUndo: Bool
-    let undoAction: () -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text(restaurant.name ?? "")
-                .font(.largeTitle)
-                .bold()
-
-            HStack {
-                StarRatingView(rating: restaurant.rating ?? 0.0)
-                Spacer()
-                Button(action: undoAction) {
-                    Image(systemName: "arrow.uturn.backward.circle.fill")
-                        .font(.system(size: 40))
-                        .foregroundStyle(canUndo ? .yellow : .gray)
-                }
-                .disabled(!canUndo)
-                .accessibilityLabel("Undo")
-            }
-
-            DollarView(price: restaurant.price ?? "", label: "")
-
-            HStack {
-                Text(restaurant.categories?.first?.title ?? "")
-                Spacer()
-                Image("yelp_burst")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 30)
-                    .padding(.bottom, 12)
-                    .padding(.trailing, 7)
-                    .accessibilityLabel("Yelp Logo")
-            }
-        }
-    }
-}
-
-private struct HotNotOverlay: View {
-    let opacity: Double
-
-    var body: some View {
-        HStack {
-            Text("HOT 🥵")
-                .font(.system(size: 40))
-                .foregroundStyle(.fuchsia)
-                .bold()
-                .padding(5)
-                .background(Color.white)
-                .clipShape(.rect(cornerRadius: 16))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(.fuchsia, lineWidth: 4)
-                }
-                .rotationEffect(.degrees(-25))
-                .opacity(opacity / 10 - 1)
-
-            Spacer()
-
-            Text("NOT 😑")
-                .font(.system(size: 40))
-                .foregroundStyle(.black)
-                .bold()
-                .padding(5)
-                .background(Color.gray)
-                .clipShape(.rect(cornerRadius: 16))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.black, lineWidth: 4)
-                }
-                .rotationEffect(.degrees(25))
-                .opacity(opacity / 10 * -1 - 1)
-        }
-        .padding(.top, 35)
-        .padding(.horizontal, 10)
     }
 }
 
 #Preview {
     CardView(
-        totalRestaurants: 50,
-        restaurant: .constant(Business.data[0]),
-        nearbyRestaurants: .constant(Business.data),
-        remainingRestaurantsInList: .constant(45),
-        currentRestaurantIndex: .constant(5),
-        restaurantsSwipedLeft: .constant([Business.data[0]]),
-        restaurantsSwipedRight: .constant([Business.data[1]])
+        business: Business.data[0],
+        isSwipedAway: false,
+        isTopCard: true,
+        showsSwipeHint: true,
+        feed: RestaurantFeed()
     )
+    .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

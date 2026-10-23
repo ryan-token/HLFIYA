@@ -32,6 +32,11 @@ final class LocationViewModel: NSObject, CLLocationManagerDelegate {
         locationUpdatesTask?.cancel()
     }
 
+    /// Whether access is granted but no location has been delivered yet.
+    var isAwaitingFirstLocation: Bool {
+        location == nil && authorizationStatus.isAuthorizedForLocation
+    }
+
     func requestPermission() {
         locationManager.requestWhenInUseAuthorization()
     }
