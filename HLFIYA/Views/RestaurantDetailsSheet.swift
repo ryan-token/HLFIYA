@@ -35,6 +35,9 @@ struct RestaurantDetailsSheet: View {
     }
 
     private func requestReviewIfDue() {
+        #if DEBUG
+        guard !ScreenshotMode.isEnabled else { return }
+        #endif
         let lastRequest = Utils.getLastReviewRequestDate() ?? .distantPast
         guard lastRequest < Date.now.addingTimeInterval(-Self.reviewRequestInterval) else { return }
 

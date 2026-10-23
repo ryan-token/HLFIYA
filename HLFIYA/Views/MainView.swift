@@ -11,8 +11,13 @@ import SwiftUI
 
 /// The swipe deck, its filters, and the app's top-level navigation.
 struct MainView: View {
+    #if DEBUG
+    @State private var feed = ScreenshotMode.isEnabled ? ScreenshotMode.makeFeed() : RestaurantFeed()
+    @State private var filters = ScreenshotMode.isEnabled ? ScreenshotMode.makeFilters() : FiltersState()
+    #else
     @State private var feed = RestaurantFeed()
     @State private var filters = FiltersState()
+    #endif
     @State private var storeManager = StoreManager()
     @State private var activeSheet: MainSheet?
 
@@ -53,6 +58,14 @@ struct MainView: View {
             }
             return
         }
+        #if DEBUG
+        // Screenshots skip the caches and open the sheet their launch arguments name.
+        if ScreenshotMode.isEnabled {
+            await feed.refresh(filters: filters, currentLocation: nil)
+            activeSheet = ScreenshotMode.sheet
+            return
+        }
+        #endif
         Utils.clearYelpCachesOverAMonthOld()
         filters.restoreFromCache()
         guard !feed.restoreFromCache() else { return }

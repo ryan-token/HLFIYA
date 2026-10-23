@@ -111,7 +111,19 @@ struct CardView: View {
                 guard photoLoadState == .loading else { return }
                 await loadPhotos()
             }
+            #if DEBUG
+            .onAppear(perform: applyScreenshotState)
+            #endif
     }
+
+    #if DEBUG
+    /// Holds the top card mid-swipe or opens its details, as screenshot mode's launch arguments ask.
+    private func applyScreenshotState() {
+        guard ScreenshotMode.isEnabled, isTopCard else { return }
+        dragOffset = CGSize(width: ScreenshotMode.dragDistance, height: 0)
+        isShowingDetails = ScreenshotMode.opensDetails
+    }
+    #endif
 
     // MARK: Layout
 

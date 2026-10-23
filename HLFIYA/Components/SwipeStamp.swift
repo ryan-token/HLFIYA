@@ -17,6 +17,9 @@ struct SwipeStamp: View {
         Text(text)
             .font(.largeTitle)
             .bold()
+            // The hidden stamp still takes half the row, so narrow cards would wrap the word.
+            .lineLimit(1)
+            .fixedSize()
             .foregroundStyle(foreground)
             .padding(5)
             .background(background, in: .rect(cornerRadius: 16))

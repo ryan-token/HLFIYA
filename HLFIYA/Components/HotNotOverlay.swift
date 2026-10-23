@@ -11,14 +11,16 @@ struct HotNotOverlay: View {
     let dragDistance: Double
 
     var body: some View {
-        HStack {
+        // Layered rather than side by side, so each stamp can use the card's full
+        // width and never pushes the other past the edge on narrow cards.
+        ZStack {
             SwipeStamp(text: "HOT 🥵", foreground: .fuchsia, background: .white, border: .fuchsia, angle: -25)
                 .opacity(dragDistance / 10 - 1)
-
-            Spacer()
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             SwipeStamp(text: "NOT 😑", foreground: .black, background: .gray, border: .black, angle: 25)
                 .opacity(-dragDistance / 10 - 1)
+                .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding(.top, 35)
         .padding(.horizontal)

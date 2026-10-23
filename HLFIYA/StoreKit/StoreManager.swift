@@ -40,6 +40,13 @@ final class StoreManager {
     }
 
     init() {
+        #if DEBUG
+        // Screenshots show the app without ads and never contact the App Store.
+        if ScreenshotMode.isEnabled {
+            purchasedIds = [Self.removeAdsProductID]
+            return
+        }
+        #endif
         let cached = UserDefaults.standard.stringArray(forKey: Self.cachedPurchasedIdsKey) ?? []
         purchasedIds = Set(cached)
 

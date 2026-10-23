@@ -42,6 +42,11 @@ nonisolated enum BusinessFetcher {
     @concurrent
     static func getBusiness(id: String) async throws -> BusinessDetails {
         guard !id.isEmpty else { throw BusinessFetcherError.invalidURL }
+        #if DEBUG
+        if ScreenshotMode.isEnabled {
+            return try ScreenshotMode.details(id: id)
+        }
+        #endif
         if let cached = Utils.getLocalYelpCacheForBusiness(id: id) {
             return cached
         }
