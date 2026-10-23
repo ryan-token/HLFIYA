@@ -29,7 +29,11 @@ struct PriceView: View {
             }
             .navigationTitle("Choose Prices")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .cancel) { dismiss() }
+                }
+
+                ToolbarItem(placement: .secondaryAction) {
                     Button("Reset", systemImage: "arrow.counterclockwise") {
                         selection.reset()
                     }

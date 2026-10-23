@@ -70,8 +70,7 @@ struct LocationRequestContent: View {
     }
 
     private var isLocationDetermined: Bool {
-        let status = locationViewModel.authorizationStatus
-        return status == .denied || status == .authorizedWhenInUse
+        locationViewModel.authorizationStatus != .notDetermined
     }
 
     private func skipLocation() {

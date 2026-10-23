@@ -30,7 +30,7 @@ struct HoursRow: View {
 
     /// Yelp numbers days from 0 for Monday; `weekdaySymbols` starts on Sunday.
     private func weekdayName(forYelpDay day: Int?) -> String {
-        guard let day, (0..<7).contains(day) else { return "Unknown" }
+        guard let day, (0..<7).contains(day) else { return String(localized: "Unknown") }
         return calendar.weekdaySymbols[(day + 1) % 7]
     }
 

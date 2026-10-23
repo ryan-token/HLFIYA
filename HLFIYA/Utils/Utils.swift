@@ -16,7 +16,9 @@ import os
 nonisolated enum Utils {
     private static let logger = Logger(subsystem: "com.ryantoken.HLFIYA", category: "Cache")
 
-    private static let businessesCacheName = "localYelpCache.json"
+    /// Shared by every cached Yelp response, so they can be told apart from saved filters.
+    private static let yelpCachePrefix = "localYelpCache"
+    private static let businessesCacheName = "\(yelpCachePrefix).json"
     private static let isOpenNowFilterCacheName = "isOpenNowFilterCache.txt"
     private static let categoriesFilterCacheName = "categoriesFilterCache.json"
     private static let pricesFilterCacheName = "pricesFilterCache.json"
@@ -34,22 +36,31 @@ nonisolated enum Utils {
     }
 
     static func getLocalYelpCache() -> [Business] {
-        read(Businesses.self, from: businessesCacheName)?.businesses?.shuffled() ?? []
+        // Caches written before shops were filtered out can still contain them.
+        let cached = read(Businesses.self, from: businessesCacheName)?.businesses ?? []
+        return BusinessFetcher.removingShops(from: cached).shuffled()
     }
 
     static func writeBusinessDetailsCache(_ details: BusinessDetails) {
         write(details, to: businessDetailsCacheName(for: details.id ?? "unknown"))
     }
 
-    /// Returns the cached details for a business, or `nil` when nothing usable is cached.
+    /// How long cached business details are used before they're fetched again.
+    private static let businessDetailsMaximumAge: TimeInterval = 7 * 24 * 60 * 60
+
+    /// Returns the cached details for a business, or `nil` when nothing recent and usable is cached.
     static func getLocalYelpCacheForBusiness(id: String) -> BusinessDetails? {
-        guard let cached = read(BusinessDetails.self, from: businessDetailsCacheName(for: id)),
+        let fileName = businessDetailsCacheName(for: id)
+        let resourceValues = try? url(for: fileName).resourceValues(forKeys: [.contentModificationDateKey])
+        guard let modificationDate = resourceValues?.contentModificationDate,
+              Date.now.timeIntervalSince(modificationDate) < businessDetailsMaximumAge,
+              let cached = read(BusinessDetails.self, from: fileName),
               cached.name?.isEmpty == false else { return nil }
         return cached
     }
 
     private static func businessDetailsCacheName(for id: String) -> String {
-        "localYelpCacheForBusId-\(id).json"
+        "\(yelpCachePrefix)ForBusId-\(id).json"
     }
 
     // MARK: Filters
@@ -112,11 +123,13 @@ nonisolated enum Utils {
 
     // MARK: Cache maintenance
 
-    static func clearAnyCacheFilesOverAMonthOld() {
+    /// Deletes Yelp responses older than a month. Saved filters are kept however old they are.
+    static func clearYelpCachesOverAMonthOld() {
         let calendar = Calendar(identifier: .gregorian)
         let now = Date.now
 
-        for fileURL in jsonCacheFiles(includingModificationDates: true) {
+        for fileURL in jsonCacheFiles(includingModificationDates: true)
+        where fileURL.lastPathComponent.hasPrefix(yelpCachePrefix) {
             let resourceValues = try? fileURL.resourceValues(forKeys: [.contentModificationDateKey])
             guard let modificationDate = resourceValues?.contentModificationDate,
                   calendar.numberOfDaysBetween(modificationDate, and: now) > 30 else { continue }

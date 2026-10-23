@@ -3,6 +3,7 @@
 //  HLFIYATests
 //
 
+import CoreLocation
 import Foundation
 @testable import HLFIYA
 import Testing
@@ -35,19 +36,30 @@ struct UtilityTests {
         #expect(!queryItems.contains { $0.name.contains("Jerry") })
     }
 
-    @Test func openTableLinkOnlyOpensTheWebsite() {
-        let link = DeliveryLinks.openTable(restaurantName: "HRD", near: nil)
+    @Test func openTableLinkSearchesNearbyAtLocalTime() throws {
+        let timeZone = try #require(TimeZone(identifier: "America/Los_Angeles"))
+        // 2026-07-01 19:30 in Los Angeles, which is 02:30 the next day in UTC.
+        let date = Date(timeIntervalSince1970: 1_782_959_400)
+
+        let link = DeliveryLinks.openTable(
+            restaurantName: "Ben & Jerry's",
+            near: CLLocation(latitude: 37.5, longitude: -122.25),
+            at: date,
+            in: timeZone
+        )
+        let url = try #require(link.webURL)
+        let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
+        let query = Dictionary(queryItems.map { ($0.name, $0.value ?? "") }) { first, _ in first }
 
         #expect(link.appURL == nil)
-        #expect(link.webURL?.host() == "www.opentable.com")
-    }
-
-    @Test func milesConvertToWholeMeters() {
-        #expect(Utils.convertMilesToMeters(miles: 5) == 8047)
+        #expect(query["dateTime"] == "2026-07-01T19:30:00")
+        #expect(query["term"] == "Ben & Jerry's")
+        #expect(query["latitude"] == "37.5")
     }
 
     @Test func dayCountIgnoresTimeOfDay() throws {
-        let calendar = Calendar(identifier: .gregorian)
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .gmt
         let start = try #require(calendar.date(from: DateComponents(year: 2026, month: 1, day: 1, hour: 23)))
         let end = try #require(calendar.date(from: DateComponents(year: 2026, month: 1, day: 3, hour: 1)))
 

@@ -32,13 +32,18 @@ final class RestaurantFeed {
     private(set) var phase = Phase.idle
     /// Increments after each successful network load, to drive success feedback.
     private(set) var successfulLoadCount = 0
+    /// Whether the latest search had no location and used the fallback coordinate.
+    @ObservationIgnored private(set) var isUsingFallbackLocation = false
 
     @ObservationIgnored private var loadTask: Task<Void, Never>?
     @ObservationIgnored private let fetchBusinesses: @Sendable (BusinessSearch) async throws -> [Business]
 
     private static let logger = Logger(subsystem: "com.ryantoken.HLFIYA", category: "RestaurantFeed")
 
-    init(fetchBusinesses: @escaping @Sendable (BusinessSearch) async throws -> [Business] = RestaurantFeed.liveFetch) {
+    init(
+        fetchBusinesses: @escaping @Sendable (BusinessSearch) async throws -> [Business]
+            = BusinessFetcher.getBusinesses(for:)
+    ) {
         self.fetchBusinesses = fetchBusinesses
     }
 
@@ -111,6 +116,7 @@ final class RestaurantFeed {
     /// Starts a fresh search, cancelling any search already in flight.
     func reload(filters: FiltersState, currentLocation: CLLocation?) {
         let request = Self.searchRequest(filters: filters, currentLocation: currentLocation)
+        isUsingFallbackLocation = request.usesFallbackLocation
         loadTask?.cancel()
         loadTask = Task { await self.load(request) }
     }
@@ -147,16 +153,14 @@ final class RestaurantFeed {
     /// Builds a search from the filters, preferring a custom location, then the
     /// person's location, then the fallback coordinate.
     static func searchRequest(filters: FiltersState, currentLocation: CLLocation?) -> BusinessSearch {
-        BusinessSearch(
-            coordinate: filters.customCoordinate ?? currentLocation?.coordinate ?? fallbackCoordinate,
+        let coordinate = filters.customCoordinate ?? currentLocation?.coordinate
+        return BusinessSearch(
+            coordinate: coordinate ?? fallbackCoordinate,
             radiusInMeters: Utils.convertMilesToMeters(miles: filters.radius),
             categories: filters.categories.categories,
             prices: filters.prices.apiValue,
-            openNow: filters.openNow
+            openNow: filters.openNow,
+            usesFallbackLocation: coordinate == nil
         )
-    }
-
-    nonisolated static func liveFetch(_ search: BusinessSearch) async throws -> [Business] {
-        try await BusinessFetcher.getBusinesses(for: search)
     }
 }

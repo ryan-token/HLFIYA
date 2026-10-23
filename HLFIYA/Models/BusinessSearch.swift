@@ -14,13 +14,16 @@ nonisolated struct BusinessSearch: Equatable {
     /// Comma-separated Yelp price levels, such as "1,2".
     var prices: String
     var openNow: Bool
+    /// Whether no location was available, so the search is around the fallback coordinate.
+    var usesFallbackLocation: Bool
 
     init(
         coordinate: CLLocationCoordinate2D,
         radiusInMeters: Int,
         categories: Set<String>,
         prices: String,
-        openNow: Bool
+        openNow: Bool,
+        usesFallbackLocation: Bool = false
     ) {
         latitude = coordinate.latitude
         longitude = coordinate.longitude
@@ -28,5 +31,6 @@ nonisolated struct BusinessSearch: Equatable {
         self.categories = categories
         self.prices = prices
         self.openNow = openNow
+        self.usesFallbackLocation = usesFallbackLocation
     }
 }

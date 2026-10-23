@@ -15,6 +15,8 @@ struct CardView: View {
     let isSwipedAway: Bool
     let isTopCard: Bool
     let showsSwipeHint: Bool
+    /// How far left a swiped card travels to clear the screen, measured by the deck.
+    let swipeAwayDistance: Double
     let feed: RestaurantFeed
 
     @State private var dragOffset = CGSize.zero
@@ -35,7 +37,11 @@ struct CardView: View {
         case left, right
     }
 
-    private static let swipeAnimation = Animation.interpolatingSpring(mass: 1, stiffness: 50, damping: 8)
+    private static let bouncySwipeAnimation = Animation.interpolatingSpring(mass: 1, stiffness: 50, damping: 8)
+
+    private var swipeAnimation: Animation {
+        reduceMotion ? .smooth : Self.bouncySwipeAnimation
+    }
 
     var body: some View {
         ImageSliderView(selection: $selectedPhoto, imageURLs: displayedPhotoURLs)
@@ -79,24 +85,28 @@ struct CardView: View {
                 cardWidth = width
             }
             .offset(x: horizontalOffset, y: verticalOffset)
-            .rotationEffect(.degrees(rotation))
-            .highPriorityGesture(dragGesture, isEnabled: isTopCard)
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(accessibilityLabel)
-            .accessibilityHint("Swipe left to skip, or open details.")
-            .accessibilityAddTraits(.isButton)
-            .accessibilityAction(named: "Show Details", swipeRight)
-            .accessibilityAction(named: "Skip", swipeLeft)
-            .accessibilityAction(named: "More Photos", showMorePhotos)
-            .accessibilityAction(named: "Undo") {
-                UndoSwipeAction(feed: feed)()
+            // Dragging doesn't animate, so tilt quickly to the new side when a drag
+            // crosses the middle, rather than flipping in a single frame.
+            .transaction { transaction in
+                if transaction.animation == nil {
+                    transaction.animation = .snappy(duration: 0.2)
+                }
+            } body: { card in
+                card.rotationEffect(.degrees(rotation))
             }
+            .highPriorityGesture(dragGesture, isEnabled: isTopCard)
+            .cardAccessibility(
+                label: accessibilityLabel,
+                showDetails: swipeRight,
+                skip: swipeLeft,
+                showMorePhotos: showMorePhotos,
+                undo: UndoSwipeAction(feed: feed)
+            )
             .accessibilityHidden(!isTopCard)
             .sheet(isPresented: $isShowingDetails) {
                 RestaurantDetailsSheet(restaurantID: business.id ?? "", restaurantName: business.name ?? "")
             }
-            // Keyed by the load state so the fetch is cancelled if the card
-            // leaves the deck before it completes.
+            // Keyed by the load state so tapping the card starts the fetch.
             .task(id: photoLoadState == .loading) {
                 guard photoLoadState == .loading else { return }
                 await loadPhotos()
@@ -109,18 +119,12 @@ struct CardView: View {
         photoURLs.isEmpty ? [business.imageURL ?? ""] : photoURLs
     }
 
-    /// How far a card travels when swiped away, relative to its width so it
-    /// always leaves the screen, even on iPhone Duo's inner display.
-    private var swipeAwayDistance: Double {
-        max(cardWidth, 320) * 1.5
-    }
-
     private var swipeThreshold: Double {
         max(cardWidth / 4, 80)
     }
 
     private var horizontalOffset: Double {
-        isSwipedAway ? -swipeAwayDistance : dragOffset.width
+        isSwipedAway ? -max(swipeAwayDistance, max(cardWidth, 320) * 1.5) : dragOffset.width
     }
 
     private var verticalOffset: Double {
@@ -151,9 +155,7 @@ struct CardView: View {
     private var dragGesture: some Gesture {
         DragGesture()
             .onChanged { value in
-                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
-                    dragOffset = value.translation
-                }
+                dragOffset = value.translation
             }
             .onEnded { value in
                 if value.translation.width > swipeThreshold {
@@ -161,13 +163,13 @@ struct CardView: View {
                 } else if value.translation.width < -swipeThreshold {
                     swipeLeft()
                 } else {
-                    withAnimation(Self.swipeAnimation) { dragOffset = .zero }
+                    withAnimation(swipeAnimation) { dragOffset = .zero }
                 }
             }
     }
 
     private func swipeLeft() {
-        withAnimation(Self.swipeAnimation) {
+        withAnimation(swipeAnimation) {
             dragOffset = .zero
             feed.swipeLeft()
         }
@@ -175,7 +177,7 @@ struct CardView: View {
     }
 
     private func swipeRight() {
-        withAnimation(Self.swipeAnimation) { dragOffset = .zero }
+        withAnimation(swipeAnimation) { dragOffset = .zero }
         recordSwipe(.right)
         isShowingDetails = true
     }
@@ -205,10 +207,9 @@ struct CardView: View {
                 selectedPhoto = photos.count > 1 ? 1 : 0
             }
             photoLoadState = .loaded
-        } catch is CancellationError {
-            photoLoadState = .notRequested
         } catch {
-            photoLoadState = .failed
+            // URLSession reports cancellation as `URLError(.cancelled)`, not `CancellationError`.
+            photoLoadState = Task.isCancelled ? .notRequested : .failed
         }
     }
 
@@ -235,12 +236,35 @@ struct CardView: View {
     }
 }
 
+private extension View {
+    /// One VoiceOver element whose default action opens details. Kept out of
+    /// `CardView.body` so the compiler type-checks the two chains separately.
+    func cardAccessibility(
+        label: String,
+        showDetails: @escaping () -> Void,
+        skip: @escaping () -> Void,
+        showMorePhotos: @escaping () -> Void,
+        undo: UndoSwipeAction
+    ) -> some View {
+        accessibilityElement(children: .ignore)
+            .accessibilityLabel(label)
+            .accessibilityHint("Opens details. Swipe up or down for more actions.")
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction(.default, showDetails)
+            .accessibilityAction(named: "Show Details", showDetails)
+            .accessibilityAction(named: "Skip", skip)
+            .accessibilityAction(named: "More Photos", showMorePhotos)
+            .accessibilityAction(named: "Undo") { undo() }
+    }
+}
+
 #Preview {
     CardView(
         business: Business.data[0],
         isSwipedAway: false,
         isTopCard: true,
         showsSwipeHint: true,
+        swipeAwayDistance: 0,
         feed: RestaurantFeed()
     )
     .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)

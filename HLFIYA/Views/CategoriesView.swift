@@ -9,7 +9,7 @@ import SwiftUI
 
 /// Chooses which kinds of food to search for, and whether to show only open places.
 ///
-/// Edits a draft; nothing changes until Save, so swiping the sheet away cancels.
+/// Edits a draft; nothing changes until Save.
 struct CategoriesView: View {
     let feed: RestaurantFeed
     let filters: FiltersState
@@ -40,7 +40,11 @@ struct CategoriesView: View {
             }
             .navigationTitle("Choose Categories")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .cancel) { dismiss() }
+                }
+
+                ToolbarItem(placement: .secondaryAction) {
                     Button("Reset", systemImage: "arrow.counterclockwise", action: reset)
                 }
 

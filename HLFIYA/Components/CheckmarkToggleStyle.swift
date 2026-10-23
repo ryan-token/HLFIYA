@@ -14,8 +14,10 @@ struct CheckmarkToggleStyle: ToggleStyle {
             configuration.isOn.toggle()
         } label: {
             HStack {
+                // `Color.primary` rather than `.primary`, which inside a button
+                // resolves to the tint color.
                 configuration.label
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(Color.primary)
                 Spacer()
                 Image(systemName: "checkmark")
                     .foregroundStyle(.tint)

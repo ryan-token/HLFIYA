@@ -15,10 +15,7 @@ struct SettingsRow: View {
     var body: some View {
         LabeledContent {
             if showsExternalLinkIndicator {
-                Image(systemName: "arrow.up.forward")
-                    .foregroundStyle(.tertiary)
-                    .font(.callout)
-                    .accessibilityHidden(true)
+                ExternalLinkIndicator()
             }
         } label: {
             Label {

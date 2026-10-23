@@ -6,12 +6,15 @@
 //
 
 import CoreData
+import os
 import SwiftUI
 
 /// A sheet for naming and creating a new saved list.
 struct CreateListSheet: View {
     @FocusState private var isNameFocused: Bool
     @State private var listName = ""
+
+    private static let logger = Logger(subsystem: "com.ryantoken.HLFIYA", category: "Lists")
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var moc
@@ -60,6 +63,7 @@ struct CreateListSheet: View {
         do {
             try moc.save()
         } catch {
+            Self.logger.error("Failed to create list: \(error.localizedDescription, privacy: .public)")
             moc.rollback()
         }
         dismiss()

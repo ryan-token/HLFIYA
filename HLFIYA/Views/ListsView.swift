@@ -47,7 +47,7 @@ struct ListsView: View {
                 SavedRestaurantsView(list: list)
             }
             .navigationDestination(for: SavedRestaurant.self) { restaurant in
-                SavedRestaurantsDetailsView(restaurantID: restaurant.wrappedId, restaurantName: restaurant.wrappedName)
+                RestaurantDetailsList(restaurantID: restaurant.wrappedId, restaurantName: restaurant.wrappedName)
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

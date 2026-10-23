@@ -13,13 +13,12 @@ struct RemoveAdsBannerView: View {
 
     var body: some View {
         if !storeManager.hasRemovedAds {
-            VStack(alignment: .trailing, spacing: 0) {
+            VStack(alignment: .trailing) {
                 if storeManager.removeAdsProduct != nil {
-                    AsyncButton(action: purchase) {
-                        Text("Remove Ads")
-                            .font(.callout)
-                            .foregroundStyle(.fuchsia)
-                    }
+                    AsyncButton(action: purchase) { Text("Remove Ads") }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .tint(.fuchsia)
                 }
 
                 GADBannerViewController()

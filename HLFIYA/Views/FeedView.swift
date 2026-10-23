@@ -5,10 +5,12 @@
 
 import SwiftUI
 
-/// The filter summary and the swipe deck, arranged for the available space.
+/// The filter summary, the swipe deck, and the filter buttons, arranged for the
+/// available space.
 ///
-/// Landscape windows place the summary beside the deck; portrait ones, including
-/// iPhone Duo's unfolded inner display, stack it above so the deck can use the
+/// Landscape windows place the summary and buttons beside the deck, so the deck
+/// can use the full height; portrait ones, including iPhone Duo's unfolded inner
+/// display, put the summary above and the buttons below so the deck can use the
 /// full width. This follows the window's shape rather than its size class, since
 /// the inner display is regular width in portrait too. An `AnyLayout` switches
 /// the arrangement without resetting the deck's state, so folding or rotating
@@ -16,6 +18,7 @@ import SwiftUI
 struct FeedView: View {
     let feed: RestaurantFeed
     let filters: FiltersState
+    @Binding var activeSheet: MainSheet?
 
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var isLandscape = false
@@ -26,13 +29,24 @@ struct FeedView: View {
             : AnyLayout(VStackLayout())
 
         layout {
-            FilterSummaryView(filters: filters)
-                .frame(maxWidth: usesSideBySideLayout ? .infinity : nil)
+            VStack {
+                FilterSummaryView(filters: filters)
+
+                if usesSideBySideLayout {
+                    FilterBar(activeSheet: $activeSheet)
+                }
+            }
+            .frame(maxWidth: usesSideBySideLayout ? .infinity : nil)
 
             FeedContentView(feed: feed, filters: filters)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .padding(.horizontal)
+        .safeAreaInset(edge: .bottom) {
+            if !usesSideBySideLayout {
+                FilterBar(activeSheet: $activeSheet)
+            }
+        }
         .onGeometryChange(for: Bool.self) { proxy in
             proxy.size.width > proxy.size.height
         } action: { isLandscape in
@@ -51,7 +65,7 @@ struct FeedView: View {
     @Previewable @State var feed = RestaurantFeed { _ in Business.data }
 
     NavigationStack {
-        FeedView(feed: feed, filters: FiltersState())
+        FeedView(feed: feed, filters: FiltersState(), activeSheet: .constant(nil))
             .navigationTitle("San Francisco")
             .toolbarTitleDisplayMode(.inline)
             .toolbar {

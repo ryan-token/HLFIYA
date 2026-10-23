@@ -23,8 +23,8 @@ struct StarRatingView: View {
             }
 
             ForEach(1...Self.maximumRating, id: \.self) { star in
-                Image(systemName: Double(star) - rating == 0.5 ? "star.leadinghalf.filled" : "star.fill")
-                    .foregroundStyle(Double(star) > rating + 0.5 ? .gray : .yellow)
+                Image(systemName: Double(star) - displayedRating == 0.5 ? "star.leadinghalf.filled" : "star.fill")
+                    .foregroundStyle(Double(star) > displayedRating + 0.5 ? .gray : .yellow)
             }
 
             if let reviewCount {
@@ -33,7 +33,18 @@ struct StarRatingView: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Yelp rating: \(rating, format: .number.precision(.fractionLength(1))) stars")
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    /// Yelp ratings can have any decimal, but the stars only show halves.
+    private var displayedRating: Double {
+        (rating * 2).rounded() / 2
+    }
+
+    private var accessibilityLabel: Text {
+        let stars = Text("Yelp rating: \(rating, format: .number.precision(.fractionLength(1))) stars")
+        guard let reviewCount else { return stars }
+        return Text("\(stars), ^[\(reviewCount) review](inflect: true)")
     }
 }
 

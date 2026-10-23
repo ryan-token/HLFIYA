@@ -10,9 +10,6 @@ import CoreLocation
 import SwiftUI
 
 /// The swipe deck, its filters, and the app's top-level navigation.
-///
-/// All controls live in the system toolbar so that, on iPhone Duo, they move into
-/// the vertical bar beside the content and share space with the status bar.
 struct MainView: View {
     @State private var feed = RestaurantFeed()
     @State private var filters = FiltersState()
@@ -25,7 +22,7 @@ struct MainView: View {
 
     var body: some View {
         NavigationStack {
-            FeedView(feed: feed, filters: filters)
+            FeedView(feed: feed, filters: filters, activeSheet: $activeSheet)
                 .navigationTitle(feed.currentRestaurant?.location?.city ?? "Hot Local Food")
                 .toolbarTitleDisplayMode(.inline)
                 .toolbar {
@@ -47,10 +44,16 @@ struct MainView: View {
     }
 
     /// Shows the previous session's results, or searches when there are none.
-    /// Safe to run again until the feed has loaded, since restoring only reads.
+    /// Runs again when the first location arrives, to replace a fallback search.
     private func loadInitialRestaurants() async {
-        guard feed.phase == .idle else { return }
-        Utils.clearAnyCacheFilesOverAMonthOld()
+        guard feed.phase == .idle else {
+            // The search stopped waiting for a location before this one arrived.
+            if feed.isUsingFallbackLocation, locationViewModel.location != nil {
+                await feed.refresh(filters: filters, currentLocation: locationViewModel.location)
+            }
+            return
+        }
+        Utils.clearYelpCachesOverAMonthOld()
         filters.restoreFromCache()
         guard !feed.restoreFromCache() else { return }
 
@@ -58,7 +61,8 @@ struct MainView: View {
         // way. Searching now would search, and cache, the fallback coordinate.
         if locationViewModel.isAwaitingFirstLocation {
             try? await Task.sleep(for: .seconds(5))
-            guard !Task.isCancelled else { return }
+            // A search the person started while waiting takes priority.
+            guard !Task.isCancelled, feed.phase == .idle else { return }
         }
         await feed.refresh(filters: filters, currentLocation: locationViewModel.location)
     }

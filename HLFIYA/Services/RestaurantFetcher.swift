@@ -23,13 +23,16 @@ nonisolated enum BusinessFetcher {
 
     /// Searches for restaurants, returning them shuffled with shops filtered out.
     /// The cache holds the filtered list, so restored results match live ones.
+    /// Fallback-location results aren't cached, so they're never restored in place
+    /// of a search around the person's real location.
     @concurrent
     static func getBusinesses(for search: BusinessSearch) async throws -> [Business] {
         let response = try await fetch(Businesses.self, from: try searchURL(for: search))
-        let restaurants = (response.businesses ?? []).filter { business in
-            !(business.categories ?? []).contains { excludedCategoryAliases.contains($0.alias) }
+        let restaurants = removingShops(from: response.businesses ?? [])
+        if !search.usesFallbackLocation {
+            let cached = Businesses(total: response.total, businesses: restaurants, region: response.region)
+            Utils.writeBusinessesCache(cached)
         }
-        Utils.writeBusinessesCache(Businesses(total: response.total, businesses: restaurants, region: response.region))
 
         return restaurants.shuffled()
     }
@@ -38,6 +41,7 @@ nonisolated enum BusinessFetcher {
     /// from the on-disk cache when they've been fetched before.
     @concurrent
     static func getBusiness(id: String) async throws -> BusinessDetails {
+        guard !id.isEmpty else { throw BusinessFetcherError.invalidURL }
         if let cached = Utils.getLocalYelpCacheForBusiness(id: id) {
             return cached
         }
@@ -46,6 +50,13 @@ nonisolated enum BusinessFetcher {
         let details = try await fetch(BusinessDetails.self, from: url)
         Utils.writeBusinessDetailsCache(details)
         return details
+    }
+
+    /// Drops businesses Yelp also files under a shop category, such as grocery stores.
+    static func removingShops(from businesses: [Business]) -> [Business] {
+        businesses.filter { business in
+            !(business.categories ?? []).contains { excludedCategoryAliases.contains($0.alias) }
+        }
     }
 
     /// Builds the business search URL. Internal so tests can verify the query.

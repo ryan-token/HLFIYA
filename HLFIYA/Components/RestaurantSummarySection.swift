@@ -18,8 +18,15 @@ struct RestaurantSummarySection: View {
             DollarView(price: price, label: "Price:")
 
             if !categories.isEmpty {
-                Text("\(categories.count == 1 ? "Category" : "Categories"): \(categories.formatted())")
-                    .foregroundStyle(.secondary)
+                // Separate strings, so each language can phrase the singular and plural.
+                Group {
+                    if categories.count == 1 {
+                        Text("Category: \(categories.formatted())")
+                    } else {
+                        Text("Categories: \(categories.formatted())")
+                    }
+                }
+                .foregroundStyle(.secondary)
             }
         }
         .accessibilityElement(children: .combine)

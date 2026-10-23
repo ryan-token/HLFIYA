@@ -51,6 +51,19 @@ struct BusinessFetcherTests {
         #expect(query["price"] == "1,2,3,4")
     }
 
+    @Test func removingShopsKeepsOnlyPlacesToEat() {
+        let businesses = [
+            Business.fixture(id: "pizza", categoryAliases: ["pizza"]),
+            Business.fixture(id: "deli", categoryAliases: ["delis", "grocery"]),
+            Business.fixture(id: "corner", categoryAliases: ["convenience"]),
+            Business.fixture(id: "uncategorized")
+        ]
+
+        let restaurants = BusinessFetcher.removingShops(from: businesses)
+
+        #expect(restaurants.map(\.id) == ["pizza", "uncategorized"])
+    }
+
     /// Caches written before the camelCase rename must still decode.
     @Test func decodesYelpSnakeCaseJSON() throws {
         let json = Data("""

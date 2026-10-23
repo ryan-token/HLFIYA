@@ -56,7 +56,9 @@ struct MapView: View {
     }
 
     private var currentRadius: Double {
-        visibleRegion.map { Self.radius(forDegrees: $0.span.longitudeDelta) } ?? filters.radius
+        // Latitude, because a degree of longitude spans fewer miles away from the
+        // equator, and the map widens the longitude span to fill its square frame.
+        visibleRegion.map { Self.radius(forDegrees: $0.span.latitudeDelta) } ?? filters.radius
     }
 
     /// The radius rounded to one decimal place, exactly as the subtitle shows it.

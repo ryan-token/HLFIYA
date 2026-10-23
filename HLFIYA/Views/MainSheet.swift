@@ -5,8 +5,8 @@
 
 import Foundation
 
-/// The sheets the main screen's toolbar can present.
-enum MainSheet: String, Identifiable {
+/// The sheets the main screen's toolbar and filter bar present.
+enum MainSheet: Identifiable {
     case settings
     case lists
     case categories

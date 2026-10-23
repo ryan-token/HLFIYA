@@ -11,6 +11,7 @@ struct FeedContentView: View {
     let filters: FiltersState
 
     @Environment(LocationViewModel.self) private var locationViewModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack {
@@ -20,6 +21,7 @@ struct FeedContentView: View {
                     systemImage: "magnifyingglass",
                     description: Text("Try changing your filters.")
                 )
+                .transition(Self.fade)
             } else if feed.phase == .failed {
                 // Also replaces a stale deck, which no longer matches the filters
                 // or has run out, so there's always a way to try again.
@@ -31,14 +33,22 @@ struct FeedContentView: View {
                     AsyncButton("Try Again", systemImage: "arrow.clockwise", action: refresh)
                         .buttonStyle(.glassProminent)
                 }
+                .transition(Self.fade)
             } else if feed.restaurants.isEmpty {
                 ProgressView()
+                    .transition(Self.fade)
             } else {
                 CardDeckView(feed: feed)
-                    .opacity(feed.phase == .loading ? 0.4 : 1)
+                    .transition(deckTransition)
+                    .animation(.snappy) { deck in
+                        deck.opacity(feed.phase == .loading ? 0.4 : 1)
+                    }
+                    // Swipes on the old deck would be lost when the new results arrive.
+                    .allowsHitTesting(feed.phase != .loading)
                     .overlay {
                         if feed.phase == .loading {
                             ProgressView()
+                                .transition(Self.fade)
                         }
                     }
 
@@ -46,10 +56,20 @@ struct FeedContentView: View {
                     AsyncButton("Refresh Food", systemImage: "arrow.clockwise.circle", action: refresh)
                         .font(.headline)
                         .buttonStyle(.glassProminent)
+                        .transition(Self.fade)
                 }
             }
         }
-        .animation(.default, value: feed.phase)
+    }
+
+    // Each state animates only its own appearance. An animation on the whole
+    // container would also animate the layout settling at launch, sliding the
+    // deck in from the corner.
+    private static let fade = AnyTransition.opacity.animation(.snappy)
+
+    /// The first results grow out from the center of the space they fill.
+    private var deckTransition: AnyTransition {
+        reduceMotion ? Self.fade : .scale(scale: 0.85).combined(with: .opacity).animation(.snappy)
     }
 
     private func refresh() async {

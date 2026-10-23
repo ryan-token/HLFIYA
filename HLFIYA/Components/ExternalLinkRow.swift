@@ -15,9 +15,7 @@ struct ExternalLinkRow: View {
     var body: some View {
         Button(action: open) {
             LabeledContent {
-                Image(systemName: "arrow.up.forward")
-                    .foregroundStyle(.tertiary)
-                    .font(.callout)
+                ExternalLinkIndicator()
             } label: {
                 Text(title)
                     .foregroundStyle(.tint)

@@ -19,9 +19,7 @@ struct AddressRow: View {
             if let directionsURL {
                 Link(destination: directionsURL) {
                     LabeledContent {
-                        Image(systemName: "arrow.up.forward")
-                            .foregroundStyle(.tertiary)
-                            .font(.callout)
+                        ExternalLinkIndicator()
                     } label: {
                         Text(addressLines.joined(separator: "\n"))
                             .foregroundStyle(.tint)

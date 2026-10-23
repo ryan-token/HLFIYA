@@ -10,7 +10,13 @@ import CoreLocation
 @Observable
 final class LocationViewModel: NSObject, CLLocationManagerDelegate {
     private(set) var authorizationStatus: CLAuthorizationStatus
-    var location: CLLocation?
+    var location: CLLocation? {
+        didSet {
+            if location != nil, !hasReceivedLocation { hasReceivedLocation = true }
+        }
+    }
+    /// Set once, so views that only care whether a location exists don't update on every fix.
+    private(set) var hasReceivedLocation = false
 
     private let locationManager: CLLocationManager
     private var locationUpdatesTask: Task<Void, Never>?
@@ -34,7 +40,7 @@ final class LocationViewModel: NSObject, CLLocationManagerDelegate {
 
     /// Whether access is granted but no location has been delivered yet.
     var isAwaitingFirstLocation: Bool {
-        location == nil && authorizationStatus.isAuthorizedForLocation
+        !hasReceivedLocation && authorizationStatus.isAuthorizedForLocation
     }
 
     func requestPermission() {

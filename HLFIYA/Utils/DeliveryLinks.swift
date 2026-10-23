@@ -25,10 +25,17 @@ nonisolated enum DeliveryLinks {
     }
 
     /// OpenTable's app doesn't accept search links, so this always opens the website.
-    static func openTable(restaurantName: String, near location: CLLocation?, at date: Date = .now) -> Link {
+    /// The time is local wall-clock time, which is what OpenTable expects.
+    static func openTable(
+        restaurantName: String,
+        near location: CLLocation?,
+        at date: Date = .now,
+        in timeZone: TimeZone = .current
+    ) -> Link {
         let name = encoded(restaurantName)
         let dateTime = date.formatted(
-            .iso8601.year().month().day().dateTimeSeparator(.standard).time(includingFractionalSeconds: false)
+            Date.ISO8601FormatStyle(timeZone: timeZone)
+                .year().month().day().dateTimeSeparator(.standard).time(includingFractionalSeconds: false)
         )
         let coordinate = location.map {
             "&latitude=\($0.coordinate.latitude)&longitude=\($0.coordinate.longitude)"

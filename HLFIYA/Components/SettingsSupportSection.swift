@@ -15,7 +15,7 @@ struct SettingsSupportSection: View {
     @Environment(\.openURL) private var openURL
 
     private static let reviewURL = URL(
-        string: "https://apps.apple.com/us/app/hot-local-food/id1621818779?action=write-review"
+        string: "https://apps.apple.com/app/id1621818779?action=write-review"
     )
 
     var body: some View {

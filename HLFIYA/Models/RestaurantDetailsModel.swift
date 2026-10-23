@@ -25,12 +25,19 @@ final class RestaurantDetailsModel {
     private static let logger = Logger(subsystem: "com.ryantoken.HLFIYA", category: "RestaurantDetails")
 
     func load(restaurantID: String) async {
+        if details?.id != restaurantID {
+            details = nil
+        }
+
         do {
-            details = try await BusinessFetcher.getBusiness(id: restaurantID)
+            let loaded = try await BusinessFetcher.getBusiness(id: restaurantID)
+            // A newer restaurant may have replaced this one while it loaded.
+            try Task.checkCancellation()
+            details = loaded
             loadFailed = false
-        } catch is CancellationError {
-            // The screen closed before the request finished.
         } catch {
+            // URLSession reports cancellation as `URLError(.cancelled)`, not `CancellationError`.
+            guard !Task.isCancelled else { return }
             let reason = error.localizedDescription
             Self.logger.error("Failed to load \(restaurantID, privacy: .public): \(reason, privacy: .public)")
             loadFailed = true
