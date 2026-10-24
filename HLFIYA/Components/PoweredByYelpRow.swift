@@ -5,20 +5,26 @@
 
 import SwiftUI
 
+/// The Yelp attribution required wherever Yelp data is shown.
 struct PoweredByYelpRow: View {
     @Environment(\.colorScheme) private var colorScheme
+    @ScaledMetric(relativeTo: .body) private var logoWidth = 75.0
 
     var body: some View {
-        HStack {
-            Text("Powered by:")
-
-            Image(colorScheme == .light ? "yelp_logo" : "yelp_logo_dark_bg")
+        LabeledContent("Powered by") {
+            Image(colorScheme == .dark ? .yelpLogoDarkBg : .yelpLogo)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 75)
+                .frame(width: logoWidth)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Powered by Yelp")
         .listRowBackground(Color.clear)
+    }
+}
+
+#Preview {
+    List {
+        PoweredByYelpRow()
     }
 }

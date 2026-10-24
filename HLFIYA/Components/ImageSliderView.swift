@@ -1,5 +1,5 @@
 //
-//  ImageSlider.swift
+//  ImageSliderView.swift
 //  HLFIYA
 //
 //  Created by Ryan Token on 4/24/22.
@@ -7,34 +7,34 @@
 
 import SwiftUI
 
+/// A paging carousel of remote photos.
 struct ImageSliderView: View {
-    @Binding var selectedTab: Int
-    let imageUrls: [String]
+    @Binding var selection: Int
+    let imageURLs: [String]
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            ForEach(imageUrls.enumerated(), id: \.offset) { index, url in
-                AsyncImageHack(url: url, isScaledToFill: true)
-                    .tag(index + 1)
+        TabView(selection: $selection) {
+            // Identified by position, so tags always match the selection range.
+            ForEach(imageURLs.enumerated(), id: \.offset) { index, url in
+                RemoteImage(url: URL(string: url))
+                    .tag(index)
             }
         }
         .tabViewStyle(.page)
-        .animation(.default, value: selectedTab)
-        .onTapGesture {
-            selectedTab = selectedTab == imageUrls.count ? 1 : selectedTab + 1
-        }
-        .accessibilityAddTraits(.isButton)
+        .animation(.default, value: selection)
     }
 }
 
 #Preview {
+    @Previewable @State var selection = 0
+
     ImageSliderView(
-        selectedTab: .constant(1),
-        imageUrls: [
+        selection: $selection,
+        imageURLs: [
             "https://s3-media2.fl.yelpcdn.com/bphoto/4avfA7HWOW_Bl0J_8J60rg/o.jpg",
             "https://s3-media4.fl.yelpcdn.com/bphoto/ahmWdH7P0UIc4lM1c8zhcQ/o.jpg",
             "https://s3-media2.fl.yelpcdn.com/bphoto/BlG7QLi2mseijvxFnAb5yg/o.jpg"
         ]
     )
-    .frame(width: 400, height: 300)
+    .aspectRatio(4 / 3, contentMode: .fit)
 }

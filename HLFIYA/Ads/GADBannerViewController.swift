@@ -7,22 +7,23 @@
 
 import GoogleMobileAds
 import SwiftUI
-import UIKit
 
+/// Hosts a Google Mobile Ads banner, which needs a UIKit view controller to present from.
 struct GADBannerViewController: UIViewControllerRepresentable {
+    #if DEBUG
+    private static let adUnitID = "ca-app-pub-3940256099942544/2934735716" // Google's test ad unit
+    #else
+    private static let adUnitID = "ca-app-pub-9555658360488346/5793158598"
+    #endif
+
     func makeUIViewController(context: Context) -> UIViewController {
-        let view = BannerView(adSize: AdSizeBanner)
         let viewController = UIViewController()
-        var adUnitId = "ca-app-pub-9555658360488346/5793158598" // prod ad unit ID
-        #if DEBUG
-            adUnitId = "ca-app-pub-3940256099942544/2934735716" // test ad unit ID
-        #endif
-        print("using ad unit ID \(adUnitId)")
-        view.adUnitID = adUnitId
-        view.rootViewController = viewController
-        viewController.view.addSubview(view)
+        let bannerView = BannerView(adSize: AdSizeBanner)
+        bannerView.adUnitID = Self.adUnitID
+        bannerView.rootViewController = viewController
+        viewController.view.addSubview(bannerView)
         viewController.view.frame = CGRect(origin: .zero, size: AdSizeBanner.size)
-        view.load(Request())
+        bannerView.load(Request())
         return viewController
     }
 

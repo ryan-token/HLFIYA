@@ -13,13 +13,22 @@ struct ContentView: View {
     var body: some View {
         Group {
             switch locationViewModel.authorizationStatus {
-            case .notDetermined where locationViewModel.location == nil:
+            case .notDetermined where locationViewModel.location == nil && !Self.skipsLocationRequest:
                 LocationRequestView()
             default:
                 MainView()
             }
         }
         .environment(locationViewModel)
+    }
+
+    /// Screenshot mode searches its own sample area, so it never asks for location.
+    private static var skipsLocationRequest: Bool {
+        #if DEBUG
+        ScreenshotMode.isEnabled
+        #else
+        false
+        #endif
     }
 }
 

@@ -44,6 +44,13 @@ struct PersistenceController {
             description.url = URL(fileURLWithPath: "/dev/null")
         }
 
+        #if DEBUG
+        // Screenshot sample data must never reach the person's iCloud.
+        if ScreenshotMode.isEnabled {
+            description.cloudKitContainerOptions = nil
+        }
+        #endif
+
         // Persistent history tracking and remote-change notifications are required
         // for NSPersistentCloudKitContainer so the view context picks up changes
         // pulled in from iCloud (and from any background contexts).

@@ -2,33 +2,34 @@
 //  LocationAuthorizationButton.swift
 //  HLFIYA
 //
-//  Created by Ryan Token on 5/21/26.
+//  Created by Ryan Token on 5/26/22.
 //
 
-import SwiftUI
 import CoreLocation
-import UIKit
+import SwiftUI
 
+/// Requests location access, links to Settings when it's denied, or recenters
+/// the map once it's granted.
 struct LocationAuthorizationButton: View {
-    let authorizationStatus: CLAuthorizationStatus
-    let requestPermission: () -> Void
-    let resetToCurrentLocation: () -> Void
+    let resetToCurrentLocation: ResetMapAction
 
+    @Environment(LocationViewModel.self) private var locationViewModel
     @Environment(\.openURL) private var openURL
 
     var body: some View {
-        switch authorizationStatus {
+        switch locationViewModel.authorizationStatus {
         case .notDetermined:
-            Button("Request Current Location", action: requestPermission)
-                .font(.headline)
+            Button("Request Current Location", systemImage: "location") {
+                locationViewModel.requestPermission()
+            }
 
         case .restricted, .denied:
-            Button("Allow Location in Settings", action: openSettings)
-                .font(.headline)
+            Button("Allow Location in Settings", systemImage: "location.slash", action: openSettings)
 
         case .authorizedAlways, .authorizedWhenInUse:
-            Button("Reset to Current Location", action: resetToCurrentLocation)
-                .font(.headline)
+            Button("Reset to Current Location", systemImage: "location.fill") {
+                resetToCurrentLocation(location: locationViewModel.location)
+            }
 
         @unknown default:
             EmptyView()

@@ -7,50 +7,28 @@
 
 import Foundation
 
-struct AllPrices {
-    private var allPrices: [String]
-    
-    init() {
-        allPrices = [
-            "All Prices",
-            "1",
-            "2",
-            "3",
-            "4"
-        ]
-    }
-    
-    func getPriceOptions() -> [String] {
-        return allPrices
-    }
-    
-    func getFormattedPrice(from price: String) -> String {
+/// The Yelp price levels the app offers as filters.
+nonisolated enum AllPrices {
+    /// The option that means "every price level".
+    static let allPrices = "All Prices"
+
+    /// Every selectable price option, in the order they appear in the picker.
+    static let priceOptions = [allPrices, "1", "2", "3", "4"]
+
+    /// Returns the user-facing name for a price option, such as "$$" for "2".
+    static func displayName(for price: String) -> String {
         switch price {
-        case "All Prices":
-            return "All Prices"
-        case "1":
-            return "$"
-        case "2":
-            return "$$"
-        case "3":
-            return "$$$"
-        case "4":
-            return "$$$$"
-        default:
-            return "Unknown"
+        case allPrices: allPrices
+        case "1": "$"
+        case "2": "$$"
+        case "3": "$$$"
+        case "4": "$$$$"
+        default: "Unknown"
         }
     }
-    
-    func getPriceNames(from prices: Set<String>) -> String {
-        var formattedPricesArray = [String]()
-        for price in prices {
-            let currentPrice = getFormattedPrice(from: price)
-            formattedPricesArray.append(currentPrice)
-        }
-        
-        formattedPricesArray.sort()
-        let formattedPricesString = formattedPricesArray.joined(separator: ", ")
-        
-        return formattedPricesString
+
+    /// Returns a summary of the selected price options, such as "$, $$$".
+    static func summary(for prices: Set<String>) -> String {
+        prices.map(displayName(for:)).sorted().formatted(.list(type: .and, width: .narrow))
     }
 }

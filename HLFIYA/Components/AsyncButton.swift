@@ -7,9 +7,10 @@
 
 import SwiftUI
 
+/// A button that runs an async action, showing a spinner and disabling itself until it finishes.
 struct AsyncButton<Label: View>: View {
-    var action: () async -> Void
-    @ViewBuilder var label: () -> Label
+    let action: () async -> Void
+    @ViewBuilder let label: Label
 
     @State private var isPerformingTask = false
 
@@ -21,16 +22,28 @@ struct AsyncButton<Label: View>: View {
                 isPerformingTask = false
             }
         } label: {
-            ZStack {
-                // Hide the label by setting its opacity to zero so the button's
-                // size doesn't change while the task is performed.
-                label().opacity(isPerformingTask ? 0 : 1)
-
-                if isPerformingTask {
-                    ProgressView()
+            // Hide the label rather than removing it, so the button keeps its size.
+            label
+                .opacity(isPerformingTask ? 0 : 1)
+                .overlay {
+                    if isPerformingTask {
+                        ProgressView()
+                    }
                 }
-            }
         }
         .disabled(isPerformingTask)
+    }
+}
+
+extension AsyncButton where Label == SwiftUI.Label<Text, Image> {
+    init(_ titleKey: LocalizedStringKey, systemImage: String, action: @escaping () async -> Void) {
+        self.action = action
+        self.label = SwiftUI.Label(titleKey, systemImage: systemImage)
+    }
+}
+
+#Preview {
+    AsyncButton("Refresh", systemImage: "arrow.clockwise") {
+        try? await Task.sleep(for: .seconds(1))
     }
 }

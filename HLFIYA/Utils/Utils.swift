@@ -2,295 +2,228 @@
 //  Utils.swift
 //  HLFIYA
 //
-//  Created by Ryan Token on 4/30/22.
+//  Created by Ryan Token on 5/14/22.
 //
 
-import Foundation
 import CoreLocation
+import Foundation
+import os
 
+/// File-backed caches for Yelp responses, filters, and review prompts.
+///
+/// Everything here is nonisolated and synchronous so it can be called from the
+/// background fetches in `BusinessFetcher` as well as from the main actor.
 nonisolated enum Utils {
-    static func convertMilesToMeters(miles: Double) -> Int {
-        let distanceInMiles = Measurement(value: miles, unit: UnitLength.miles)
-        let distanceInMeters = distanceInMiles.converted(to: UnitLength.meters)
-        
-        let distanceInMetersDouble = distanceInMeters.value
-        let distanceInMetersRounded = Int(distanceInMetersDouble.rounded())
-        
-        return distanceInMetersRounded
-    }
-    
-    static func getDocumentsDirectory() -> URL {
-        // find all possible documents directories for this user
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+    private static let logger = Logger(subsystem: "com.ryantoken.HLFIYA", category: "Cache")
 
-        // just send back the first one, which ought to be the only one
-        return paths[0]
+    /// Shared by every cached Yelp response, so they can be told apart from saved filters.
+    private static let yelpCachePrefix = "localYelpCache"
+    private static let businessesCacheName = "\(yelpCachePrefix).json"
+    private static let isOpenNowFilterCacheName = "isOpenNowFilterCache.txt"
+    private static let categoriesFilterCacheName = "categoriesFilterCache.json"
+    private static let pricesFilterCacheName = "pricesFilterCache.json"
+    private static let locationFilterCacheName = "locationFilterCache.json"
+    private static let lastReviewDateName = "lastReviewData.txt"
+
+    static func convertMilesToMeters(miles: Double) -> Int {
+        Int(Measurement(value: miles, unit: UnitLength.miles).converted(to: .meters).value.rounded())
     }
-    
+
+    // MARK: Yelp responses
+
+    static func writeBusinessesCache(_ response: Businesses) {
+        write(response, to: businessesCacheName)
+    }
+
     static func getLocalYelpCache() -> [Business] {
-        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("localYelpCache.json")
-        
+        // Caches written before shops were filtered out can still contain them.
+        let cached = read(Businesses.self, from: businessesCacheName)?.businesses ?? []
+        return BusinessFetcher.removingShops(from: cached).shuffled()
+    }
+
+    static func writeBusinessDetailsCache(_ details: BusinessDetails) {
+        write(details, to: businessDetailsCacheName(for: details.id ?? "unknown"))
+    }
+
+    /// How long cached business details are used before they're fetched again.
+    private static let businessDetailsMaximumAge: TimeInterval = 7 * 24 * 60 * 60
+
+    /// Returns the cached details for a business, or `nil` when nothing recent and usable is cached.
+    static func getLocalYelpCacheForBusiness(id: String) -> BusinessDetails? {
+        let fileName = businessDetailsCacheName(for: id)
+        let resourceValues = try? url(for: fileName).resourceValues(forKeys: [.contentModificationDateKey])
+        guard let modificationDate = resourceValues?.contentModificationDate,
+              Date.now.timeIntervalSince(modificationDate) < businessDetailsMaximumAge,
+              let cached = read(BusinessDetails.self, from: fileName),
+              cached.name?.isEmpty == false else { return nil }
+        return cached
+    }
+
+    private static func businessDetailsCacheName(for id: String) -> String {
+        "\(yelpCachePrefix)ForBusId-\(id).json"
+    }
+
+    // MARK: Filters
+
+    static func writeIsOpenNowFilterToCache(onlyShowOpenNow: Bool) {
+        writeString(onlyShowOpenNow ? "true" : "false", to: isOpenNowFilterCacheName)
+    }
+
+    static func getIsOpenNowFilterCache() -> Bool {
+        readString(from: isOpenNowFilterCacheName) == "true"
+    }
+
+    static func writeCategoriesFilterToCache(categories: Set<String>, categoriesNames: String) {
+        write(CategoriesFilter(categories: categories, categoriesNames: categoriesNames), to: categoriesFilterCacheName)
+    }
+
+    static func getCategoriesFilterCache() -> CategoriesFilter {
+        read(CategoriesFilter.self, from: categoriesFilterCacheName)
+            ?? CategoriesFilter(categories: [AllCategories.allFood], categoriesNames: "All Food")
+    }
+
+    static func writePricesFilterToCache(prices: Set<String>, priceName: String) {
+        write(PricesFilter(prices: prices, priceName: priceName), to: pricesFilterCacheName)
+    }
+
+    static func getPricesFilterCache() -> PricesFilter {
+        read(PricesFilter.self, from: pricesFilterCacheName)
+            ?? PricesFilter(prices: [AllPrices.allPrices], priceName: AllPrices.allPrices)
+    }
+
+    static func writeLocationFilterToCache(
+        customLatitude: CLLocationDegrees,
+        customLongitude: CLLocationDegrees,
+        customRadius: Double
+    ) {
+        let filter = LocationFilter(
+            customLatitude: customLatitude,
+            customLongitude: customLongitude,
+            customRadius: customRadius
+        )
+        write(filter, to: locationFilterCacheName)
+    }
+
+    static func getLocationFilterCache() -> LocationFilter {
+        read(LocationFilter.self, from: locationFilterCacheName)
+            ?? LocationFilter(customLatitude: 0, customLongitude: 0, customRadius: 5)
+    }
+
+    // MARK: Review prompts
+
+    static func writeReviewDateToDocumentsDir(date: Date) {
+        writeString(date.formatted(.iso8601), to: lastReviewDateName)
+    }
+
+    /// The last time the app asked for a review, or `nil` if it never has.
+    static func getLastReviewRequestDate() -> Date? {
+        guard let string = readString(from: lastReviewDateName) else { return nil }
+        return try? Date(string, strategy: .iso8601)
+    }
+
+    // MARK: Cache maintenance
+
+    /// Deletes Yelp responses older than a month. Saved filters are kept however old they are.
+    static func clearYelpCachesOverAMonthOld() {
+        let calendar = Calendar(identifier: .gregorian)
+        let now = Date.now
+
+        for fileURL in jsonCacheFiles(includingModificationDates: true)
+        where fileURL.lastPathComponent.hasPrefix(yelpCachePrefix) {
+            let resourceValues = try? fileURL.resourceValues(forKeys: [.contentModificationDateKey])
+            guard let modificationDate = resourceValues?.contentModificationDate,
+                  calendar.numberOfDaysBetween(modificationDate, and: now) > 30 else { continue }
+
+            do {
+                try FileManager.default.removeItem(at: fileURL)
+            } catch {
+                logFailure("remove stale cache \(fileURL.lastPathComponent)", error)
+            }
+        }
+    }
+
+    static func clearAllCacheFilesInDocumentsDir() {
+        for fileURL in jsonCacheFiles(includingModificationDates: false) {
+            do {
+                try FileManager.default.removeItem(at: fileURL)
+            } catch {
+                logFailure("remove cache \(fileURL.lastPathComponent)", error)
+            }
+        }
+    }
+
+    private static func jsonCacheFiles(includingModificationDates: Bool) -> [URL] {
         do {
-            let localYelpCache = try String(contentsOf: localCacheUrl, encoding: .utf8)
-            let localCacheAsData = Data(localYelpCache.utf8)
-            let localCacheAsBusinesses = try! JSONDecoder().decode(Businesses.self, from: localCacheAsData)
-            
-            return localCacheAsBusinesses.businesses?.shuffled() ?? []
+            return try FileManager.default.contentsOfDirectory(
+                at: .documentsDirectory,
+                includingPropertiesForKeys: includingModificationDates ? [.contentModificationDateKey] : nil,
+                options: .skipsHiddenFiles
+            )
+            .filter { $0.pathExtension == "json" }
         } catch {
-            print(error.localizedDescription)
+            logFailure("list the documents directory", error)
             return []
         }
     }
-    
-    static func getLocalYelpCacheForBusiness(id: String) -> BusinessDetails {
-        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("localYelpCacheForBusId-\(id).json")
-        
-        do {
-            let localYelpCacheForBusiness = try String(contentsOf: localCacheUrl, encoding: .utf8)
-            
-            let localCacheAsData = Data(localYelpCacheForBusiness.utf8)
-            let localCacheAsBusiness = try! JSONDecoder().decode(BusinessDetails.self, from: localCacheAsData)
-            
-            return localCacheAsBusiness
-        } catch {
-            print(error.localizedDescription)
-            return BusinessDetails.emptyBusiness
-        }
-    }
-    
-    static func writeIsOpenNowFilterToCache(onlyShowOpenNow: Bool) {
-        let cacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("isOpenNowFilterCache.txt")
-        var onlyShowOpenNowString = "false"
-        if onlyShowOpenNow {
-            onlyShowOpenNowString = "true"
-        }
-        do {
-            try onlyShowOpenNowString.write(to: cacheUrl, atomically: true, encoding: .utf8)
-        } catch {
-            print(error.localizedDescription)
-        }
-    }
-    
-    static func getIsOpenNowFilterCache() -> Bool {
-        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("isOpenNowFilterCache.txt")
-        
-        do {
-            let isOpenNowCache = try String(contentsOf: localCacheUrl, encoding: .utf8)
-            if (isOpenNowCache == "true") {
-                return true
-            } else {
-                return false
-            }
-        } catch {
-            print(error.localizedDescription)
-            return false
-        }
-    }
-    
-    static func writeCategoriesFilterToCache(categories: Set<String>, categoriesNames: String) {
-        let categoriesStruct = CategoriesFilter(categories: categories, categoriesNames: categoriesNames)
 
-        let encoder = JSONEncoder()
-        let cacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("categoriesFilterCache.json")
-        do {
-            let result = try encoder.encode(categoriesStruct)
-            if let jsonString = String(data: result, encoding: .utf8){
-                do {
-                    try jsonString.write(to: cacheUrl, atomically: true, encoding: .utf8)
-                } catch {
-                    print(error.localizedDescription)
-                }
-            }
-        } catch {
-            print("Error writing categories filter to cache: \(error)")
-        }
-    }
-    
-    static func getCategoriesFilterCache() -> CategoriesFilter {
-        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("categoriesFilterCache.json")
-        
-        do {
-            let localYelpCache = try String(contentsOf: localCacheUrl, encoding: .utf8)
-            let localCacheAsData = Data(localYelpCache.utf8)
-            let localCacheAsCategories = try! JSONDecoder().decode(CategoriesFilter.self, from: localCacheAsData)
-            
-            return localCacheAsCategories
-        } catch {
-            print(error.localizedDescription)
-            return CategoriesFilter(categories: ["food"], categoriesNames: "All Food")
-        }
-    }
-    
-    static func writePricesFilterToCache(prices: Set<String>, priceName: String) {
-        let pricesStruct = PricesFilter(prices: prices, priceName: priceName)
+    // MARK: File helpers
 
-        let encoder = JSONEncoder()
-        let cacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("pricesFilterCache.json")
-        do {
-            let result = try encoder.encode(pricesStruct)
-            if let jsonString = String(data: result, encoding: .utf8){
-                do {
-                    try jsonString.write(to: cacheUrl, atomically: true, encoding: .utf8)
-                } catch {
-                    print(error.localizedDescription)
-                }
-            }
-        } catch {
-            print("Error writing prices filter to cache: \(error)")
-        }
+    private static func logFailure(_ action: String, _ error: any Error) {
+        logger.error("Failed to \(action, privacy: .public): \(error.localizedDescription, privacy: .public)")
     }
-    
-    static func getPricesFilterCache() -> PricesFilter {
-        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("pricesFilterCache.json")
-        
-        do {
-            let localYelpCache = try String(contentsOf: localCacheUrl, encoding: .utf8)
-            let localCacheAsData = Data(localYelpCache.utf8)
-            let localCacheAsPrices = try! JSONDecoder().decode(PricesFilter.self, from: localCacheAsData)
-            
-            return localCacheAsPrices
-        } catch {
-            print(error.localizedDescription)
-            return PricesFilter(prices: ["All Prices"], priceName: "All Prices")
-        }
-    }
-    
-    static func writeReviewDateToDocumentsDir(date: Date) {
-        let lastReviewDateDoc = Utils.getDocumentsDirectory().appendingPathComponent("lastReviewData.txt")
-        let dateString = date.formatted(.iso8601)
-        do {
-            try dateString.write(to: lastReviewDateDoc, atomically: true, encoding: .utf8)
-        } catch {
-            print(error.localizedDescription)
-        }
-    }
-    
-    static func getLastReviewRequestFromDocumentsDir() -> String {
-        let lastReviewDateDoc = Utils.getDocumentsDirectory().appendingPathComponent("lastReviewData.txt")
-        
-        do {
-            let lastReviewDateString = try String(contentsOf: lastReviewDateDoc, encoding: .utf8)
-            return lastReviewDateString
-        } catch {
-            print(error.localizedDescription)
-            return "Unknown"
-        }
-    }
-    
-    static func writeLocationFilterToCache(customLatitude: CLLocationDegrees, customLongitude: CLLocationDegrees, customRadius: Double) {
-        let locationStruct = LocationFilter(customLatitude: customLatitude, customLongitude: customLongitude, customRadius: customRadius)
 
-        let encoder = JSONEncoder()
-        let cacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("locationFilterCache.json")
+    private static func url(for fileName: String) -> URL {
+        URL.documentsDirectory.appending(path: fileName)
+    }
+
+    private static func write(_ value: some Encodable, to fileName: String) {
         do {
-            let result = try encoder.encode(locationStruct)
-            if let jsonString = String(data: result, encoding: .utf8){
-                do {
-                    try jsonString.write(to: cacheUrl, atomically: true, encoding: .utf8)
-                } catch {
-                    print(error.localizedDescription)
-                }
-            }
+            let data = try JSONEncoder.yelp.encode(value)
+            try data.write(to: url(for: fileName), options: .atomic)
         } catch {
-            print("Error writing location filter to cache: \(error)")
+            logFailure("write \(fileName)", error)
         }
     }
-    
-    static func getLocationFilterCache() -> LocationFilter {
-        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("locationFilterCache.json")
-        
+
+    private static func read<Value: Decodable>(_ type: Value.Type, from fileName: String) -> Value? {
+        let fileURL = url(for: fileName)
+        guard FileManager.default.fileExists(atPath: fileURL.path(percentEncoded: false)) else { return nil }
+
         do {
-            let localYelpCache = try String(contentsOf: localCacheUrl, encoding: .utf8)
-            let localCacheAsData = Data(localYelpCache.utf8)
-            let localCacheAsLocation = try! JSONDecoder().decode(LocationFilter.self, from: localCacheAsData)
-            
-            return localCacheAsLocation
+            return try JSONDecoder.yelp.decode(type, from: Data(contentsOf: fileURL))
         } catch {
-            print(error.localizedDescription)
-            return LocationFilter(customLatitude: CLLocationDegrees(), customLongitude: CLLocationDegrees(), customRadius: 5.0)
+            logFailure("read \(fileName)", error)
+            return nil
         }
     }
-    
-    static func clearAnyCacheFilesOverAMonthOld() {
-        let documentsDir = getDocumentsDirectory()
-        let todaysDate = Date.now
-        let calendar = Calendar(identifier: .gregorian)
-        
-        // loop over every local cache file
-        // if any modificationDates are over a month old, return  true
-        // otherwise return false
+
+    private static func writeString(_ string: String, to fileName: String) {
         do {
-            let fileURLs = try FileManager.default.contentsOfDirectory(at: documentsDir, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
-            
-            for fileURL in fileURLs where fileURL.pathExtension == "json" {
-                let fileName = fileURL.lastPathComponent
-                print("file name: \(fileName)")
-                let filePath = fileURL.relativePath
-                do {
-                    let fileAttributes = try FileManager.default.attributesOfItem(atPath: filePath)
-                    
-                    for attribute in fileAttributes {
-                        if attribute.key == FileAttributeKey("NSFileModificationDate") {
-                            let modificationDate = attribute.value as! Date
-                            let daysSinceCacheModification = calendar.numberOfDaysBetween(modificationDate, and: todaysDate)
-                            print("days since cache modification: \(daysSinceCacheModification)")
-                            if daysSinceCacheModification > 30 {
-                                print("clearing cache for \(fileName)")
-                                try FileManager.default.removeItem(at: fileURL)
-                            }
-                        }
-                    }
-                } catch {
-                    print("error checking for old cache files: \(error)")
-                }
-            }
-        } catch  {
-            print("error getting files from documents dir: \(error)")
+            try string.write(to: url(for: fileName), atomically: true, encoding: .utf8)
+        } catch {
+            logFailure("write \(fileName)", error)
         }
     }
-    
-    static func clearAllCacheFilesInDocumentsDir() {
-        let documentsDir = getDocumentsDirectory()
-        
-        do {
-            let fileURLs = try FileManager.default.contentsOfDirectory(at: documentsDir, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
-            for fileURL in fileURLs where fileURL.pathExtension == "json" {
-                try FileManager.default.removeItem(at: fileURL)
-            }
-        } catch  {
-            print("error clearing files from cache: \(error)")
-        }
+
+    private static func readString(from fileName: String) -> String? {
+        try? String(contentsOf: url(for: fileName), encoding: .utf8)
     }
-    
+
+    // MARK: Cached filter shapes
+
     struct CategoriesFilter: Codable {
         var categories: Set<String>
         var categoriesNames: String
-        
-        init(categories: Set<String>, categoriesNames: String) {
-            self.categories = categories
-            self.categoriesNames = categoriesNames
-        }
     }
-    
+
     struct PricesFilter: Codable {
         var prices: Set<String>
         var priceName: String
-        
-        init(prices: Set<String>, priceName: String) {
-            self.prices = prices
-            self.priceName = priceName
-        }
     }
-    
+
     struct LocationFilter: Codable {
         var customLatitude: CLLocationDegrees
         var customLongitude: CLLocationDegrees
         var customRadius: Double
-        
-        init(customLatitude: CLLocationDegrees, customLongitude: CLLocationDegrees, customRadius: Double) {
-            self.customLatitude = customLatitude
-            self.customLongitude = customLongitude
-            self.customRadius = customRadius
-        }
     }
 }

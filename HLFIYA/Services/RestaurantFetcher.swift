@@ -1,119 +1,98 @@
 //
-//  BusinessFetcher.swift
+//  RestaurantFetcher.swift
 //  HLFIYA
 //
-//  Created by Ryan Token on 2/22/22.
+//  Created by Ryan Token on 1/18/22.
 //
 
 import Foundation
 
-enum BusinessFetcher {
-    private nonisolated static let yelpKey = Bundle.main.infoDictionary?["YelpAPIKey"] as? String ?? ""
+/// Fetches restaurants from the Yelp Fusion API and caches the responses on disk.
+nonisolated enum BusinessFetcher {
+    private static let yelpKey = Bundle.main.infoDictionary?["YelpAPIKey"] as? String ?? ""
+    private static let baseURL = URL(string: "https://api.yelp.com/v3/businesses")
+
+    /// Yelp categories that describe shops rather than places to eat.
+    private static let excludedCategoryAliases: Set<String> = [
+        "grocery", "intlgrocery", "ethicgrocery", "healthmarkets", "organic_stores", "convenience", "giftshops"
+    ]
 
     enum BusinessFetcherError: Error {
         case invalidURL
-        case missingData
     }
 
-    // radius is in meters
-    nonisolated static func getBusinessesNear(latitude: Double, longitude: Double, radius: Int, categories: Set<String>, prices: String, onlyGetOpenNow: Bool) async throws -> [Business] {
-        var userCategories: Set = ["food"]
-        if categories == userCategories { userCategories = ["food"] } else { userCategories = categories }
-        let formattedCategories = userCategories.joined(separator: ",")
-        
-        var userPrice = ""
-        if prices == "" { userPrice = "1, 2, 3, 4" } else { userPrice = prices }
-        
-        print("getting businesses near \(latitude), \(longitude), within a radius of \(radius) meters")
-        var endpoint = ""
-        if onlyGetOpenNow {
-            endpoint = "https://api.yelp.com/v3/businesses/search?latitude=\(latitude)&longitude=\(longitude)&radius=\(radius)&limit=50&categories=\(formattedCategories)&price=\(userPrice)&open_now=true"
-        } else {
-            endpoint = "https://api.yelp.com/v3/businesses/search?latitude=\(latitude)&longitude=\(longitude)&radius=\(radius)&limit=50&categories=\(formattedCategories)&price=\(userPrice)"
+    /// Searches for restaurants, returning them shuffled with shops filtered out.
+    /// The cache holds the filtered list, so restored results match live ones.
+    /// Fallback-location results aren't cached, so they're never restored in place
+    /// of a search around the person's real location.
+    @concurrent
+    static func getBusinesses(for search: BusinessSearch) async throws -> [Business] {
+        let response = try await fetch(Businesses.self, from: try searchURL(for: search))
+        let restaurants = removingShops(from: response.businesses ?? [])
+        if !search.usesFallbackLocation {
+            let cached = Businesses(total: response.total, businesses: restaurants, region: response.region)
+            Utils.writeBusinessesCache(cached)
         }
-        
-        let cleanEndpoint = endpoint.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        print("hit endpoint: \(cleanEndpoint)")
-        
-        guard let url = URL(string: cleanEndpoint) else {
-            throw BusinessFetcherError.invalidURL
-        }
-        
-        var yelpRequest = URLRequest(url: url)
-        yelpRequest.httpMethod = "GET"
-        yelpRequest.setValue("Bearer \(yelpKey)", forHTTPHeaderField: "Authorization")
-        yelpRequest.setValue("application/json;charset=utf-8", forHTTPHeaderField: "Content-Type")
 
-        let (data, _) = try await URLSession.shared.data(for: yelpRequest)
-
-        let response = try JSONDecoder().decode(Businesses.self, from: data)
-        let businesses = response.businesses
-        
-        // Filter out grocery stores, convenience stores, and gift shops
-        var filteredBusinesses = [Business]()
-        for business in businesses ?? [] {
-            var containsGroceryCategory = false
-            for category in business.categories ?? [] {
-                if category.alias == "grocery" || category.alias == "intlgrocery" || category.alias == "ethicgrocery" || category.alias == "healthmarkets" || category.alias == "organic_stores" || category.alias == "convenience" || category.alias == "giftshops" {
-                    containsGroceryCategory = true
-                }
-            }
-            
-            if !containsGroceryCategory {
-                filteredBusinesses.append(business)
-            }
-        }
-        
-        let shuffledBusinesses = filteredBusinesses.shuffled()
-        
-        // Write JSON data to local document as cache
-        let encodedData = try JSONEncoder().encode(response)
-        let jsonString = String(data: encodedData,
-                                encoding: .utf8)
-        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("localYelpCache.json")
-
-        do {
-            try jsonString?.write(to: localCacheUrl, atomically: true, encoding: .utf8)
-        } catch {
-            print(error.localizedDescription)
-        }
-        
-        await HapticGenerator.playSuccessHaptic()
-        return shuffledBusinesses
+        return restaurants.shuffled()
     }
-    
+
+    /// Returns the full details, including photos and hours, for one business,
+    /// from the on-disk cache when they've been fetched before.
+    @concurrent
     static func getBusiness(id: String) async throws -> BusinessDetails {
-        print("getting business with ID \(id)")
-        let endpoint = "https://api.yelp.com/v3/businesses/\(id)"
-        let cleanEndpoint = endpoint.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        print("getBusiness endpoint: \(cleanEndpoint)")
-        
-        guard let url = URL(string: cleanEndpoint) else {
-            throw BusinessFetcherError.invalidURL
+        guard !id.isEmpty else { throw BusinessFetcherError.invalidURL }
+        #if DEBUG
+        if ScreenshotMode.isEnabled {
+            return try ScreenshotMode.details(id: id)
         }
-        
-        var yelpRequest = URLRequest(url: url)
-        yelpRequest.httpMethod = "GET"
-        yelpRequest.setValue("Bearer \(yelpKey)", forHTTPHeaderField: "Authorization")
-        yelpRequest.setValue("application/json;charset=utf-8", forHTTPHeaderField: "Content-Type")
-
-        let (data, _) = try await URLSession.shared.data(for: yelpRequest)
-
-        // Parse the JSON data
-        let businessDetails = try JSONDecoder().decode(BusinessDetails.self, from: data)
-        
-        // Write JSON data to local document as cache
-        let encodedData = try JSONEncoder().encode(businessDetails)
-        let jsonString = String(data: encodedData,
-                                encoding: .utf8)
-        let localCacheUrl = Utils.getDocumentsDirectory().appendingPathComponent("localYelpCacheForBusId-\(businessDetails.id ?? "unknown").json")
-
-        do {
-            try jsonString?.write(to: localCacheUrl, atomically: true, encoding: .utf8)
-        } catch {
-            print(error.localizedDescription)
+        #endif
+        if let cached = Utils.getLocalYelpCacheForBusiness(id: id) {
+            return cached
         }
-        
-        return businessDetails
+        guard let url = baseURL?.appending(path: id) else { throw BusinessFetcherError.invalidURL }
+
+        let details = try await fetch(BusinessDetails.self, from: url)
+        Utils.writeBusinessDetailsCache(details)
+        return details
+    }
+
+    /// Drops businesses Yelp also files under a shop category, such as grocery stores.
+    static func removingShops(from businesses: [Business]) -> [Business] {
+        businesses.filter { business in
+            !(business.categories ?? []).contains { excludedCategoryAliases.contains($0.alias) }
+        }
+    }
+
+    /// Builds the business search URL. Internal so tests can verify the query.
+    static func searchURL(for search: BusinessSearch) throws -> URL {
+        guard let searchURL = baseURL?.appending(path: "search") else { throw BusinessFetcherError.invalidURL }
+
+        var queryItems = [
+            URLQueryItem(name: "latitude", value: String(search.latitude)),
+            URLQueryItem(name: "longitude", value: String(search.longitude)),
+            URLQueryItem(name: "radius", value: String(search.radiusInMeters)),
+            URLQueryItem(name: "limit", value: "50"),
+            URLQueryItem(name: "categories", value: search.categories.sorted().joined(separator: ",")),
+            URLQueryItem(name: "price", value: search.prices.isEmpty ? "1,2,3,4" : search.prices)
+        ]
+
+        if search.openNow {
+            queryItems.append(URLQueryItem(name: "open_now", value: "true"))
+        }
+
+        return searchURL.appending(queryItems: queryItems)
+    }
+
+    private static func fetch<Value: Decodable>(_ type: Value.Type, from url: URL) async throws -> Value {
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(yelpKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        if let httpResponse = response as? HTTPURLResponse, !(200..<300).contains(httpResponse.statusCode) {
+            throw URLError(.badServerResponse)
+        }
+        return try JSONDecoder.yelp.decode(type, from: data)
     }
 }

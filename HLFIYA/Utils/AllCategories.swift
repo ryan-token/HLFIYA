@@ -7,118 +7,56 @@
 
 import Foundation
 
-struct AllCategories {
-    private var allCategories: [String]
-    
-    init() {
-        allCategories = [
-            "food",
-            "beer_and_wine",
-            "breakfast_brunch",
-            "breweries",
-            "british",
-            "burgers",
-            "chinese",
-            "cocktailbars",
-            "coffee",
-            "comfortfood",
-            "desserts",
-            "hotdogs",
-            "foodtrucks",
-            "french",
-            "german",
-            "greek",
-            "icecream",
-            "indpak",
-            "italian",
-            "japanese",
-            "korean",
-            "mexican",
-            "mideastern",
-            "pizza",
-            "seafood",
-            "sportsbars",
-            "steak",
-            "sushi",
-            "thai",
-            "vegan",
-            "vegetarian",
-            "wineries"
-        ]
+/// The Yelp category aliases the app offers as filters, in display order.
+nonisolated enum AllCategories {
+    /// The alias that means "every food category".
+    static let allFood = "food"
+
+    /// Every selectable Yelp category alias, in the order they appear in the picker.
+    static let yelpCategories = displayNames.map(\.alias)
+
+    private static let displayNames: [(alias: String, name: String)] = [
+        ("food", "All Food"),
+        ("beer_and_wine", "Beer, Wine, & Spirits"),
+        ("breakfast_brunch", "Breakfast & Brunch"),
+        ("breweries", "Breweries"),
+        ("british", "British"),
+        ("burgers", "Burgers"),
+        ("chinese", "Chinese"),
+        ("cocktailbars", "Cocktail Bars"),
+        ("coffee", "Coffee & Tea"),
+        ("comfortfood", "Comfort Food"),
+        ("desserts", "Desserts"),
+        ("hotdogs", "Fast Food"),
+        ("foodtrucks", "Food Trucks"),
+        ("french", "French"),
+        ("german", "German"),
+        ("greek", "Greek"),
+        ("icecream", "Ice Cream"),
+        ("indpak", "Indian"),
+        ("italian", "Italian"),
+        ("japanese", "Japanese"),
+        ("korean", "Korean"),
+        ("mexican", "Mexican"),
+        ("mideastern", "Middle Eastern"),
+        ("pizza", "Pizza"),
+        ("seafood", "Seafood"),
+        ("sportsbars", "Sports Bars"),
+        ("steak", "Steakhouses"),
+        ("sushi", "Sushi"),
+        ("thai", "Thai"),
+        ("vegan", "Vegan"),
+        ("vegetarian", "Vegetarian"),
+        ("wineries", "Wineries")
+    ]
+
+    /// Returns the user-facing name for a Yelp category alias.
+    static func displayName(for alias: String) -> String {
+        displayNames.first { $0.alias == alias }?.name ?? "Unknown"
     }
-    
-    func getYelpCategories() -> [String] {
-        return allCategories
-    }
-    
-    func getFormattedCategory(from yelpCategory: String) -> String {
-        switch yelpCategory {
-        case "food":
-            return "All Food"
-        case "beer_and_wine":
-            return "Beer, Wine, & Spirits"
-        case "breakfast_brunch":
-            return "Breakfast & Brunch"
-        case "breweries":
-            return "Breweries"
-        case "british":
-            return "British"
-        case "burgers":
-            return "Burgers"
-        case "chinese":
-            return "Chinese"
-        case "cocktailbars":
-            return "Cocktail Bars"
-        case "coffee":
-            return "Coffee & Tea"
-        case "comfortfood":
-            return "Comfort Food"
-        case "desserts":
-            return "Desserts"
-        case "hotdogs":
-            return "Fast Food"
-        case "foodtrucks":
-            return "Food Trucks"
-        case "french":
-            return "French"
-        case "german":
-            return "German"
-        case "greek":
-            return "Greek"
-        case "icecream":
-            return "Ice Cream"
-        case "indpak":
-            return "Indian"
-        case "italian":
-            return "Italian"
-        case "japanese":
-            return "Japanese"
-        case "korean":
-            return "Korean"
-        case "mexican":
-            return "Mexican"
-        case "mideastern":
-            return "Middle Eastern"
-        case "pizza":
-            return "Pizza"
-        case "seafood":
-            return "Seafood"
-        case "sportsbars":
-            return "Sports Bars"
-        case "steak":
-            return "Steakhouses"
-        case "sushi":
-            return "Sushi"
-        case "thai":
-            return "Thai"
-        case "vegan":
-            return "Vegan"
-        case "vegetarian":
-            return "Vegetarian"
-        case "wineries":
-            return "Wineries"
-        default:
-            return "Unknown"
-        }
+
+    /// Returns the given aliases sorted into picker order, so summaries are stable.
+    static func sortedInDisplayOrder(_ aliases: Set<String>) -> [String] {
+        yelpCategories.filter(aliases.contains)
     }
 }

@@ -3,30 +3,28 @@
 //  HLFIYA
 //
 
+import CoreData
 import SwiftUI
 
+/// Buttons that save the restaurant to one of the person's lists, or create a new list.
 struct AddToListSection: View {
-    let savedLists: FetchedResults<SavedList>
-    let onAddToList: (SavedList) -> Void
-    let onCreateList: () -> Void
+    let restaurantID: String
+    let restaurantName: String
+    let model: RestaurantDetailsModel
+
+    @FetchRequest(fetchRequest: SavedList.allListsFetchRequest)
+    private var savedLists: FetchedResults<SavedList>
 
     var body: some View {
         Section("Add to List") {
             ForEach(savedLists) { list in
-                Button {
-                    onAddToList(list)
-                } label: {
-                    Text(list.wrappedName)
-                }
-                .accessibilityLabel("Add to \(list.wrappedName) list")
+                AddToListRow(restaurantID: restaurantID, restaurantName: restaurantName, list: list, model: model)
             }
-            .foregroundStyle(.fuchsia)
 
-            Button(action: onCreateList) {
-                Label("Create List", systemImage: "plus.square.fill")
-                    .font(.headline)
-                    .foregroundStyle(.fuchsia)
+            Button("Create List", systemImage: "plus.square.fill") {
+                model.isShowingCreateListSheet = true
             }
+            .font(.headline)
         }
     }
 }

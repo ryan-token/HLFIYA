@@ -2,34 +2,30 @@
 //  DollarView.swift
 //  HLFIYA
 //
-//  Created by Ryan Token on 4/25/22.
+//  Created by Ryan Token on 6/3/22.
 //
 
 import SwiftUI
 
+/// A Yelp price level drawn as four dollar-sign symbols, with an optional label.
 struct DollarView: View {
-    var price: String
-    var label: String
-    var maximumPrice = 4
-    var offColor = Color.gray
-    var onColor = Color.green
+    /// The Yelp price string, such as "$$".
+    let price: String
+    var label: LocalizedStringResource?
+
+    private static let maximumPrice = 4
 
     var body: some View {
         HStack {
-            if !label.isEmpty {
+            if let label {
                 Text(label)
-                    .foregroundStyle(.gray)
-
-                Spacer()
-                    .frame(width: 20)
+                    .foregroundStyle(.secondary)
+                    .padding(.trailing)
             }
 
-            ForEach(1..<maximumPrice + 1, id: \.self) { possiblePrice in
+            ForEach(1...Self.maximumPrice, id: \.self) { level in
                 Image(systemName: "dollarsign.circle")
-                    .foregroundStyle(possiblePrice > price.count ? offColor : onColor)
-
-                Spacer()
-                    .frame(width: 10.3)
+                    .foregroundStyle(level > price.count ? .gray : .green)
             }
         }
         .accessibilityElement(children: .ignore)
