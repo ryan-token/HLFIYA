@@ -5,10 +5,11 @@
 
 import SwiftUI
 
-/// The "Hot Local Food" wordmark, whose words slide in one at a time.
+/// The neon "Hot Local Food" wordmark, styled after the app icon, whose words slide in
+/// and flicker on one at a time.
 ///
-/// Each word's image is a layer on the same canvas, already placed within the
-/// wordmark, so stacking them assembles it at any size.
+/// The words share one canvas and are already placed within the wordmark, so stacking them
+/// assembles it at any size.
 struct HotLocalFoodTitle: View {
     let showsHot: Bool
     let showsLocal: Bool
@@ -16,10 +17,11 @@ struct HotLocalFoodTitle: View {
 
     var body: some View {
         ZStack {
-            TitleWord(image: .hot, isVisible: showsHot, insertionEdge: .leading)
-            TitleWord(image: .local, isVisible: showsLocal, insertionEdge: .trailing)
-            TitleWord(image: .food, isVisible: showsFood, insertionEdge: .bottom)
+            TitleWord(word: .hot, isVisible: showsHot)
+            TitleWord(word: .local, isVisible: showsLocal)
+            TitleWord(word: .food, isVisible: showsFood)
         }
+        .aspectRatio(WordmarkLetteringData.aspectRatio, contentMode: .fit)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Hot Local Food")
         .accessibilityAddTraits(.isHeader)

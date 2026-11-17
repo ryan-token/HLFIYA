@@ -34,8 +34,14 @@ struct AboutView: View {
 
                     Text("Thank you for using the app. Please leave a review if you find it valuable.")
 
-                    Button("Rate on the App Store", systemImage: "heart.square.fill", action: openReviewPage)
-                        .font(.headline)
+                    Button(action: openReviewPage) {
+                        SettingsRow(
+                            iconName: "heart",
+                            iconColor: .fuchsia,
+                            title: "Rate on the App Store",
+                            showsExternalLinkIndicator: true
+                        )
+                    }
                 }
 
                 Section("Try my other apps") {

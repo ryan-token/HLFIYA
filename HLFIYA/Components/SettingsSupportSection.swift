@@ -22,7 +22,7 @@ struct SettingsSupportSection: View {
         Section("Support") {
             Button(action: openReviewPage) {
                 SettingsRow(
-                    iconName: "heart.square.fill",
+                    iconName: "heart",
                     iconColor: .fuchsia,
                     title: "Rate on the App Store",
                     showsExternalLinkIndicator: true
@@ -32,7 +32,7 @@ struct SettingsSupportSection: View {
             if !storeManager.hasRemovedAds, let product = storeManager.removeAdsProduct {
                 AsyncButton(action: purchaseRemoveAds) {
                     SettingsRow(
-                        iconName: "star.square.fill",
+                        iconName: "star",
                         iconColor: .green,
                         title: "Remove Ads for \(product.displayPrice)"
                     )
@@ -40,7 +40,7 @@ struct SettingsSupportSection: View {
             }
 
             AsyncButton(action: restorePurchases) {
-                SettingsRow(iconName: "arrow.clockwise.square.fill", iconColor: .indigo, title: "Restore Purchases")
+                SettingsRow(iconName: "arrow.clockwise", iconColor: .indigo, title: "Restore Purchases")
             }
         }
     }

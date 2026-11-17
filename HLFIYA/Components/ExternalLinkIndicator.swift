@@ -10,6 +10,9 @@ struct ExternalLinkIndicator: View {
     var body: some View {
         Image(systemName: "arrow.up.forward")
             .foregroundStyle(.tertiary)
+            // Resolves `.tertiary` against the label color; inside a button it would
+            // otherwise take the tint.
+            .foregroundStyle(Color.primary)
             .font(.callout)
             .accessibilityHidden(true)
     }
