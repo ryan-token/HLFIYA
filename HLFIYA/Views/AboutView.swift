@@ -41,22 +41,30 @@ struct AboutView: View {
                             title: "Rate on the App Store",
                             showsExternalLinkIndicator: true
                         )
+						.fontWeight(.semibold)
                     }
                 }
 
                 Section("Try my other apps") {
                     OtherAppRow(
-                        image: .catchUp1024,
+                        image: .catchUpIcon,
                         title: "CatchUp: Keep in Touch",
                         subtitle: "Personal relationship manager",
                         url: URL(string: "itms-apps://apps.apple.com/us/app/catchup-keep-in-touch/id1358023550")
                     )
 
                     OtherAppRow(
-                        image: .outrank1024,
+                        image: .outrankIcon,
                         title: "Outrank: CFB Stat Rankings",
                         subtitle: "College football team stats",
                         url: URL(string: "itms-apps://apps.apple.com/us/app/outrank/id1588983785")
+                    )
+
+                    OtherAppRow(
+                        image: .youHQIcon,
+                        title: "YouHQ: Life Organizer",
+                        subtitle: "Track homes, vehicles, money",
+                        url: URL(string: "itms-apps://apps.apple.com/app/id6744900328")
                     )
                 }
             }

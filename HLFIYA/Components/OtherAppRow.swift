@@ -67,16 +67,23 @@ struct OtherAppRow: View {
     Form {
         Section("Try my other apps") {
             OtherAppRow(
-                image: .catchUp1024,
+                image: .catchUpIcon,
                 title: "CatchUp: Keep in Touch",
                 subtitle: "Personal relationship manager",
                 url: nil
             )
 
             OtherAppRow(
-                image: .outrank1024,
+                image: .outrankIcon,
                 title: "Outrank: CFB Stat Rankings",
                 subtitle: "College football team stats",
+                url: nil
+            )
+
+            OtherAppRow(
+                image: .youHQIcon,
+                title: "YouHQ: Life Organizer",
+                subtitle: "Track homes, vehicles, money",
                 url: nil
             )
         }
@@ -86,7 +93,7 @@ struct OtherAppRow: View {
 #Preview("Accessibility size") {
     Form {
         OtherAppRow(
-            image: .catchUp1024,
+            image: .catchUpIcon,
             title: "CatchUp: Keep in Touch",
             subtitle: "Personal relationship manager",
             url: nil

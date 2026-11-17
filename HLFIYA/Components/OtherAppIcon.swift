@@ -38,7 +38,8 @@ struct OtherAppIcon: View {
 
 #Preview {
     HStack {
-        OtherAppIcon(image: .catchUp1024)
-        OtherAppIcon(image: .outrank1024)
+        OtherAppIcon(image: .catchUpIcon)
+        OtherAppIcon(image: .outrankIcon)
+        OtherAppIcon(image: .youHQIcon)
     }
 }
