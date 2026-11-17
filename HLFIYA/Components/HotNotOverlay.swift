@@ -11,18 +11,27 @@ struct HotNotOverlay: View {
     let dragDistance: Double
 
     var body: some View {
-        // Layered rather than side by side, so each stamp can use the card's full
-        // width and never pushes the other past the edge on narrow cards.
-        ZStack {
-            SwipeStamp(text: "HOT 🥵", foreground: .fuchsia, background: .white, border: .fuchsia, angle: -25)
-                .opacity(dragDistance / 10 - 1)
-                .frame(maxWidth: .infinity, alignment: .leading)
+        // The stamps are centered in the card's top half, a quarter of the way down,
+        // clear of the name and rating at the bottom at any card size.
+        VStack(spacing: 0) {
+            // Layered rather than side by side, so each stamp can use the card's full
+            // width and never pushes the other past the edge on narrow cards.
+            ZStack {
+                SwipeStamp(text: "HOT 🥵", foreground: .fuchsia, background: .white, border: .fuchsia, angle: -25)
+                    .opacity(dragDistance / 10 - 1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-            SwipeStamp(text: "NOT 😑", foreground: .black, background: .gray, border: .black, angle: 25)
-                .opacity(-dragDistance / 10 - 1)
-                .frame(maxWidth: .infinity, alignment: .trailing)
+                SwipeStamp(text: "NOT 😑", foreground: .black, background: .gray, border: .black, angle: 25)
+                    .opacity(-dragDistance / 10 - 1)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            .frame(maxHeight: .infinity)
+
+            // Equally flexible, so the two halves split the card evenly. A Spacer would
+            // only get what's left after the stamps take the full height.
+            Color.clear
+                .frame(maxHeight: .infinity)
         }
-        .padding(.top, 35)
         .padding(.horizontal)
         .accessibilityHidden(true)
         .allowsHitTesting(false)
@@ -31,4 +40,6 @@ struct HotNotOverlay: View {
 
 #Preview {
     HotNotOverlay(dragDistance: 30)
+        .frame(width: 300, height: 400)
+        .border(.secondary)
 }

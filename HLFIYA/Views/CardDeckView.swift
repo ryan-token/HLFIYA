@@ -13,6 +13,9 @@ import SwiftUI
 struct CardDeckView: View {
     let feed: RestaurantFeed
 
+    /// The cards' width divided by their height.
+    static let aspectRatio = 3.0 / 4
+
     @State private var swipeAwayDistance = 0.0
 
     var body: some View {
@@ -29,7 +32,7 @@ struct CardDeckView: View {
                 .zIndex(-Double(card.position))
             }
         }
-        .aspectRatio(3 / 4, contentMode: .fit)
+        .aspectRatio(Self.aspectRatio, contentMode: .fit)
         // A swiped card travels the deck's right edge's distance from the screen's
         // leading edge, plus room for its tilted corners, so it clears the screen
         // even when the deck sits on the right. Measured on the deck, which never

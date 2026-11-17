@@ -60,15 +60,11 @@ struct CardView: View {
                 .buttonStyle(.plain)
                 .accessibilityHidden(true)
             }
-            .overlay(alignment: .top) {
-                CardStatusBadge(showsSwipeHint: showsSwipeHint, photosFailedToLoad: photoLoadState == .failed)
-            }
-            .overlay(alignment: .bottom) {
-                CardFooter(
-                    name: business.name ?? "",
-                    rating: business.rating ?? 0,
-                    price: business.price ?? "",
-                    category: business.categories?.first?.title ?? "",
+            .overlay {
+                CardInfoOverlay(
+                    showsSwipeHint: showsSwipeHint,
+                    photosFailedToLoad: photoLoadState == .failed,
+                    summary: CardSummary(business: business),
                     canUndo: feed.canUndo,
                     undo: UndoSwipeAction(feed: feed)
                 )
@@ -154,12 +150,7 @@ struct CardView: View {
     }
 
     private var accessibilityLabel: String {
-        let rating = (business.rating ?? 0).formatted(.number.precision(.fractionLength(1)))
-        let price = business.price ?? ""
-        let category = business.categories?.first?.title ?? ""
-        return [business.name ?? "", "\(rating) stars", "\(price.count) dollar signs", category]
-            .filter { !$0.isEmpty }
-            .formatted(.list(type: .and, width: .narrow))
+        CardSummary(business: business).accessibilityDescription
     }
 
     // MARK: Gestures
