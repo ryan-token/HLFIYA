@@ -18,12 +18,12 @@ struct SettingsGeneralSection: View {
     var body: some View {
         Section("General") {
             NavigationLink(value: SettingsDestination.locationPermissions) {
-                SettingsRow(iconName: "location.square.fill", iconColor: .blue, title: "Location Permissions")
+                SettingsRow(iconName: "location", iconColor: .blue, title: "Location Permissions")
             }
 
             Button(action: sendFeatureRequestEmail) {
                 SettingsRow(
-                    iconName: "bolt.square.fill",
+                    iconName: "bolt",
                     iconColor: .mint,
                     title: "Feature Request",
                     showsExternalLinkIndicator: true
@@ -34,13 +34,13 @@ struct SettingsGeneralSection: View {
             Button {
                 isShowingAboutScreen = true
             } label: {
-                SettingsRow(iconName: "person.crop.square.fill", iconColor: .fuchsia, title: "About")
+                SettingsRow(iconName: "person", iconColor: .fuchsia, title: "About")
             }
 
             Button {
                 isShowingLegalDialog = true
             } label: {
-                SettingsRow(iconName: "lock.square.fill", iconColor: .gray, title: "Terms & Privacy Policy")
+                SettingsRow(iconName: "lock", iconColor: .gray, title: "Terms & Privacy Policy")
             }
             .confirmationDialog(
                 "Terms of Use and Privacy Policy",

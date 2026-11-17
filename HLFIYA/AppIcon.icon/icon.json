@@ -1,0 +1,262 @@
+{
+  "features": [
+    "refractivity"
+  ],
+  "fill-specializations": [
+    {
+      "value": {
+        "linear-gradient": [
+          "extended-srgb:0.07843,0.05882,0.21961,1.00000",
+          "extended-srgb:0.02745,0.01961,0.10196,1.00000"
+        ],
+        "orientation": {
+          "start": {
+            "x": 0.5,
+            "y": 0
+          },
+          "stop": {
+            "x": 0.5,
+            "y": 1
+          }
+        }
+      }
+    },
+    {
+      "appearance": "dark",
+      "value": {
+        "linear-gradient": [
+          "extended-srgb:0.03922,0.02745,0.12549,1.00000",
+          "extended-srgb:0.01176,0.00784,0.04706,1.00000"
+        ],
+        "orientation": {
+          "start": {
+            "x": 0.5,
+            "y": 0
+          },
+          "stop": {
+            "x": 0.5,
+            "y": 1
+          }
+        }
+      }
+    },
+    {
+      "appearance": "tinted",
+      "value": {
+        "linear-gradient": [
+          "extended-gray:0.03000,1.00000",
+          "extended-gray:0.00000,1.00000"
+        ],
+        "orientation": {
+          "start": {
+            "x": 0.5,
+            "y": 0
+          },
+          "stop": {
+            "x": 0.5,
+            "y": 1
+          }
+        }
+      }
+    }
+  ],
+  "groups": [
+    {
+      "blur-material": 0.3,
+      "layers": [
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "extended-srgb:1.00000,0.95686,0.98431,1.00000"
+              }
+            },
+            {
+              "appearance": "tinted",
+              "value": {
+                "solid": "extended-gray:1.00000,1.00000"
+              }
+            }
+          ],
+          "glass": false,
+          "image-name": "main-core.svg",
+          "name": "main-core"
+        },
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "extended-srgb:1.00000,0.30980,0.86275,1.00000"
+              }
+            },
+            {
+              "appearance": "tinted",
+              "value": {
+                "solid": "extended-gray:0.72000,1.00000"
+              }
+            }
+          ],
+          "glass": true,
+          "image-name": "main-tube.svg",
+          "name": "main-tube"
+        },
+        {
+          "blend-mode-specializations": [
+            {
+              "value": "plus-lighter"
+            },
+            {
+              "appearance": "tinted",
+              "value": "normal"
+            }
+          ],
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "extended-srgb:0.87843,0.25098,1.00000,1.00000"
+              }
+            },
+            {
+              "appearance": "tinted",
+              "value": {
+                "solid": "extended-gray:0.45000,1.00000"
+              }
+            }
+          ],
+          "glass": false,
+          "image-name": "main-halo.svg",
+          "name": "main-halo",
+          "opacity-specializations": [
+            {
+              "value": 0.42
+            },
+            {
+              "appearance": "tinted",
+              "value": 0.336
+            }
+          ]
+        },
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "extended-srgb:1.00000,1.00000,1.00000,1.00000"
+              }
+            },
+            {
+              "appearance": "tinted",
+              "value": {
+                "solid": "extended-gray:0.50000,1.00000"
+              }
+            }
+          ],
+          "glass": true,
+          "image-name": "main-backer.svg",
+          "name": "main-backer",
+          "opacity-specializations": [
+            {
+              "value": 0.22
+            },
+            {
+              "appearance": "tinted",
+              "value": 0.3
+            }
+          ]
+        }
+      ],
+      "lighting": "individual",
+      "name": "neon",
+      "refractivity": {
+        "depth": 0.4,
+        "enabled": true,
+        "strength": 0.35
+      },
+      "shadow-specializations": [
+        {
+          "value": {
+            "kind": "layer-color",
+            "opacity": 0.6
+          }
+        },
+        {
+          "appearance": "tinted",
+          "value": {
+            "kind": "neutral",
+            "opacity": 0.5
+          }
+        }
+      ],
+      "specular": true,
+      "translucency": {
+        "enabled": true,
+        "value": 0.3
+      }
+    },
+    {
+      "layers": [
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "extended-srgb:0.20000,0.15686,0.49804,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "extended-srgb:0.13725,0.10588,0.36863,1.00000"
+              }
+            },
+            {
+              "appearance": "tinted",
+              "value": {
+                "solid": "extended-gray:0.10000,1.00000"
+              }
+            }
+          ],
+          "glass": true,
+          "image-name": "bricks-b.svg",
+          "name": "bricks-b"
+        },
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "extended-srgb:0.16471,0.12941,0.43922,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "extended-srgb:0.10980,0.08627,0.31373,1.00000"
+              }
+            },
+            {
+              "appearance": "tinted",
+              "value": {
+                "solid": "extended-gray:0.07000,1.00000"
+              }
+            }
+          ],
+          "glass": true,
+          "image-name": "bricks-a.svg",
+          "name": "bricks-a"
+        }
+      ],
+      "lighting": "combined",
+      "name": "wall",
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.3
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": true,
+        "value": 0.2
+      }
+    }
+  ],
+  "supported-platforms": {
+    "squares": "shared"
+  }
+}

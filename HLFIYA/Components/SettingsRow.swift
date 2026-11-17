@@ -5,8 +5,9 @@
 
 import SwiftUI
 
-/// A Settings row with a colored icon, a title, and an optional external-link arrow.
+/// A Settings row with a Settings-app style icon, a title, and an optional external-link arrow.
 struct SettingsRow: View {
+    /// The symbol's plain name, such as "star". It is drawn filled on a square of `iconColor`.
     let iconName: String
     let iconColor: Color
     let title: LocalizedStringResource
@@ -18,16 +19,7 @@ struct SettingsRow: View {
                 ExternalLinkIndicator()
             }
         } label: {
-            Label {
-                // `Color.primary` rather than `.primary`, which inside a button
-                // resolves to the tint color.
-                Text(title)
-                    .foregroundStyle(Color.primary)
-            } icon: {
-                Image(systemName: iconName)
-                    .font(.title)
-                    .foregroundStyle(iconColor)
-            }
+            SettingsLabel(title: title, iconName: iconName, iconColor: iconColor)
         }
         .contentShape(.rect)
     }
@@ -36,10 +28,11 @@ struct SettingsRow: View {
 #Preview {
     Form {
         SettingsRow(
-            iconName: "heart.square.fill",
-            iconColor: .pink,
+            iconName: "heart",
+            iconColor: .fuchsia,
             title: "Rate on the App Store",
             showsExternalLinkIndicator: true
         )
+        SettingsRow(iconName: "trash", iconColor: .pink, title: "Delete Data")
     }
 }

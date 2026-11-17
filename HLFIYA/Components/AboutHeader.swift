@@ -11,11 +11,12 @@ struct AboutHeader: View {
 
     var body: some View {
         VStack {
-            Image(.HLF_1024)
+            // A flattened render of AppIcon.icon (light and dark). It already carries the
+            // system icon mask, so no clip shape is applied here.
+            Image(.appIcon)
                 .resizable()
                 .scaledToFit()
                 .frame(width: appIconSize, height: appIconSize)
-                .clipShape(.rect(cornerRadius: appIconSize / 5))
                 .shadow(radius: 10)
                 .accessibilityHidden(true)
 

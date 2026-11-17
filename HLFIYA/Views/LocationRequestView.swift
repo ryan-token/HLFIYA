@@ -36,7 +36,7 @@ struct LocationRequestView: View {
 
         let steps: [(step: IntroStep, delay: Duration)] = [
             (.getReady, .seconds(1)),
-            (.hot, .seconds(2)),
+            (.hot, .seconds(2.5)),
             (.local, .seconds(1)),
             (.food, .seconds(1)),
             (.buttons, .seconds(2))
