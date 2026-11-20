@@ -1,4 +1,6 @@
-# Hot Local Food
+<img src=".github/app-icon.png" width="128" height="128" alt="Hot Local Food app icon">
+
+# Hot Local Food: Find Dinner
 
 **Hot Local Food in Your Area**
 
